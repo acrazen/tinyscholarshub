@@ -10,6 +10,7 @@ import type { FeedPost } from '@/lib/types';
 import { formatDistanceToNow } from 'date-fns';
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 interface FeedItemCardProps {
   post: FeedPost;
@@ -114,13 +115,28 @@ export function FeedItemCard({ post }: FeedItemCardProps) {
         </div>
       </CardContent>
       <CardFooter className="flex justify-between p-4 border-t">
-        <Button variant="ghost" size="sm" className={`hover:text-primary ${isLikedByUser ? 'text-primary' : 'text-muted-foreground'}`} onClick={handleLike}>
-          <Heart className={`mr-2 h-4 w-4 ${isLikedByUser ? 'fill-primary' : ''}`} /> {currentLikes} Likes
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className={cn(isLikedByUser ? 'text-primary' : 'text-muted-foreground')} 
+          onClick={handleLike}
+        >
+          <Heart className={cn("mr-2 h-4 w-4", isLikedByUser ? 'fill-primary' : '')} /> {currentLikes} Likes
         </Button>
-        <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary" onClick={handleComment}>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="text-muted-foreground" 
+          onClick={handleComment}
+        >
           <MessageCircle className="mr-2 h-4 w-4" /> {currentCommentsCount} Comments
         </Button>
-        <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary" onClick={handleShare}>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="text-muted-foreground" 
+          onClick={handleShare}
+        >
           <Share2 className="mr-2 h-4 w-4" /> Share
         </Button>
       </CardFooter>
