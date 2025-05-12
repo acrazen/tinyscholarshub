@@ -62,3 +62,34 @@ export interface NavItem {
   icon: React.ElementType;
   active?: boolean;
 }
+
+export interface SchoolEvent {
+  id: string;
+  title: string;
+  date: string; // ISO date string
+  time?: string;
+  location: string;
+  description: string;
+  status: 'upcoming' | 'past' | 'cancelled';
+  isBooked?: boolean; // For UI state to show if the user has booked this event
+}
+
+export interface ResourceItem {
+  id: string;
+  title: string;
+  description: string;
+  type: 'pdf' | 'article' | 'video' | 'link';
+  url: string; // Link to the resource or a placeholder for download
+  icon: React.ElementType; // Specific lucide icon component
+  category: string; // E.g., "Parenting Tips", "Curriculum", "School Policies"
+}
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  address?: string; // Optional
+  profilePhotoUrl?: string;
+  role: 'Parent' | 'Teacher' | 'Admin'; // Example roles
+}

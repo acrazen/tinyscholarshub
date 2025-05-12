@@ -1,4 +1,5 @@
-import type { Student, FeedPost, Guardian, Milestone } from './types';
+import type { Student, FeedPost, Guardian, Milestone, SchoolEvent, ResourceItem, UserProfile } from './types';
+import { FileText, Youtube, Link as LinkIcon, BookOpen, UserCog } from 'lucide-react';
 
 const guardiansData: Guardian[] = [
   { id: 'g1', name: 'Alice Smith', relation: 'Mother', phoneNumber: '555-0101', email: 'alice.smith@example.com', profilePhotoUrl: 'https://picsum.photos/seed/g1/100/100' },
@@ -133,5 +134,115 @@ export const feedPostsData: FeedPost[] = [
     commentsCount: 2,
   },
 ];
+
+export const sampleSchoolEvents: SchoolEvent[] = [
+  {
+    id: 'ev1',
+    title: 'Annual Sports Day',
+    date: '2024-07-15',
+    time: '09:00 AM - 01:00 PM',
+    location: 'School Playground',
+    description: 'Join us for a fun-filled day of games and friendly competition. All families welcome!',
+    status: 'upcoming',
+    isBooked: false,
+  },
+  {
+    id: 'ev2',
+    title: 'Parent-Teacher Meeting (Butterflies)',
+    date: '2024-06-20',
+    time: '03:00 PM - 06:00 PM',
+    location: 'Butterflies Classroom',
+    description: 'Individual meetings to discuss your child\'s progress. Please book your slot.',
+    status: 'upcoming',
+    isBooked: true,
+  },
+  {
+    id: 'ev3',
+    title: 'Summer Art Camp Showcase',
+    date: '2024-08-05',
+    time: '11:00 AM',
+    location: 'School Hall',
+    description: 'See the amazing artwork created by our little artists during the summer camp.',
+    status: 'upcoming',
+    isBooked: false,
+  },
+  {
+    id: 'ev4',
+    title: 'Spring Fair',
+    date: '2024-04-12',
+    time: '10:00 AM - 02:00 PM',
+    location: 'School Grounds',
+    description: 'A wonderful day with stalls, games, and food. Thank you to everyone who attended!',
+    status: 'past',
+  },
+   {
+    id: 'ev5',
+    title: 'Science Fair Workshop',
+    date: '2024-09-10',
+    time: '02:00 PM',
+    location: 'School Library',
+    description: 'Cancelled due to unforeseen circumstances. We apologize for any inconvenience.',
+    status: 'cancelled',
+  }
+];
+
+export const sampleResources: ResourceItem[] = [
+  {
+    id: 'res1',
+    title: 'Healthy Eating Guide for Toddlers',
+    description: 'A comprehensive guide to nutrition for young children, including meal ideas.',
+    type: 'pdf',
+    url: '#', // Placeholder for actual PDF link
+    icon: FileText,
+    category: 'Health & Nutrition',
+  },
+  {
+    id: 'res2',
+    title: 'The Importance of Play in Early Childhood',
+    description: 'An insightful article on how play contributes to learning and development.',
+    type: 'article',
+    url: '#', // Placeholder for article link
+    icon: BookOpen,
+    category: 'Child Development',
+  },
+  {
+    id: 'res3',
+    title: 'DIY Craft Ideas for Kids',
+    description: 'A fun video tutorial with easy craft projects you can do at home.',
+    type: 'video',
+    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Placeholder video link
+    icon: Youtube,
+    category: 'Activities & Crafts',
+  },
+  {
+    id: 'res4',
+    title: 'School Calendar 2024-2025',
+    description: 'Download the official school academic calendar for the upcoming year.',
+    type: 'pdf',
+    url: '#',
+    icon: FileText,
+    category: 'School Information',
+  },
+  {
+    id: 'res5',
+    title: 'Local Library Resources',
+    description: 'Link to the local public library website for children\'s programs and books.',
+    type: 'link',
+    url: '#',
+    icon: LinkIcon,
+    category: 'Community Resources',
+  },
+];
+
+export const sampleUserProfile: UserProfile = {
+  id: 'user123',
+  name: 'Sarah Davis',
+  email: 'sarah.davis@example.com',
+  phoneNumber: '555-123-4567',
+  address: '123 Main Street, Anytown, USA 12345',
+  profilePhotoUrl: 'https://picsum.photos/seed/user123/200/200',
+  role: 'Parent',
+};
+
 
 export const getStudentById = (id: string): Student | undefined => studentsData.find(s => s.id === id);

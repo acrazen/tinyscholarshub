@@ -10,6 +10,7 @@ import {
   PlaneTakeoff,
   UserCircle2,
   ListChecks,
+  UserCog, // Added for My Profile
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
@@ -37,15 +38,21 @@ const moreItems: MoreItem[] = [
   { label: "Event Booking", icon: CalendarPlus, color: chartColors[4], href: "/more/event-booking" },
   { label: "Resources", icon: LibraryBig, color: chartColors[0], href: "/more/resources" },
   { label: "Travel", icon: PlaneTakeoff, color: chartColors[1], href: "#" },
-  { label: "Kid's Profile", icon: UserCircle2, color: chartColors[2], href: "/more/kids-profile" },
+  { label: "Kid's Profiles", icon: UserCircle2, color: chartColors[2], href: "/more/kids-profile" },
+  { label: "My Profile", icon: UserCog, color: chartColors[4], href: "/more/my-profile" }, // New Item
   { label: "Survey", icon: ListChecks, color: chartColors[3], href: "#" },
+  // Add two more dummy items to make it a 3x4 or adjust grid
+  { label: "Placeholder 1", icon: Award, color: chartColors[0], href: "#" },
+  { label: "Placeholder 2", icon: Megaphone, color: chartColors[1], href: "#" },
+
+
 ];
 
 export default function MorePage() {
   return (
     <div>
       <h1 className="text-3xl font-bold tracking-tight mb-6 text-center md:text-left">More Options</h1>
-      <div className="grid grid-cols-3 gap-2 sm:gap-3"> {/* Reduced gap for mobile, default gap for sm+ */}
+      <div className="grid grid-cols-3 gap-2 sm:gap-3">
         {moreItems.map((item) => (
           <Link href={item.href} key={item.label} legacyBehavior>
             <a className="block h-full">
