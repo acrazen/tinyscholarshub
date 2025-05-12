@@ -4,95 +4,95 @@
 
 @layer base {
   :root {
-    --background: 20 100% 98%; /* Light Peach White */
-    --foreground: 240 10% 25%; /* Dark, slightly cool gray-blue */
+    --background: 30 100% 97%; /* Very light, slightly warm off-white (Soft Peach) */
+    --foreground: 220 15% 25%; /* Deep, friendly navy blue */
 
     --card: 0 0% 100%; /* White */
-    --card-foreground: 240 10% 25%; /* Dark, slightly cool gray-blue */
+    --card-foreground: 220 15% 25%; /* Deep, friendly navy blue */
 
     --popover: 0 0% 100%; /* White */
-    --popover-foreground: 240 10% 25%; /* Dark, slightly cool gray-blue */
+    --popover-foreground: 220 15% 25%; /* Deep, friendly navy blue */
 
-    --primary: 340 80% 60%; /* Vibrant Pink/Rose */
+    --primary: 25 95% 55%; /* Playful Orange */
     --primary-foreground: 0 0% 100%; /* White */
 
-    --secondary: 170 70% 55%; /* Bright Turquoise/Cyan */
-    --secondary-foreground: 170 100% 10%; /* Very Dark Cyan */
+    --secondary: 190 70% 50%; /* Bright Teal */
+    --secondary-foreground: 0 0% 100%; /* White */
 
-    --muted: 20 50% 92%; /* Lighter Peach for muted backgrounds */
-    --muted-foreground: 240 10% 50%; /* Medium gray-blue for muted text */
+    --muted: 30 70% 94%; /* Lighter Peach for muted backgrounds */
+    --muted-foreground: 220 10% 45%; /* Medium navy-gray for muted text */
 
-    --accent: 45 100% 55%; /* Bright Sunny Yellow */
-    --accent-foreground: 45 100% 15%; /* Dark Brown/Black for text on yellow */
+    --accent: 320 80% 60%; /* Bright Pink/Magenta */
+    --accent-foreground: 0 0% 100%; /* White */
 
-    --destructive: 0 75% 55%; /* Vibrant Red */
-    --destructive-foreground: 0 0% 100%; /* White text on destructive */
+    --destructive: 0 80% 60%; /* Vibrant Red */
+    --destructive-foreground: 0 0% 100%; /* White */
 
-    --border: 20 30% 85%; /* Soft, warm border */
-    --input: 20 30% 95%; /* Very light warm input background */
-    --ring: 340 80% 65%; /* Lighter primary for focus rings */
+    --border: 30 50% 88%; /* Soft, peachy border */
+    --input: 30 50% 96%; /* Very light peachy input background */
+    --ring: 25 95% 60%; /* Lighter primary (orange) for focus rings */
 
-    --radius: 0.5rem;
+    --radius: 0.75rem; /* Slightly more rounded */
 
-    --sidebar-background: 20 100% 97%; /* Slightly darker than main background for depth */
-    --sidebar-foreground: 240 10% 30%;
-    --sidebar-primary: 340 80% 55%;
+    --sidebar-background: 30 100% 96%; 
+    --sidebar-foreground: 220 15% 30%;
+    --sidebar-primary: 25 90% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 45 100% 55%;
-    --sidebar-accent-foreground: 45 100% 15%;
-    --sidebar-border: 20 30% 80%;
-    --sidebar-ring: 340 80% 65%;
+    --sidebar-accent: 320 75% 55%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 30 40% 85%;
+    --sidebar-ring: 25 90% 60%;
 
-    --chart-1: 340 80% 60%; /* Primary - Vibrant Pink/Rose */
-    --chart-2: 170 70% 55%; /* Secondary - Bright Turquoise/Cyan */
-    --chart-3: 45 100% 55%; /* Accent - Bright Sunny Yellow */
-    --chart-4: 200 70% 60%; /* A nice Blue */
-    --chart-5: 280 60% 65%; /* A playful Purple */
+    --chart-1: 25 95% 55%;   /* Playful Orange */
+    --chart-2: 190 70% 50%;  /* Bright Teal */
+    --chart-3: 50 90% 55%;   /* Sunny Yellow */
+    --chart-4: 130 60% 55%;  /* Lime Green */
+    --chart-5: 270 70% 60%;  /* Vibrant Purple */
   }
 
   .dark {
-    --background: 240 10% 10%; 
-    --foreground: 20 100% 95%; 
+    --background: 220 20% 12%; /* Dark Navy */
+    --foreground: 30 100% 92%; /* Light Peach/Cream */
 
-    --card: 240 10% 15%; 
-    --card-foreground: 20 100% 95%; 
+    --card: 220 20% 15%; 
+    --card-foreground: 30 100% 92%;
 
-    --popover: 240 10% 12%; 
-    --popover-foreground: 20 100% 95%;
+    --popover: 220 20% 10%;
+    --popover-foreground: 30 100% 92%;
 
-    --primary: 340 70% 50%; 
-    --primary-foreground: 0 0% 100%; 
+    --primary: 25 85% 60%; /* Playful Orange (Dark Theme) */
+    --primary-foreground: 220 15% 15%; /* Darker for contrast on orange */
 
-    --secondary: 170 60% 45%; 
-    --secondary-foreground: 170 100% 90%; 
+    --secondary: 190 60% 55%; /* Bright Teal (Dark Theme) */
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 240 10% 20%; 
-    --muted-foreground: 20 30% 70%; 
+    --muted: 220 15% 20%; 
+    --muted-foreground: 30 50% 75%; 
 
-    --accent: 45 90% 50%; 
-    --accent-foreground: 45 100% 90%; 
+    --accent: 320 70% 65%; /* Bright Pink/Magenta (Dark Theme) */
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 65% 50%; 
-    --destructive-foreground: 0 0% 98%; 
+    --destructive: 0 70% 55%; 
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 240 10% 25%; 
-    --input: 240 10% 22%; 
-    --ring: 340 70% 55%; 
+    --border: 220 15% 25%;
+    --input: 220 15% 18%;
+    --ring: 25 85% 65%;
 
-    --sidebar-background: 240 10% 8%;
-    --sidebar-foreground: 20 100% 93%;
-    --sidebar-primary: 340 70% 45%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 45 90% 50%;
-    --sidebar-accent-foreground: 45 100% 90%;
-    --sidebar-border: 240 10% 20%;
-    --sidebar-ring: 340 70% 55%;
-
-    --chart-1: 340 70% 50%;
-    --chart-2: 170 60% 45%;
-    --chart-3: 45 90% 50%;
-    --chart-4: 200 60% 50%;
-    --chart-5: 280 50% 55%;
+    --sidebar-background: 220 20% 10%;
+    --sidebar-foreground: 30 100% 90%;
+    --sidebar-primary: 25 80% 55%;
+    --sidebar-primary-foreground: 220 15% 10%;
+    --sidebar-accent: 320 65% 60%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 220 15% 22%;
+    --sidebar-ring: 25 80% 65%;
+    
+    --chart-1: 25 85% 60%;
+    --chart-2: 190 60% 55%;
+    --chart-3: 50 80% 60%;
+    --chart-4: 130 50% 60%;
+    --chart-5: 270 60% 65%;
   }
 }
 
