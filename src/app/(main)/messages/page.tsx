@@ -98,7 +98,7 @@ export default function MessagesPage() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-var(--header-height,8rem))] md:h-[calc(100vh-var(--header-height,5rem)-2rem)]"> {/* Adjusted height calculation */}
-      <div className="flex items-center justify-between p-4 border-b md:hidden">
+      <div className="flex items-center justify-between p-4 border-b border-muted md:hidden">
         <h1 className="text-2xl font-bold flex items-center"><MessageSquare className="mr-2 h-6 w-6 text-primary" /> Messages</h1>
         <Button variant="ghost" size="icon"><Settings2 className="h-5 w-5" /></Button>
       </div>
@@ -106,10 +106,10 @@ export default function MessagesPage() {
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar - Conversation List (hidden on mobile if a chat is selected, full width otherwise) */}
         <aside className={cn(
-          "w-full md:w-1/3 lg:w-1/4 border-r flex flex-col bg-card",
+          "w-full md:w-1/3 lg:w-1/4 border-r border-muted flex flex-col bg-card",
           selectedConversationId && "hidden md:flex" // Hide on mobile if a chat is selected
         )}>
-          <div className="p-4 border-b hidden md:block">
+          <div className="p-4 border-b border-muted hidden md:block">
              <h1 className="text-xl font-semibold flex items-center"><MessageSquare className="mr-2 h-5 w-5 text-primary" /> Messages</h1>
           </div>
           <div className="p-2">
@@ -158,7 +158,7 @@ export default function MessagesPage() {
         )}>
           {selectedConversation ? (
             <>
-              <header className="p-4 border-b bg-card flex items-center space-x-3">
+              <header className="p-4 border-b border-muted bg-card flex items-center space-x-3">
                  <Button variant="ghost" size="icon" className="md:hidden mr-2" onClick={() => setSelectedConversationId(null)}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
                  </Button>
@@ -171,7 +171,7 @@ export default function MessagesPage() {
                   <p className="text-xs text-muted-foreground">{selectedConversation.participantRole || 'Online'}</p>
                 </div>
               </header>
-              <ScrollArea className="flex-1 p-4 space-y-4">
+              <ScrollArea className="flex-1 p-4 space-y-3"> {/* Reduced space-y from 4 to 3 */}
                 {messages.map(msg => (
                   <div key={msg.id} className={cn("flex items-end space-x-2", msg.sender === 'user' ? "justify-end" : "")}>
                     {msg.sender === 'other' && (
@@ -199,7 +199,7 @@ export default function MessagesPage() {
                 ))}
                 <div ref={messagesEndRef} />
               </ScrollArea>
-              <form onSubmit={handleSendMessage} className="p-4 border-t bg-card flex items-center space-x-2">
+              <form onSubmit={handleSendMessage} className="p-4 border-t border-muted bg-card flex items-center space-x-2">
                 <Button variant="ghost" size="icon" type="button">
                   <Paperclip className="h-5 w-5 text-muted-foreground" />
                   <span className="sr-only">Attach file</span>
