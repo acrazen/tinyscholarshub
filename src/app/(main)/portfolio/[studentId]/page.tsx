@@ -1,3 +1,4 @@
+// src/app/(main)/portfolio/[studentId]/page.tsx
 import { getStudentById } from '@/lib/data';
 import { StudentProfileView } from '@/components/profile/student-profile-view';
 import { GuardianContactCard } from '@/components/profile/guardian-contact-card';
@@ -8,11 +9,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
-interface StudentDetailPageProps {
+interface PortfolioDetailPageProps {
   params: { studentId: string };
 }
 
-export default function StudentDetailPage({ params }: StudentDetailPageProps) {
+export default function PortfolioDetailPage({ params }: PortfolioDetailPageProps) {
   const student = getStudentById(params.studentId);
 
   if (!student) {
@@ -20,9 +21,9 @@ export default function StudentDetailPage({ params }: StudentDetailPageProps) {
       <div className="flex flex-col items-center justify-center h-[60vh]">
         <AlertTriangle className="w-16 h-16 text-destructive mb-4" />
         <h1 className="text-2xl font-semibold mb-2">Student Not Found</h1>
-        <p className="text-muted-foreground mb-6">The student you are looking for does not exist.</p>
-        <Link href="/students">
-          <Button variant="outline">Back to Students List</Button>
+        <p className="text-muted-foreground mb-6">The student portfolio you are looking for does not exist.</p>
+        <Link href="/portfolio">
+          <Button variant="outline">Back to Portfolios</Button>
         </Link>
       </div>
     );
@@ -31,7 +32,7 @@ export default function StudentDetailPage({ params }: StudentDetailPageProps) {
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">{`${student.firstName} ${student.lastName}`}</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{`${student.firstName} ${student.lastName}'s Portfolio`}</h1>
         <p className="text-muted-foreground md:mt-0 mt-1">Class: {student.className}</p>
       </div>
       

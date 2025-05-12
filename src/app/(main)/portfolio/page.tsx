@@ -1,17 +1,22 @@
+// src/app/(main)/portfolio/page.tsx
 import Link from 'next/link';
 import Image from 'next/image';
 import { studentsData } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, FolderKanban } from 'lucide-react';
 
-export default function StudentsListPage() {
-  const students = studentsData; // Fetch or import students data
+export default function PortfolioListPage() {
+  const students = studentsData; 
 
   return (
     <div>
-      <h1 className="text-3xl font-bold tracking-tight mb-8 text-center md:text-left">Our Little Scholars</h1>
+      <div className="flex items-center justify-center md:justify-start space-x-2 mb-8 text-center md:text-left">
+        <FolderKanban className="h-8 w-8 text-primary" />
+        <h1 className="text-3xl font-bold tracking-tight">Student Portfolios</h1>
+      </div>
+      
       {students.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {students.map((student) => (
@@ -31,9 +36,9 @@ export default function StudentsListPage() {
               <CardContent className="p-4">
                 <CardTitle className="text-lg mb-1">{`${student.firstName} ${student.lastName}`}</CardTitle>
                 <p className="text-sm text-muted-foreground mb-3">Class: {student.className}</p>
-                <Link href={`/students/${student.id}`} passHref>
+                <Link href={`/portfolio/${student.id}`} passHref>
                   <Button variant="outline" className="w-full">
-                    View Profile <ArrowRight className="ml-2 h-4 w-4" />
+                    View Portfolio <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
               </CardContent>
@@ -42,7 +47,7 @@ export default function StudentsListPage() {
         </div>
       ) : (
         <div className="text-center py-10">
-          <p className="text-muted-foreground">No students found.</p>
+          <p className="text-muted-foreground">No student portfolios found.</p>
         </div>
       )}
     </div>

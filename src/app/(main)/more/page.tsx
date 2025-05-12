@@ -10,8 +10,9 @@ import {
   PlaneTakeoff, // For Travel Declaration
   UserCircle2, // For Kid's Profile (was UserCog for My Profile)
   ListChecks, // For Survey
-  Receipt, // For Statement of Account (New)
-  FilePenLine, // For eService (New)
+  Receipt, // For Statement of Account
+  FilePenLine, // For eService
+  Settings, // For Settings
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
@@ -39,10 +40,11 @@ const moreItems: MoreItem[] = [
   { label: "Event Booking", icon: CalendarPlus, color: chartColors[4], href: "/more/event-booking" },
   { label: "Resources", icon: LibraryBig, color: chartColors[0], href: "/more/resources" },
   { label: "Travel Declaration", icon: PlaneTakeoff, color: chartColors[1], href: "#" },
-  { label: "Kid's Profile", icon: UserCircle2, color: chartColors[2], href: "/students" }, 
+  { label: "Kid's Profile", icon: UserCircle2, color: chartColors[2], href: "/portfolio" }, 
   { label: "Survey", icon: ListChecks, color: chartColors[3], href: "#" },
   { label: "Statement of Account", icon: Receipt, color: chartColors[4], href: "/more/statement-of-account" },
   { label: "eService", icon: FilePenLine, color: chartColors[0], href: "/more/eservice" },
+  { label: "Settings", icon: Settings, color: chartColors[1], href: "/more/settings" }, // New item
 ];
 
 export default function MorePage() {

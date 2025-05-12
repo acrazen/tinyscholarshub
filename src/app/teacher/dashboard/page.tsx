@@ -44,15 +44,15 @@ export default function TeacherDashboardPage() {
           <CardHeader>
             <CardTitle className="flex items-center text-xl">
               <Users className="mr-2 h-5 w-5 text-primary" />
-              My Students
+              My Students (Portfolios)
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              View student profiles and track their progress.
+              View student portfolios and track their progress.
             </p>
-            <Link href="/students" passHref> {/* Links to the general student list for now */}
-              <Button className="w-full" variant="secondary">View Students</Button>
+            <Link href="/portfolio" passHref> 
+              <Button className="w-full" variant="secondary">View Portfolios</Button>
             </Link>
           </CardContent>
         </Card>

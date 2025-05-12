@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Contact, GraduationCap, LayoutGrid, Menu, MessageSquare } from 'lucide-react';
+import { Home, FolderKanban, GraduationCap, LayoutGrid, Menu, MessageSquare, Settings } from 'lucide-react';
 import { Logo } from '@/components/icons/logo';
 import type { NavItem } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -13,10 +13,9 @@ import { useState } from 'react';
 
 const navItems: NavItem[] = [
   { href: '/', label: 'Home', icon: Home },
-  { href: '/students', label: 'Students', icon: Contact },
+  { href: '/portfolio', label: 'Portfolio', icon: FolderKanban },
+  { href: '/my-learning', label: 'My Learning', icon: GraduationCap },
   { href: '/messages', label: 'Messages', icon: MessageSquare },
-  // Smart Update is now under /teacher path
-  // { href: '/smart-update', label: 'My Learning', icon: GraduationCap }, 
   { href: '/more', label: 'More', icon: LayoutGrid },
 ];
 

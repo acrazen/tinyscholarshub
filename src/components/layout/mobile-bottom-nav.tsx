@@ -3,16 +3,15 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Contact, GraduationCap, LayoutGrid, MessageSquare } from 'lucide-react';
+import { Home, FolderKanban, GraduationCap, LayoutGrid, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { NavItem } from '@/lib/types';
 
 const navItems: NavItem[] = [
   { href: '/', label: 'Home', icon: Home },
-  { href: '/students', label: 'Students', icon: Contact },
+  { href: '/portfolio', label: 'Portfolio', icon: FolderKanban },
+  { href: '/my-learning', label: 'My Learning', icon: GraduationCap },
   { href: '/messages', label: 'Messages', icon: MessageSquare },
-  // Smart Update is now under /teacher path
-  // { href: '/smart-update', label: 'My Learning', icon: GraduationCap },
   { href: '/more', label: 'More', icon: LayoutGrid },
 ];
 
@@ -26,13 +25,12 @@ export function MobileBottomNav() {
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
     // For messages and more, check exact path, otherwise startsWith
-    if (href === '/messages' || href === '/more') return pathname === href;
+    if (href === '/messages' || href === '/more' || href === '/my-learning') return pathname === href;
     return pathname.startsWith(href);
   };
 
   // Determine number of items for grid layout
   const itemCount = currentNavItems.length;
-  const gridColsClass = `grid-cols-${itemCount}`; // e.g. grid-cols-4, grid-cols-5
   // Tailwind JIT needs full class names, so we might need to map this explicitly
   // For now, using flex justify-around will work better for dynamic item counts
 
