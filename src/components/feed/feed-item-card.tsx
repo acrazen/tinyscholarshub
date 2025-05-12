@@ -1,3 +1,6 @@
+// src/components/feed/feed-item-card.tsx
+"use client";
+
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -5,13 +8,63 @@ import { Button } from "@/components/ui/button";
 import { Heart, MessageCircle, Share2, Video, Image as ImageIcon } from 'lucide-react';
 import type { FeedPost } from '@/lib/types';
 import { formatDistanceToNow } from 'date-fns';
+import { useState, useEffect } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 interface FeedItemCardProps {
   post: FeedPost;
 }
 
 export function FeedItemCard({ post }: FeedItemCardProps) {
-  const timeAgo = formatDistanceToNow(new Date(post.timestamp), { addSuffix: true });
+  const [timeAgo, setTimeAgo] = useState('');
+  const [currentLikes, setCurrentLikes] = useState(post.likes);
+  const [isLikedByUser, setIsLikedByUser] = useState(false); // In a real app, this would come from user data
+  const [currentCommentsCount, setCurrentCommentsCount] = useState(post.commentsCount);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    setTimeAgo(formatDistanceToNow(new Date(post.timestamp), { addSuffix: true }));
+  }, [post.timestamp]);
+
+
+  const handleLike = () => {
+    if (isLikedByUser) {
+      setCurrentLikes(prev => prev - 1);
+    } else {
+      setCurrentLikes(prev => prev + 1);
+    }
+    setIsLikedByUser(prev => !prev);
+    // In a real app, you would also send an update to the backend here.
+  };
+
+  const handleComment = () => {
+    // For now, just increment count and show a toast.
+    // In a real app, this would open a comment modal or section.
+    setCurrentCommentsCount(prev => prev + 1);
+    toast({
+      title: "Comment Added (Simulated)",
+      description: "In a real app, you could type your comment here!",
+    });
+  };
+
+  const handleShare = () => {
+    // In a real app, this would open a share dialog.
+    navigator.clipboard.writeText(`${post.description} - Check out this post!`)
+      .then(() => {
+        toast({
+          title: "Shared! (Link Copied)",
+          description: "Post content copied to clipboard.",
+        });
+      })
+      .catch(() => {
+         toast({
+          title: "Share via Link",
+          description: "Feature to share not fully implemented. Content available in console.",
+        });
+        console.log("Share content:", post.description);
+      });
+  };
+
 
   return (
     <Card className="overflow-hidden shadow-lg rounded-xl">
@@ -22,7 +75,7 @@ export function FeedItemCard({ post }: FeedItemCardProps) {
         </Avatar>
         <div>
           <CardTitle className="text-base font-semibold">{post.author.name}</CardTitle>
-          <CardDescription className="text-xs">{timeAgo}</CardDescription>
+          <CardDescription className="text-xs">{timeAgo || 'Calculating time...'}</CardDescription>
         </div>
       </CardHeader>
       <CardContent className="p-0">
@@ -61,13 +114,13 @@ export function FeedItemCard({ post }: FeedItemCardProps) {
         </div>
       </CardContent>
       <CardFooter className="flex justify-between p-4 border-t">
-        <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary">
-          <Heart className="mr-2 h-4 w-4" /> {post.likes} Likes
+        <Button variant="ghost" size="sm" className={`hover:text-primary ${isLikedByUser ? 'text-primary' : 'text-muted-foreground'}`} onClick={handleLike}>
+          <Heart className={`mr-2 h-4 w-4 ${isLikedByUser ? 'fill-primary' : ''}`} /> {currentLikes} Likes
         </Button>
-        <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary">
-          <MessageCircle className="mr-2 h-4 w-4" /> {post.commentsCount} Comments
+        <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary" onClick={handleComment}>
+          <MessageCircle className="mr-2 h-4 w-4" /> {currentCommentsCount} Comments
         </Button>
-        <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary">
+        <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary" onClick={handleShare}>
           <Share2 className="mr-2 h-4 w-4" /> Share
         </Button>
       </CardFooter>

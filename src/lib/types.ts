@@ -1,3 +1,5 @@
+import type { LucideIcon } from 'lucide-react';
+
 export interface Guardian {
   id: string;
   name: string;
@@ -59,8 +61,9 @@ export interface FeedPost {
 export interface NavItem {
   href: string;
   label: string;
-  icon: React.ElementType;
+  icon: LucideIcon; // Using LucideIcon type directly
   active?: boolean;
+  roles?: ('parent' | 'teacher' | 'admin')[]; // Optional: for role-based visibility
 }
 
 export interface SchoolEvent {
@@ -80,7 +83,7 @@ export interface ResourceItem {
   description: string;
   type: 'pdf' | 'article' | 'video' | 'link';
   url: string; // Link to the resource or a placeholder for download
-  icon: React.ElementType; // Specific lucide icon component
+  icon: LucideIcon; // Specific lucide icon component
   category: string; // E.g., "Parenting Tips", "Curriculum", "School Policies"
 }
 
@@ -92,4 +95,22 @@ export interface UserProfile {
   address?: string; // Optional
   profilePhotoUrl?: string;
   role: 'Parent' | 'Teacher' | 'Admin'; // Example roles
+}
+
+export interface ChatMessage {
+  id: string;
+  sender: 'user' | 'other'; // 'user' is the current user, 'other' is the person they're chatting with
+  text: string;
+  timestamp: string; // ISO date string
+  avatarUrl?: string; // Optional avatar for the 'other' person
+}
+
+export interface Conversation {
+  id: string;
+  participantName: string;
+  participantRole?: string; // e.g., "Teacher - Butterflies Class"
+  lastMessage: string;
+  lastMessageTimestamp: string; // ISO date string
+  avatarUrl?: string;
+  unreadCount?: number;
 }

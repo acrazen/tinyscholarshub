@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Contact, GraduationCap, LayoutGrid, Menu } from 'lucide-react';
+import { Home, Contact, GraduationCap, LayoutGrid, Menu, MessageSquare } from 'lucide-react';
 import { Logo } from '@/components/icons/logo';
 import type { NavItem } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -14,13 +14,22 @@ import { useState } from 'react';
 const navItems: NavItem[] = [
   { href: '/', label: 'Home', icon: Home },
   { href: '/students', label: 'Students', icon: Contact },
-  { href: '/smart-update', label: 'My Learning', icon: GraduationCap },
+  { href: '/messages', label: 'Messages', icon: MessageSquare },
+  // Smart Update is now under /teacher path
+  // { href: '/smart-update', label: 'My Learning', icon: GraduationCap }, 
   { href: '/more', label: 'More', icon: LayoutGrid },
 ];
+
 
 export function AppHeader() {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Filter nav items based on current path context (e.g. if in /teacher or /admin)
+  // For now, this header is primarily for the (main) parent layout.
+  // Teacher/Admin layouts might have their own headers or customize these items.
+  const currentNavItems = navItems;
+
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -30,15 +39,15 @@ export function AppHeader() {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-2 lg:space-x-4">
-          {navItems.map((item) => (
+        <nav className="hidden md:flex items-center space-x-1 lg:space-x-2 flex-wrap">
+          {currentNavItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "text-sm font-medium transition-colors hover:text-primary",
+                "px-2 py-1 text-sm font-medium transition-colors hover:text-primary rounded-md",
                 pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
-                  ? "text-primary"
+                  ? "text-primary bg-primary/10"
                   : "text-muted-foreground"
               )}
             >
@@ -63,7 +72,7 @@ export function AppHeader() {
                 </Link>
               </div>
               <nav className="flex flex-col space-y-1 px-4">
-                {navItems.map((item) => (
+                {currentNavItems.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}

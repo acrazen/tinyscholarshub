@@ -8,9 +8,11 @@ import {
   CalendarPlus,
   LibraryBig,
   PlaneTakeoff,
-  UserCircle2,
+  // UserCircle2, // Removed as "Kid's Profiles" (management) is now admin
+  UserCog, 
   ListChecks,
-  UserCog, // Added for My Profile
+  Settings, // Example for another item
+  HelpCircle, // Example for another item
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
@@ -37,15 +39,15 @@ const moreItems: MoreItem[] = [
   { label: "eConsent", icon: FileSignature, color: chartColors[3], href: "#" },
   { label: "Event Booking", icon: CalendarPlus, color: chartColors[4], href: "/more/event-booking" },
   { label: "Resources", icon: LibraryBig, color: chartColors[0], href: "/more/resources" },
-  { label: "Travel", icon: PlaneTakeoff, color: chartColors[1], href: "#" },
-  { label: "Kid's Profiles", icon: UserCircle2, color: chartColors[2], href: "/more/kids-profile" },
-  { label: "My Profile", icon: UserCog, color: chartColors[4], href: "/more/my-profile" }, // New Item
-  { label: "Survey", icon: ListChecks, color: chartColors[3], href: "#" },
-  // Add two more dummy items to make it a 3x4 or adjust grid
-  { label: "Placeholder 1", icon: Award, color: chartColors[0], href: "#" },
-  { label: "Placeholder 2", icon: Megaphone, color: chartColors[1], href: "#" },
-
-
+  { label: "My Profile", icon: UserCog, color: chartColors[1], href: "/more/my-profile" }, 
+  { label: "Travel Plans", icon: PlaneTakeoff, color: chartColors[2], href: "#" },
+  { label: "Take Survey", icon: ListChecks, color: chartColors[3], href: "#" },
+  { label: "Settings", icon: Settings, color: chartColors[4], href: "#" },
+  { label: "Help & FAQ", icon: HelpCircle, color: chartColors[0], href: "#" },
+  // Removed "Kid's Profiles" as it's now an admin feature (/admin/manage-students)
+  // Parents can see students via the main /students tab
+  // Adjust grid or add more items if layout looks sparse
+   { label: "Placeholder", icon: Award, color: chartColors[1], href: "#" },
 ];
 
 export default function MorePage() {

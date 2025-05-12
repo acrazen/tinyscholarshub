@@ -1,16 +1,19 @@
-// src/app/(main)/more/kids-profile/page.tsx
+// src/app/admin/manage-students/page.tsx
+// This page was formerly src/app/(main)/more/kids-profile/page.tsx
+// It's now an admin/teacher feature to manage all student profiles.
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { UserCircle2, UserPlus, ArrowRight, Edit3, ShieldAlert } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { studentsData } from '@/lib/data';
+import { studentsData } from '@/lib/data'; // In a real app, fetch this based on admin rights
 import type { Student } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
 
-export default function KidsProfileManagementPage() {
-  const kids = studentsData; // Using all students as "my kids" for demo purposes
+export default function ManageStudentsPage() {
+  const kids = studentsData; // Admins/Teachers see all students
 
   return (
     <div className="space-y-8">
@@ -18,14 +21,14 @@ export default function KidsProfileManagementPage() {
         <div>
             <div className="flex items-center justify-center md:justify-start space-x-2 mb-2">
                 <UserCircle2 className="h-8 w-8 text-primary" />
-                <h1 className="text-3xl font-bold tracking-tight">Kid's Profiles</h1>
+                <h1 className="text-3xl font-bold tracking-tight">Manage Student Profiles</h1>
             </div>
             <p className="text-muted-foreground max-w-xl">
-            View and manage your children's profiles, update their information, and track their progress.
+            Add, view, and manage all student profiles in the school system.
             </p>
         </div>
         <Button className="mt-4 md:mt-0">
-          <UserPlus className="mr-2 h-5 w-5" /> Add New Child
+          <UserPlus className="mr-2 h-5 w-5" /> Add New Student
         </Button>
       </div>
 
@@ -61,6 +64,7 @@ export default function KidsProfileManagementPage() {
               </CardContent>
               <div className="p-4 border-t mt-auto">
                 <div className="flex space-x-2">
+                    {/* Link to the general student detail page, accessible by multiple roles */}
                     <Link href={`/students/${kid.id}`} passHref className="flex-1">
                         <Button variant="outline" className="w-full">
                         View Full Profile <ArrowRight className="ml-2 h-4 w-4" />
@@ -77,8 +81,8 @@ export default function KidsProfileManagementPage() {
       ) : (
         <div className="text-center py-10">
           <UserCircle2 className="mx-auto h-12 w-12 text-muted-foreground" />
-          <h3 className="mt-2 text-sm font-medium text-foreground">No child profiles found</h3>
-          <p className="mt-1 text-sm text-muted-foreground">Get started by adding a child's profile.</p>
+          <h3 className="mt-2 text-sm font-medium text-foreground">No student profiles found</h3>
+          <p className="mt-1 text-sm text-muted-foreground">Get started by adding a student's profile.</p>
         </div>
       )}
     </div>
