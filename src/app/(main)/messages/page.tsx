@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MessageSquare, Send, Paperclip, Search, Settings2 } from 'lucide-react';
+import { MessageSquare, Send, Paperclip, Search, Settings2, ArrowLeft } from 'lucide-react';
 import type { Conversation, ChatMessage } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -91,6 +91,12 @@ export default function MessagesPage() {
     } else {
         sampleMessages[selectedConversationId] = [newMsg];
     }
+    // Update conversation's last message for the sidebar
+    const convoIndex = sampleConversations.findIndex(c => c.id === selectedConversationId);
+    if (convoIndex !== -1) {
+        sampleConversations[convoIndex].lastMessage = newMessage;
+        sampleConversations[convoIndex].lastMessageTimestamp = new Date().toISOString();
+    }
     setNewMessage('');
   };
 
@@ -104,10 +110,10 @@ export default function MessagesPage() {
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar - Conversation List (hidden on mobile if a chat is selected, full width otherwise) */}
+        {/* Sidebar - Conversation List */}
         <aside className={cn(
           "w-full md:w-1/3 lg:w-1/4 border-r border-muted flex flex-col bg-card",
-          selectedConversationId && "hidden md:flex" // Hide on mobile if a chat is selected
+          selectedConversationId && "hidden md:flex" 
         )}>
           <div className="p-4 border-b border-muted hidden md:block">
              <h1 className="text-xl font-semibold flex items-center"><MessageSquare className="mr-2 h-5 w-5 text-primary" /> Messages</h1>
@@ -154,13 +160,13 @@ export default function MessagesPage() {
         {/* Main Chat Area */}
         <main className={cn(
           "flex-1 flex flex-col bg-background",
-          !selectedConversationId && "hidden md:flex" // Hide on mobile if no chat is selected
+          !selectedConversationId && "hidden md:flex"
         )}>
           {selectedConversation ? (
             <>
               <header className="p-4 border-b border-muted bg-card flex items-center space-x-3">
                  <Button variant="ghost" size="icon" className="md:hidden mr-2" onClick={() => setSelectedConversationId(null)}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                    <ArrowLeft className="h-5 w-5"/>
                  </Button>
                 <Avatar className="h-10 w-10">
                   <AvatarImage src={selectedConversation.avatarUrl} alt={selectedConversation.participantName} data-ai-hint="person chat avatar" />
@@ -171,9 +177,12 @@ export default function MessagesPage() {
                   <p className="text-xs text-muted-foreground">{selectedConversation.participantRole || 'Online'}</p>
                 </div>
               </header>
-              <ScrollArea className="flex-1 p-4 space-y-3"> {/* Reduced space-y from 4 to 3 */}
+              <ScrollArea className="flex-1 p-4"> {/* Removed space-y-3 */}
                 {messages.map(msg => (
-                  <div key={msg.id} className={cn("flex items-end space-x-2", msg.sender === 'user' ? "justify-end" : "")}>
+                  <div key={msg.id} className={cn(
+                    "flex items-end space-x-2 mb-4", // Added mb-4 for vertical spacing
+                    msg.sender === 'user' ? "justify-end" : ""
+                  )}>
                     {msg.sender === 'other' && (
                       <Avatar className="h-8 w-8 self-start">
                         <AvatarImage src={msg.avatarUrl} data-ai-hint="chat participant avatar"/>
@@ -181,11 +190,11 @@ export default function MessagesPage() {
                       </Avatar>
                     )}
                     <div className={cn(
-                      "p-3 rounded-xl max-w-xs lg:max-w-md break-words",
-                      msg.sender === 'user' ? "bg-primary text-primary-foreground rounded-br-none" : "bg-muted text-foreground rounded-bl-none"
+                      "p-3 rounded-xl max-w-xs lg:max-w-md break-words shadow", // Added shadow for depth
+                      msg.sender === 'user' ? "bg-primary text-primary-foreground rounded-br-none" : "bg-card text-card-foreground rounded-bl-none border border-muted" // Use card for received, with border
                     )}>
                       <p className="text-sm">{msg.text}</p>
-                       <p className={cn("text-xs mt-1", msg.sender === 'user' ? 'text-primary-foreground/70 text-right' : 'text-muted-foreground/70 text-left')}>
+                       <p className={cn("text-xs mt-1", msg.sender === 'user' ? 'text-primary-foreground/70 text-right' : 'text-muted-foreground text-left')}>
                         {format(new Date(msg.timestamp), 'p')}
                       </p>
                     </div>
