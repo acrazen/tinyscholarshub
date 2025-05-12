@@ -2,103 +2,97 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: Arial, Helvetica, sans-serif;
-}
-
 @layer base {
   :root {
-    --background: 210 60% 98%; /* Very light, slightly cool off-white */
-    --foreground: 215 40% 20%; /* Dark, desaturated blue */
+    --background: 20 100% 98%; /* Light Peach White */
+    --foreground: 240 10% 25%; /* Dark, slightly cool gray-blue */
 
     --card: 0 0% 100%; /* White */
-    --card-foreground: 215 40% 20%; /* Dark, desaturated blue */
+    --card-foreground: 240 10% 25%; /* Dark, slightly cool gray-blue */
 
     --popover: 0 0% 100%; /* White */
-    --popover-foreground: 215 40% 20%; /* Dark, desaturated blue */
+    --popover-foreground: 240 10% 25%; /* Dark, slightly cool gray-blue */
 
-    --primary: 200 70% 65%; /* Pastel Blue - for primary actions like buttons */
-    --primary-foreground: 210 100% 10%; /* Very dark blue for text on primary */
+    --primary: 340 80% 60%; /* Vibrant Pink/Rose */
+    --primary-foreground: 0 0% 100%; /* White */
 
-    --secondary: 122 45% 78%; /* Pastel Green - for secondary actions or elements */
-    --secondary-foreground: 120 35% 20%; /* Dark green for text on secondary */
+    --secondary: 170 70% 55%; /* Bright Turquoise/Cyan */
+    --secondary-foreground: 170 100% 10%; /* Very Dark Cyan */
 
-    --muted: 210 50% 94%; /* Lighter cool gray/blue for muted backgrounds */
-    --muted-foreground: 210 30% 55%; /* Medium desaturated blue for muted text */
+    --muted: 20 50% 92%; /* Lighter Peach for muted backgrounds */
+    --muted-foreground: 240 10% 50%; /* Medium gray-blue for muted text */
 
-    --accent: 55 100% 63%; /* Cheerful Yellow - for accents and highlights */
-    --accent-foreground: 50 100% 15%; /* Dark brown/black for text on yellow */
+    --accent: 45 100% 55%; /* Bright Sunny Yellow */
+    --accent-foreground: 45 100% 15%; /* Dark Brown/Black for text on yellow */
 
-    --destructive: 0 70% 60%; /* Standard red for destructive actions */
+    --destructive: 0 75% 55%; /* Vibrant Red */
     --destructive-foreground: 0 0% 100%; /* White text on destructive */
 
-    --border: 210 40% 88%; /* Soft, light cool border */
-    --input: 210 40% 95%; /* Very light cool input background */
-    --ring: 205 70% 55%; /* More vibrant blue for focus rings */
+    --border: 20 30% 85%; /* Soft, warm border */
+    --input: 20 30% 95%; /* Very light warm input background */
+    --ring: 340 80% 65%; /* Lighter primary for focus rings */
 
     --radius: 0.5rem;
 
-    /* Keeping sidebar variables for potential future use or consistency, themed similarly */
-    --sidebar-background: 210 60% 97%; /* Slightly darker than main background for depth */
-    --sidebar-foreground: 215 40% 25%;
-    --sidebar-primary: 200 70% 60%;
-    --sidebar-primary-foreground: 210 100% 10%;
-    --sidebar-accent: 55 100% 63%;
-    --sidebar-accent-foreground: 50 100% 15%;
-    --sidebar-border: 210 40% 85%;
-    --sidebar-ring: 205 70% 55%;
+    --sidebar-background: 20 100% 97%; /* Slightly darker than main background for depth */
+    --sidebar-foreground: 240 10% 30%;
+    --sidebar-primary: 340 80% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 45 100% 55%;
+    --sidebar-accent-foreground: 45 100% 15%;
+    --sidebar-border: 20 30% 80%;
+    --sidebar-ring: 340 80% 65%;
 
-    --chart-1: 200 70% 65%; /* Primary */
-    --chart-2: 122 45% 78%; /* Secondary */
-    --chart-3: 55 100% 63%; /* Accent */
-    --chart-4: 25 80% 60%; /* A warm orange */
-    --chart-5: 300 60% 70%; /* A soft purple */
+    --chart-1: 340 80% 60%; /* Primary - Vibrant Pink/Rose */
+    --chart-2: 170 70% 55%; /* Secondary - Bright Turquoise/Cyan */
+    --chart-3: 45 100% 55%; /* Accent - Bright Sunny Yellow */
+    --chart-4: 200 70% 60%; /* A nice Blue */
+    --chart-5: 280 60% 65%; /* A playful Purple */
   }
 
   .dark {
-    /* Define a basic dark theme based on the light theme's structure */
-    --background: 215 30% 15%;
-    --foreground: 210 40% 95%;
+    --background: 240 10% 10%; 
+    --foreground: 20 100% 95%; 
 
-    --card: 215 30% 20%;
-    --card-foreground: 210 40% 95%;
+    --card: 240 10% 15%; 
+    --card-foreground: 20 100% 95%; 
 
-    --popover: 215 30% 18%;
-    --popover-foreground: 210 40% 95%;
+    --popover: 240 10% 12%; 
+    --popover-foreground: 20 100% 95%;
 
-    --primary: 200 65% 55%;
-    --primary-foreground: 210 100% 90%;
+    --primary: 340 70% 50%; 
+    --primary-foreground: 0 0% 100%; 
 
-    --secondary: 122 40% 45%;
-    --secondary-foreground: 120 30% 90%;
+    --secondary: 170 60% 45%; 
+    --secondary-foreground: 170 100% 90%; 
 
-    --muted: 210 30% 25%;
-    --muted-foreground: 210 30% 70%;
+    --muted: 240 10% 20%; 
+    --muted-foreground: 20 30% 70%; 
 
-    --accent: 55 90% 50%;
-    --accent-foreground: 50 100% 90%;
+    --accent: 45 90% 50%; 
+    --accent-foreground: 45 100% 90%; 
 
-    --destructive: 0 60% 50%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 65% 50%; 
+    --destructive-foreground: 0 0% 98%; 
 
-    --border: 210 30% 30%;
-    --input: 210 30% 28%;
-    --ring: 205 70% 50%;
+    --border: 240 10% 25%; 
+    --input: 240 10% 22%; 
+    --ring: 340 70% 55%; 
 
-    --sidebar-background: 215 30% 12%;
-    --sidebar-foreground: 210 40% 93%;
-    --sidebar-primary: 200 65% 50%;
-    --sidebar-primary-foreground: 210 100% 90%;
-    --sidebar-accent: 55 90% 50%;
-    --sidebar-accent-foreground: 50 100% 90%;
-    --sidebar-border: 210 30% 25%;
-    --sidebar-ring: 205 70% 50%;
+    --sidebar-background: 240 10% 8%;
+    --sidebar-foreground: 20 100% 93%;
+    --sidebar-primary: 340 70% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 45 90% 50%;
+    --sidebar-accent-foreground: 45 100% 90%;
+    --sidebar-border: 240 10% 20%;
+    --sidebar-ring: 340 70% 55%;
 
-    --chart-1: 200 65% 55%;
-    --chart-2: 122 40% 45%;
-    --chart-3: 55 90% 50%;
-    --chart-4: 25 70% 50%;
-    --chart-5: 300 50% 60%;
+    --chart-1: 340 70% 50%;
+    --chart-2: 170 60% 45%;
+    --chart-3: 45 90% 50%;
+    --chart-4: 200 60% 50%;
+    --chart-5: 280 50% 55%;
   }
 }
 

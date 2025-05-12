@@ -1,8 +1,9 @@
+// src/components/layout/app-header.tsx
 "use client";
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Newspaper, Users, Sparkles, Menu } from 'lucide-react';
+import { Home, Contact, GraduationCap, LayoutGrid, Menu } from 'lucide-react';
 import { Logo } from '@/components/icons/logo';
 import type { NavItem } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -11,9 +12,10 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useState } from 'react';
 
 const navItems: NavItem[] = [
-  { href: '/', label: 'Daily Feed', icon: Newspaper },
-  { href: '/students', label: 'Students', icon: Users },
-  { href: '/smart-update', label: 'Smart Update', icon: Sparkles },
+  { href: '/', label: 'Home', icon: Home },
+  { href: '/students', label: 'Students', icon: Contact },
+  { href: '/smart-update', label: 'My Learning', icon: GraduationCap },
+  { href: '/more', label: 'More', icon: LayoutGrid },
 ];
 
 export function AppHeader() {
@@ -35,7 +37,9 @@ export function AppHeader() {
               href={item.href}
               className={cn(
                 "text-sm font-medium transition-colors hover:text-primary",
-                pathname === item.href ? "text-primary" : "text-muted-foreground"
+                pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
+                  ? "text-primary"
+                  : "text-muted-foreground"
               )}
             >
               {item.label}
@@ -52,21 +56,21 @@ export function AppHeader() {
                 <span className="sr-only">Toggle Menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-72 p-0">
-              <div className="p-6">
+            <SheetContent side="left" className="w-72 p-0 pt-6">
+              <div className="px-6 mb-4">
                 <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
                   <Logo />
                 </Link>
               </div>
-              <nav className="flex flex-col space-y-2 px-4">
+              <nav className="flex flex-col space-y-1 px-4">
                 {navItems.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={cn(
-                      "flex items-center space-x-3 rounded-md px-3 py-2 text-base font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
-                      pathname === item.href
+                      "flex items-center space-x-3 rounded-md px-3 py-3 text-base font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
+                      pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
                         ? "bg-accent text-accent-foreground"
                         : "text-foreground hover:text-accent-foreground"
                     )}
