@@ -4,15 +4,14 @@ import {
   Award,
   Megaphone,
   CalendarDays,
-  FileSignature,
-  CalendarPlus,
-  LibraryBig,
-  PlaneTakeoff,
-  // UserCircle2, // Removed as "Kid's Profiles" (management) is now admin
-  UserCog, 
-  ListChecks,
-  Settings, // Example for another item
-  HelpCircle, // Example for another item
+  FileSignature, // For eConsent
+  CalendarPlus, // For Event Booking
+  LibraryBig, // For Resources
+  PlaneTakeoff, // For Travel Declaration
+  UserCircle2, // For Kid's Profile (was UserCog for My Profile)
+  ListChecks, // For Survey
+  Receipt, // For Statement of Account (New)
+  FilePenLine, // For eService (New)
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
@@ -39,29 +38,27 @@ const moreItems: MoreItem[] = [
   { label: "eConsent", icon: FileSignature, color: chartColors[3], href: "#" },
   { label: "Event Booking", icon: CalendarPlus, color: chartColors[4], href: "/more/event-booking" },
   { label: "Resources", icon: LibraryBig, color: chartColors[0], href: "/more/resources" },
-  { label: "My Profile", icon: UserCog, color: chartColors[1], href: "/more/my-profile" }, 
-  { label: "Travel Plans", icon: PlaneTakeoff, color: chartColors[2], href: "#" },
-  { label: "Take Survey", icon: ListChecks, color: chartColors[3], href: "#" },
-  { label: "Settings", icon: Settings, color: chartColors[4], href: "#" },
-  { label: "Help & FAQ", icon: HelpCircle, color: chartColors[0], href: "#" },
-  // Removed "Kid's Profiles" as it's now an admin feature (/admin/manage-students)
-  // Parents can see students via the main /students tab
-  // Adjust grid or add more items if layout looks sparse
-   { label: "Placeholder", icon: Award, color: chartColors[1], href: "#" },
+  { label: "Travel Declaration", icon: PlaneTakeoff, color: chartColors[1], href: "#" },
+  { label: "Kid's Profile", icon: UserCircle2, color: chartColors[2], href: "/students" }, 
+  { label: "Survey", icon: ListChecks, color: chartColors[3], href: "#" },
+  { label: "Statement of Account", icon: Receipt, color: chartColors[4], href: "/more/statement-of-account" },
+  { label: "eService", icon: FilePenLine, color: chartColors[0], href: "/more/eservice" },
 ];
 
 export default function MorePage() {
   return (
     <div>
       <h1 className="text-3xl font-bold tracking-tight mb-6 text-center md:text-left">More Options</h1>
-      <div className="grid grid-cols-3 gap-2 sm:gap-3">
-        {moreItems.map((item) => (
+      <div className="grid grid-cols-3 gap-1.5 sm:gap-2.5"> {/* Reduced gap */}
+        {moreItems.map((item, index) => (
           <Link href={item.href} key={item.label} legacyBehavior>
             <a className="block h-full">
-              <Card className="shadow-lg rounded-xl hover:shadow-xl transition-shadow duration-300 h-full flex flex-col items-center justify-center p-2 sm:p-3 aspect-square bg-card hover:bg-muted/50">
-                <CardContent className="flex flex-col items-center justify-center text-center p-1">
-                  <item.icon className={`h-8 w-8 sm:h-10 sm:mb-2 ${item.color}`} strokeWidth={1.5} />
-                  <p className="text-[10px] sm:text-xs font-medium text-foreground mt-1 sm:mt-0">{item.label}</p>
+              <Card className="shadow-lg rounded-xl hover:shadow-xl transition-shadow duration-300 h-full flex flex-col items-center justify-center p-1.5 sm:p-2 aspect-square bg-card hover:bg-muted/50"> {/* Reduced padding */}
+                <CardContent className="flex flex-col items-center justify-center text-center p-1"> {/* Adjusted padding */}
+                  <item.icon className={`h-7 w-7 sm:h-8 sm:mb-1 ${item.color}`} strokeWidth={1.5} /> {/* Adjusted size and margin */}
+                  <p className="text-[9px] sm:text-[11px] font-medium text-foreground mt-0.5 sm:mt-1 leading-tight"> {/* Adjusted text size and margin */}
+                    {item.label}
+                  </p>
                 </CardContent>
               </Card>
             </a>
