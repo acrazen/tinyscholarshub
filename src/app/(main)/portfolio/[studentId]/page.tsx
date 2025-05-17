@@ -25,7 +25,7 @@ export default function PortfolioDetailPage({ params }: PortfolioDetailPageProps
         <Link href="/portfolio">
           <Button variant="outline" size="lg">
             <ArrowLeft className="mr-2 h-5 w-5" />
-            Back to Portfolios Overview
+            Back to Portfolio Overview
           </Button>
         </Link>
       </div>

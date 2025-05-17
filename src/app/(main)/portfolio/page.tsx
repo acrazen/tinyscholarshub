@@ -13,8 +13,7 @@ import { ReportsTabContent } from '@/components/portfolio/reports-tab-content';
 
 export default function PortfolioPage() {
   // For this page, we'll display the portfolio of the first student as a default.
-  // In a real app, you might have a different logic to select which student to show here,
-  // or this page might be a dashboard leading to individual student portfolios.
+  // This simulates the view for a logged-in parent viewing their child's portfolio.
   const studentIdToShow = studentsData[0]?.id; // Get the ID of the first student
   const student = studentIdToShow ? getStudentById(studentIdToShow) : null;
 
@@ -24,7 +23,6 @@ export default function PortfolioPage() {
         <AlertTriangle className="w-16 h-16 text-destructive mb-4" />
         <h1 className="text-2xl font-semibold mb-2">No Student Data</h1>
         <p className="text-muted-foreground mb-6">There is no student data available to display a portfolio.</p>
-        {/* Optionally, link to a selection page or home if needed */}
          <Link href="/">
           <Button variant="outline" size="lg">
             <ArrowLeft className="mr-2 h-5 w-5" />
@@ -35,8 +33,6 @@ export default function PortfolioPage() {
     );
   }
 
-  // The content below is similar to src/app/(main)/portfolio/[studentId]/page.tsx
-  // but adapted for this page to show a specific student directly.
   return (
     <div className="space-y-6">
       {/* Page Title - consistent with other top-level pages */}
