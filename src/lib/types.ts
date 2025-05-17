@@ -143,4 +143,3 @@ export interface Conversation {
   avatarUrl?: string;
   unreadCount?: number;
 }
-

@@ -3,12 +3,12 @@
 import { getStudentById } from '@/lib/data';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Activity, FileText as ReportIcon, AlertTriangle, ArrowLeft } from 'lucide-react'; // Changed User to Activity, TrendingUp to ReportIcon
+import { Activity, FileText as ReportIcon, AlertTriangle, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { MilestonesCard } from '@/components/performance/milestones-card';
 import { ReportsTabContent } from '@/components/portfolio/reports-tab-content';
-import { StudentProfileView } from '@/components/profile/student-profile-view'; // To display basic profile info
+// Removed StudentProfileView as basic info is now in the header
 
 interface PortfolioDetailPageProps {
   params: { studentId: string };
@@ -34,7 +34,8 @@ export default function PortfolioDetailPage({ params }: PortfolioDetailPageProps
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 border-4 border-red-500 p-1"> {/* VISUAL CUE: Red Border */}
+      <h1 className="text-xs text-red-500">DEBUG_PORTFOLIO_V_REAPPLY</h1> {/* VISUAL CUE: Debug Text */}
       {/* Student Header Info */}
       <div className="flex flex-col items-center text-center p-4 md:p-6 bg-card rounded-xl shadow-lg">
         <Avatar className="w-24 h-24 md:w-28 md:h-28 mb-4 border-4 border-background shadow-md">
@@ -60,12 +61,10 @@ export default function PortfolioDetailPage({ params }: PortfolioDetailPageProps
         </TabsList>
 
         <TabsContent value="activities">
-          {/* For "Activities", we can show Milestones or other relevant performance info */}
-          {/* We can also include StudentProfileView for basic details if not covered above */}
           <div className="space-y-6">
             <MilestonesCard milestones={student.milestones} />
-            {/* You could add AttendanceCard here as well if desired under Activities */}
-            {/* <AttendanceCard student={student} /> */}
+            {/* Consider adding AttendanceCard or other activity-related components here */}
+            {/* e.g., <AttendanceCard student={student} /> */}
           </div>
         </TabsContent>
         <TabsContent value="reports">
@@ -84,4 +83,3 @@ export default function PortfolioDetailPage({ params }: PortfolioDetailPageProps
     </div>
   );
 }
-

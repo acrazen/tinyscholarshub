@@ -1,6 +1,6 @@
 
 import type { Student, FeedPost, Guardian, Milestone, SchoolEvent, ResourceItem, UserProfile, Comment, CommentAuthor, ReportItem } from './types';
-import { FileText, Youtube, Link as LinkIcon, BookOpen, FileArchive, FileType2 } from 'lucide-react'; // Added FileArchive, FileType2
+import { FileText, Youtube, Link as LinkIcon, BookOpen } from 'lucide-react'; // Removed FileArchive, FileType2 as they are used directly in component
 
 const guardiansData: Guardian[] = [
   { id: 'g1', name: 'Alice Smith', relation: 'Mother', phoneNumber: '555-0101', email: 'alice.smith@example.com', profilePhotoUrl: 'https://placehold.co/100x100.png' },
@@ -19,14 +19,14 @@ const milestonesData: Milestone[] = [
 ];
 
 const sampleReportsLeo: ReportItem[] = [
-  { id: 'lr1', title: '2024 Report - Leo Miller', termName: '2024 Term 2', year: 2024, type: 'folio', url: '#', dataAiHint: 'report document' },
-  { id: 'lr2', title: '2023 Report - Leo Miller', termName: '2023 Term 4', year: 2023, type: 'pdf', url: '#', dataAiHint: 'report pdf' },
-  { id: 'lr3', title: '2023 Report - Leo Miller', termName: '2023 Term 2', year: 2023, type: 'pdf', url: '#', dataAiHint: 'report pdf' },
+  { id: 'lr1', title: 'Term 2 Folio - 2024', termName: '2024 Term 2', year: 2024, type: 'folio', url: '#', dataAiHint: 'report document' },
+  { id: 'lr2', title: 'Term 4 Report Card - 2023', termName: '2023 Term 4', year: 2023, type: 'pdf', url: '#', dataAiHint: 'report pdf' },
+  { id: 'lr3', title: 'Term 2 Report Card - 2023', termName: '2023 Term 2', year: 2023, type: 'pdf', url: '#', dataAiHint: 'report pdf' },
 ];
 
 const sampleReportsMia: ReportItem[] = [
-  { id: 'mr1', title: '2024 Report - Mia Garcia', termName: '2024 Term 2', year: 2024, type: 'folio', url: '#', dataAiHint: 'report document' },
-  { id: 'mr2', title: '2023 Report - Mia Garcia', termName: '2023 Term 4', year: 2023, type: 'pdf', url: '#', dataAiHint: 'report pdf' },
+  { id: 'mr1', title: 'Term 2 Folio - 2024', termName: '2024 Term 2', year: 2024, type: 'folio', url: '#', dataAiHint: 'report document' },
+  { id: 'mr2', title: 'Term 4 Report Card - 2023', termName: '2023 Term 4', year: 2023, type: 'pdf', url: '#', dataAiHint: 'report pdf' },
 ];
 
 
@@ -285,4 +285,3 @@ export const sampleUserProfile: UserProfile = {
 
 
 export const getStudentById = (id: string): Student | undefined => studentsData.find(s => s.id === id);
-

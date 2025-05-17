@@ -2,7 +2,7 @@
 // src/components/portfolio/reports-tab-content.tsx
 import type { Student } from '@/lib/types';
 import { ReportListItem } from './report-list-item';
-import { AlertTriangle, FolderOpen } from 'lucide-react';
+import { FolderOpen } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
 
@@ -31,7 +31,8 @@ export function ReportsTabContent({ student }: ReportsTabContentProps) {
     if (b.year !== a.year) {
       return b.year - a.year;
     }
-    return b.termName.localeCompare(a.termName); // This might need adjustment if term names are complex
+    // For term names, simple string localeCompare should work for "Term X"
+    return b.termName.localeCompare(a.termName); 
   });
 
 
@@ -43,4 +44,3 @@ export function ReportsTabContent({ student }: ReportsTabContentProps) {
     </div>
   );
 }
-
