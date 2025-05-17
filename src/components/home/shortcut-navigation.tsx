@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MessageSquare, ScanLine, GraduationCap, Receipt } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { useEffect } from 'react';
 
 interface ShortcutItem {
   label: string;
@@ -50,8 +51,12 @@ const shortcutItems: ShortcutItem[] = [
 ];
 
 export function ShortcutNavigation() {
+  useEffect(() => {
+    console.log("ShortcutNavigation component rendered.");
+  }, []);
+
   return (
-    <div className="mb-6">
+    <div className="mb-6"> {/* Original mb-6 is fine, page.tsx wrapper handles top margin */}
       <div className="grid grid-cols-4 gap-3 sm:gap-4">
         {shortcutItems.map((item) => (
           <Link href={item.href} key={item.label} legacyBehavior>
