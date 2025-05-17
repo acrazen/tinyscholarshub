@@ -1,3 +1,4 @@
+
 import type { LucideIcon } from 'lucide-react';
 
 export interface Guardian {
@@ -42,6 +43,21 @@ export interface Student {
   milestones: Milestone[];
 }
 
+export interface CommentAuthor {
+  id: string;
+  name: string;
+  avatarUrl: string;
+}
+
+export interface Comment {
+  id: string;
+  author: CommentAuthor;
+  text: string;
+  timestamp: string; // ISO date string
+  likes: number;
+  isLikedByUser?: boolean; // For UI state
+}
+
 export interface FeedPost {
   id: string;
   author: {
@@ -54,13 +70,14 @@ export interface FeedPost {
   dataAiHint?: string; // For placeholder images
   description: string;
   likes: number;
-  commentsCount: number;
+  comments: Comment[]; // Changed from commentsCount to an array of Comment objects
+  commentsCount: number; // Keep this for the summary on the card, or derive it from comments.length
 }
 
 // For navigation
 export interface NavItem {
   href: string;
-  label: string;
+  label:string;
   icon: LucideIcon; // Using LucideIcon type directly
   active?: boolean;
   roles?: ('parent' | 'teacher' | 'admin')[]; // Optional: for role-based visibility
