@@ -94,7 +94,7 @@ export function FeedItemCard({ post }: FeedItemCardProps) {
     
     const newComment: Comment = {
       id: `comment-${Date.now()}-${Math.random()}`,
-      author: { id: 'currentUser', name: 'You (Sarah D.)', avatarUrl: 'https://placehold.co/40x40.png' },
+      author: { id: 'currentUser', name: 'You (Sarah D.)', avatarUrl: 'https://picsum.photos/seed/currentusercomment/40/40' }, // Updated placeholder
       text: commentText,
       timestamp: new Date().toISOString(),
       likes: 0,
@@ -116,7 +116,7 @@ export function FeedItemCard({ post }: FeedItemCardProps) {
     const shareData = {
       title: `Post from ${post.author.name}`,
       text: post.description,
-      url: window.location.href, // Shares the current page URL. Can be customized for specific post URLs if available.
+      url: window.location.href, 
     };
 
     if (navigator.share) {
@@ -127,8 +127,6 @@ export function FeedItemCard({ post }: FeedItemCardProps) {
           description: 'The post has been shared.',
         });
       } catch (error) {
-        // Handle errors, e.g., user cancelled share or API error
-        // Don't show error toast if user simply cancelled
         if ((error as DOMException).name !== 'AbortError') {
             toast({
             variant: 'destructive',
@@ -139,7 +137,6 @@ export function FeedItemCard({ post }: FeedItemCardProps) {
         console.error('Error sharing:', error);
       }
     } else {
-      // Fallback for browsers that don't support Web Share API
       navigator.clipboard.writeText(`${post.description} - Check out this post from ${post.author.name} at ${shareData.url}`)
         .then(() => {
           toast({
@@ -162,10 +159,8 @@ export function FeedItemCard({ post }: FeedItemCardProps) {
     const text = e.target.value;
     setCommentText(text);
   
-    // Regex to find @mention at the end of the text being typed
-    // Example: "Hello @Joh" -> mentionMatch = ["@Joh", "Joh"]
     const mentionRegex = /@(\w*)$/; 
-    const currentTextUpToCursor = text.substring(0, e.target.selectionStart); // Get text up to cursor
+    const currentTextUpToCursor = text.substring(0, e.target.selectionStart);
     const mentionMatch = currentTextUpToCursor.match(mentionRegex);
   
     if (mentionMatch && mentionMatch[1] !== undefined) {
@@ -174,25 +169,23 @@ export function FeedItemCard({ post }: FeedItemCardProps) {
   
       let classFilterName: string | undefined = undefined;
       const authorNameLower = post.author.name.toLowerCase();
-      // Infer class from post author name
       if (authorNameLower.includes('butterflies')) {
           classFilterName = 'Butterflies';
       } else if (authorNameLower.includes('caterpillars')) {
           classFilterName = 'Caterpillars';
-      } // Add more class name checks if needed
+      } 
   
       const suggestions = studentsData.filter(student => {
-        // Suggest from all if class can't be determined or post is by admin, etc.
         const inClass = classFilterName ? student.className === classFilterName : true; 
         
-        const nameMatchesQuery = query === '' || // Show some initial suggestions if query is empty but @ is typed
+        const nameMatchesQuery = query === '' || 
                                  student.firstName.toLowerCase().startsWith(query) ||
                                  student.lastName.toLowerCase().startsWith(query) ||
                                  `${student.firstName}${student.lastName}`.toLowerCase().startsWith(query);
         return inClass && nameMatchesQuery;
       });
   
-      setMentionSuggestions(suggestions.slice(0, 5)); // Limit to 5 suggestions
+      setMentionSuggestions(suggestions.slice(0, 5));
       setShowMentionPopover(suggestions.length > 0);
     } else {
       setShowMentionPopover(false);
@@ -204,7 +197,6 @@ export function FeedItemCard({ post }: FeedItemCardProps) {
   const handleSelectMention = (student: Student) => {
     const mentionHandle = `@${student.firstName}${student.lastName}`;
     
-    // Find the start of the current @mention query
     const currentText = commentText;
     const cursorPos = commentInputRef.current?.selectionStart || currentText.length;
     const textBeforeCursor = currentText.substring(0, cursorPos);
@@ -212,23 +204,20 @@ export function FeedItemCard({ post }: FeedItemCardProps) {
     const atSymbolIndex = textBeforeCursor.lastIndexOf('@');
     
     if (atSymbolIndex !== -1) {
-        // Ensure we are replacing a valid partial mention
         const potentialQuery = textBeforeCursor.substring(atSymbolIndex + 1);
-        if (potentialQuery.match(/^\w*$/)) { // Checks if it's word characters (what we are trying to replace)
+        if (potentialQuery.match(/^\w*$/)) { 
             const newText = currentText.substring(0, atSymbolIndex) + mentionHandle + ' ' + currentText.substring(cursorPos);
             setCommentText(newText);
 
-            // Attempt to set cursor position after the inserted mention
-            // This is a bit tricky and might not be perfect in all browsers/scenarios
             const newCursorPos = atSymbolIndex + mentionHandle.length + 1;
             setTimeout(() => {
                 commentInputRef.current?.focus();
                 commentInputRef.current?.setSelectionRange(newCursorPos, newCursorPos);
             }, 0);
-        } else { // Fallback if the pattern is not as expected
+        } else { 
              setCommentText(currentText + mentionHandle + ' ');
         }
-    } else { // Fallback if @ not found (should not happen if popover is visible)
+    } else { 
         setCommentText(currentText + mentionHandle + ' ');
     }
   
@@ -364,7 +353,6 @@ export function FeedItemCard({ post }: FeedItemCardProps) {
           </ScrollArea>
 
           <form onSubmit={handleSubmitComment} className="p-4 border-t bg-background sticky bottom-0">
-            {/* Suggestion Popover */}
             {showMentionPopover && mentionSuggestions.length > 0 && (
               <div className="absolute bottom-full left-0 right-0 mb-1 p-2 bg-card border border-border rounded-md shadow-lg max-h-36 overflow-y-auto z-20 mx-4">
                 <ul className="space-y-1">
@@ -410,3 +398,4 @@ export function FeedItemCard({ post }: FeedItemCardProps) {
   );
 }
 
+    

@@ -1,3 +1,4 @@
+
 // src/components/layout/app-header.tsx
 "use client";
 
@@ -7,7 +8,7 @@ import { Home, FolderKanban, GraduationCap, LayoutGrid, MessageSquare } from 'lu
 import { Logo } from '@/components/icons/logo';
 import type { NavItem } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'; // Added Avatar imports
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const navItems: NavItem[] = [
   { href: '/', label: 'Home', icon: Home },
@@ -56,7 +57,7 @@ export function AppHeader() {
         <div className="md:hidden">
           <Link href="/more/my-profile" aria-label="My Profile">
             <Avatar className="h-9 w-9 cursor-pointer">
-              <AvatarImage src="https://placehold.co/40x40.png" alt="My Profile" data-ai-hint="user avatar" />
+              <AvatarImage src="https://picsum.photos/seed/headeravatar/40/40" alt="My Profile" data-ai-hint="user avatar" />
               <AvatarFallback className="bg-muted text-muted-foreground">
                 {/* In a real app, use user initials */}
                 U
@@ -68,3 +69,5 @@ export function AppHeader() {
     </header>
   );
 }
+
+    

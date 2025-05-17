@@ -1,3 +1,4 @@
+
 // src/app/(main)/messages/page.tsx
 "use client";
 
@@ -36,7 +37,7 @@ const sampleConversations: Conversation[] = [
     participantRole: 'Administration',
     lastMessage: "Reminder: School fees are due next Friday.",
     lastMessageTimestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
-    avatarUrl: 'https://picsum.photos/seed/admin/100/100',
+    avatarUrl: 'https://picsum.photos/seed/adminmsg/100/100',
     unreadCount: 1,
   },
 ];
@@ -51,7 +52,7 @@ const sampleMessages: Record<string, ChatMessage[]> = {
     { id: 'msg2-1', sender: 'other', text: "Mia had a great day today, she really enjoyed the story time about the little blue truck.", timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), avatarUrl: 'https://picsum.photos/seed/teacher2/100/100' },
   ],
   convo3: [
-     { id: 'msg3-1', sender: 'other', text: "Dear Parents, a friendly reminder: School fees are due next Friday. Please ensure payments are made on time. Thank you!", timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), avatarUrl: 'https://picsum.photos/seed/admin/100/100' },
+     { id: 'msg3-1', sender: 'other', text: "Dear Parents, a friendly reminder: School fees are due next Friday. Please ensure payments are made on time. Thank you!", timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), avatarUrl: 'https://picsum.photos/seed/adminmsg/100/100' },
   ]
 };
 
@@ -241,8 +242,10 @@ export default function MessagesPage() {
 }
 
 // Dummy UserProfile data for current user avatar in chat
+// Updated to use picsum.photos
 const sampleUserProfile = {
   name: 'Sarah Davis', // Example name
   profilePhotoUrl: 'https://picsum.photos/seed/currentUser/100/100',
 };
 
+    

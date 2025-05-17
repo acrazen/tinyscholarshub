@@ -1,5 +1,6 @@
+
 // src/app/(main)/more/my-profile/page.tsx
-"use client"; // For useState and potential form handling in future
+"use client"; 
 
 import { useState } from 'react';
 import { UserCog, Edit3, Lock, Mail, Phone, MapPin, Save } from 'lucide-react';
@@ -23,7 +24,6 @@ export default function MyProfilePage() {
   };
 
   const handleSaveChanges = () => {
-    // In a real app, you'd send this data to your backend
     console.log("Saving changes:", user);
     setIsEditing(false);
     toast({
@@ -127,3 +127,5 @@ export default function MyProfilePage() {
     </div>
   );
 }
+
+    

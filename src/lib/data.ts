@@ -1,13 +1,13 @@
 
 import type { Student, FeedPost, Guardian, Milestone, SchoolEvent, ResourceItem, UserProfile, Comment, CommentAuthor, ReportItem } from './types';
-import { FileText, Youtube, Link as LinkIcon, BookOpen } from 'lucide-react';
+import { FileText, Youtube, Link as LinkIcon, BookOpen, FileArchive } from 'lucide-react'; // Added FileArchive
 
 const guardiansData: Guardian[] = [
-  { id: 'g1', name: 'Alice Smith', relation: 'Mother', phoneNumber: '555-0101', email: 'alice.smith@example.com', profilePhotoUrl: 'https://placehold.co/100x100.png' },
-  { id: 'g2', name: 'Bob Smith', relation: 'Father', phoneNumber: '555-0102', email: 'bob.smith@example.com', profilePhotoUrl: 'https://placehold.co/100x100.png' },
-  { id: 'g3', name: 'Carol White', relation: 'Mother', phoneNumber: '555-0103', email: 'carol.white@example.com', profilePhotoUrl: 'https://placehold.co/100x100.png' },
-  { id: 'g4', name: 'David White', relation: 'Father', phoneNumber: '555-0104', email: 'david.white@example.com', profilePhotoUrl: 'https://placehold.co/100x100.png' },
-  { id: 'g5', name: 'Eva Green', relation: 'Guardian', phoneNumber: '555-0105', email: 'eva.green@example.com', profilePhotoUrl: 'https://placehold.co/100x100.png' },
+  { id: 'g1', name: 'Alice Smith', relation: 'Mother', phoneNumber: '555-0101', email: 'alice.smith@example.com', profilePhotoUrl: 'https://picsum.photos/seed/guardian1/100/100' },
+  { id: 'g2', name: 'Bob Smith', relation: 'Father', phoneNumber: '555-0102', email: 'bob.smith@example.com', profilePhotoUrl: 'https://picsum.photos/seed/guardian2/100/100' },
+  { id: 'g3', name: 'Carol White', relation: 'Mother', phoneNumber: '555-0103', email: 'carol.white@example.com', profilePhotoUrl: 'https://picsum.photos/seed/guardian3/100/100' },
+  { id: 'g4', name: 'David White', relation: 'Father', phoneNumber: '555-0104', email: 'david.white@example.com', profilePhotoUrl: 'https://picsum.photos/seed/guardian4/100/100' },
+  { id: 'g5', name: 'Eva Green', relation: 'Guardian', phoneNumber: '555-0105', email: 'eva.green@example.com', profilePhotoUrl: 'https://picsum.photos/seed/guardian5/100/100' },
 ];
 
 const milestonesData: Milestone[] = [
@@ -19,14 +19,14 @@ const milestonesData: Milestone[] = [
 ];
 
 const sampleReportsLeo: ReportItem[] = [
-  { id: 'lr1', title: 'Term 2 Folio - 2024', termName: '2024 Term 2', year: 2024, type: 'folio', url: '#', dataAiHint: 'report document' },
-  { id: 'lr2', title: 'Term 4 Report Card - 2023', termName: '2023 Term 4', year: 2023, type: 'pdf', url: '#', dataAiHint: 'report pdf' },
-  { id: 'lr3', title: 'Term 2 Report Card - 2023', termName: '2023 Term 2', year: 2023, type: 'pdf', url: '#', dataAiHint: 'report pdf' },
+  { id: 'lr1', title: 'Term 2 Folio - 2024', termName: '2024 Term 2', year: 2024, type: 'folio', url: '#', icon: FileArchive, dataAiHint: 'report document' },
+  { id: 'lr2', title: 'Term 4 Report Card - 2023', termName: '2023 Term 4', year: 2023, type: 'pdf', url: '#', icon: FileText, dataAiHint: 'report pdf' },
+  { id: 'lr3', title: 'Term 2 Report Card - 2023', termName: '2023 Term 2', year: 2023, type: 'pdf', url: '#', icon: FileText, dataAiHint: 'report pdf' },
 ];
 
 const sampleReportsMia: ReportItem[] = [
-  { id: 'mr1', title: 'Term 2 Folio - 2024', termName: '2024 Term 2', year: 2024, type: 'folio', url: '#', dataAiHint: 'report document' },
-  { id: 'mr2', title: 'Term 4 Report Card - 2023', termName: '2023 Term 4', year: 2023, type: 'pdf', url: '#', dataAiHint: 'report pdf' },
+  { id: 'mr1', title: 'Term 2 Folio - 2024', termName: '2024 Term 2', year: 2024, type: 'folio', url: '#', icon: FileArchive, dataAiHint: 'report document' },
+  { id: 'mr2', title: 'Term 4 Report Card - 2023', termName: '2023 Term 4', year: 2023, type: 'pdf', url: '#', icon: FileText, dataAiHint: 'report pdf' },
 ];
 
 
@@ -37,7 +37,7 @@ export const studentsData: Student[] = [
     lastName: 'Miller',
     dateOfBirth: '2020-03-15',
     className: 'Butterflies',
-    profilePhotoUrl: 'https://placehold.co/200x200.png',
+    profilePhotoUrl: 'https://picsum.photos/seed/leo/200/200',
     dataAiHint: 'child portrait',
     allergies: ['Peanuts'],
     notes: 'Loves dinosaurs and building blocks.',
@@ -59,7 +59,7 @@ export const studentsData: Student[] = [
     lastName: 'Garcia',
     dateOfBirth: '2020-07-22',
     className: 'Caterpillars',
-    profilePhotoUrl: 'https://placehold.co/200x200.png',
+    profilePhotoUrl: 'https://picsum.photos/seed/mia/200/200',
     dataAiHint: 'child portrait',
     notes: 'Enjoys story time and drawing.',
     guardians: [guardiansData[2], guardiansData[3]],
@@ -80,7 +80,7 @@ export const studentsData: Student[] = [
     lastName: 'Davis',
     dateOfBirth: '2021-01-10',
     className: 'Butterflies',
-    profilePhotoUrl: 'https://placehold.co/200x200.png',
+    profilePhotoUrl: 'https://picsum.photos/seed/noah/200/200',
     dataAiHint: 'child portrait',
     allergies: ['Dairy', 'Gluten'],
     guardians: [guardiansData[4]],
@@ -101,7 +101,7 @@ export const studentsData: Student[] = [
     lastName: 'Chen',
     dateOfBirth: '2020-09-05',
     className: 'Caterpillars',
-    profilePhotoUrl: 'https://placehold.co/200x200.png',
+    profilePhotoUrl: 'https://picsum.photos/seed/olivia/200/200',
     dataAiHint: 'child portrait',
     guardians: [guardiansData[0]], // Re-using for example
     attendanceSummary: { present: 19, absent: 1, totalDays: 20 },
@@ -112,18 +112,18 @@ export const studentsData: Student[] = [
 ];
 
 const sampleCommentAuthors: CommentAuthor[] = [
-    { id: 'user1', name: 'Sarah D. (Leo\'s Mom)', avatarUrl: 'https://placehold.co/40x40.png' },
-    { id: 'user2', name: 'Mike B. (Mia\'s Dad)', avatarUrl: 'https://placehold.co/40x40.png' },
-    { id: 'teacher1', name: 'Ms. Emily (Butterflies)', avatarUrl: 'https://placehold.co/40x40.png' },
+    { id: 'user1', name: 'Sarah D. (Leo\'s Mom)', avatarUrl: 'https://picsum.photos/seed/sarah/40/40' },
+    { id: 'user2', name: 'Mike B. (Mia\'s Dad)', avatarUrl: 'https://picsum.photos/seed/mike/40/40' },
+    { id: 'teacher1', name: 'Ms. Emily (Butterflies)', avatarUrl: 'https://picsum.photos/seed/emily/40/40' },
 ];
 
 export const feedPostsData: FeedPost[] = [
   {
     id: 'fp1',
-    author: { name: 'Butterflies Class', avatarUrl: 'https://placehold.co/50x50.png' },
+    author: { name: 'Butterflies Class', avatarUrl: 'https://picsum.photos/seed/butterfliesclass/50/50' },
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
     type: 'photo',
-    mediaUrl: 'https://placehold.co/600x400.png',
+    mediaUrl: 'https://picsum.photos/seed/artday/600/400',
     dataAiHint: 'children painting',
     description: 'Our little artists had a blast with finger painting today! So much creativity on display. 🎨 #ArtDay #PreschoolFun Great job @LeoMiller and @MiaGarcia!',
     likes: 15,
@@ -135,7 +135,7 @@ export const feedPostsData: FeedPost[] = [
   },
   {
     id: 'fp2',
-    author: { name: 'Tiny Scholars Admin', avatarUrl: 'https://placehold.co/50x50.png' },
+    author: { name: 'Tiny Scholars Admin', avatarUrl: 'https://picsum.photos/seed/admin/50/50' },
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
     type: 'text',
     description: "Reminder: Parent-teacher meetings are next week! Please sign up for a slot if you haven't already. We look forward to chatting with you!",
@@ -147,10 +147,10 @@ export const feedPostsData: FeedPost[] = [
   },
   {
     id: 'fp3',
-    author: { name: 'Caterpillars Class', avatarUrl: 'https://placehold.co/50x50.png' },
+    author: { name: 'Caterpillars Class', avatarUrl: 'https://picsum.photos/seed/caterpillarsclass/50/50' },
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(), // 2 days ago
     type: 'video',
-    mediaUrl: 'https://placehold.co/600x400.png', 
+    mediaUrl: 'https://picsum.photos/seed/singalong/600/400', 
     dataAiHint: 'kids singing',
     description: 'Sing-along time! 🎶 Our Caterpillars are learning new songs and having so much fun with music and movement. #MusicTime #EarlyLearning Special thanks to @SarahDavis for the song suggestion!',
     likes: 30,
@@ -162,10 +162,10 @@ export const feedPostsData: FeedPost[] = [
   },
   {
     id: 'fp4',
-    author: { name: 'Butterflies Class', avatarUrl: 'https://placehold.co/50x50.png' },
+    author: { name: 'Butterflies Class', avatarUrl: 'https://picsum.photos/seed/butterfliesclass2/50/50' },
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString(), // 3 days ago
     type: 'photo',
-    mediaUrl: 'https://placehold.co/600x400.png',
+    mediaUrl: 'https://picsum.photos/seed/playground/600/400',
     dataAiHint: 'playground fun',
     description: 'Enjoying the sunny weather on the playground today! Lots of running, climbing, and laughter. ☀️ #OutdoorPlay #ActiveKids',
     likes: 18,
@@ -279,9 +279,12 @@ export const sampleUserProfile: UserProfile = {
   email: 'sarah.davis@example.com',
   phoneNumber: '555-123-4567',
   address: '123 Main Street, Anytown, USA 12345',
-  profilePhotoUrl: 'https://placehold.co/200x200.png',
+  profilePhotoUrl: 'https://picsum.photos/seed/userprofile/200/200',
+  dataAiHint: 'user avatar',
   role: 'Parent',
 };
 
 
 export const getStudentById = (id: string): Student | undefined => studentsData.find(s => s.id === id);
+
+    
