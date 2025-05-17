@@ -24,6 +24,17 @@ export interface AttendanceRecord {
   status: 'Present' | 'Absent' | 'Late';
 }
 
+export interface ReportItem {
+  id: string;
+  title: string;
+  termName: string; // e.g., "2024 Term 4", "2023 Term 2"
+  year: number;
+  type: 'folio' | 'pdf';
+  url: string; // URL to the report file or view
+  icon?: LucideIcon; // Optional: if we want to specify icons directly in data
+  dataAiHint?: string;
+}
+
 export interface Student {
   id: string;
   firstName: string;
@@ -31,16 +42,18 @@ export interface Student {
   dateOfBirth: string; // ISO date string
   className: string;
   profilePhotoUrl: string;
+  dataAiHint?: string; // Added for student profile photo
   allergies?: string[];
   notes?: string;
   guardians: Guardian[];
-  attendanceSummary: { // Simplified for now
+  attendanceSummary: {
     present: number;
     absent: number;
     totalDays: number;
   };
   recentAttendance: AttendanceRecord[];
   milestones: Milestone[];
+  reports?: ReportItem[]; // Added reports
 }
 
 export interface CommentAuthor {
@@ -61,26 +74,25 @@ export interface Comment {
 export interface FeedPost {
   id: string;
   author: {
-    name: string; // e.g., 'Sunshine Class Teacher' or 'Tiny Scholars Admin'
+    name: string;
     avatarUrl: string;
   };
   timestamp: string; // ISO date string
   type: 'photo' | 'video' | 'text';
-  mediaUrl?: string; // URL for photo/video, required if type is photo/video
-  dataAiHint?: string; // For placeholder images
+  mediaUrl?: string;
+  dataAiHint?: string;
   description: string;
   likes: number;
-  comments: Comment[]; // Changed from commentsCount to an array of Comment objects
-  commentsCount: number; // Keep this for the summary on the card, or derive it from comments.length
+  comments: Comment[];
+  commentsCount: number;
 }
 
-// For navigation
 export interface NavItem {
   href: string;
   label:string;
-  icon: LucideIcon; // Using LucideIcon type directly
+  icon: LucideIcon;
   active?: boolean;
-  roles?: ('parent' | 'teacher' | 'admin')[]; // Optional: for role-based visibility
+  roles?: ('parent' | 'teacher' | 'admin')[];
 }
 
 export interface SchoolEvent {
@@ -91,7 +103,7 @@ export interface SchoolEvent {
   location: string;
   description: string;
   status: 'upcoming' | 'past' | 'cancelled';
-  isBooked?: boolean; // For UI state to show if the user has booked this event
+  isBooked?: boolean;
 }
 
 export interface ResourceItem {
@@ -99,9 +111,9 @@ export interface ResourceItem {
   title: string;
   description: string;
   type: 'pdf' | 'article' | 'video' | 'link';
-  url: string; // Link to the resource or a placeholder for download
-  icon: LucideIcon; // Specific lucide icon component
-  category: string; // E.g., "Parenting Tips", "Curriculum", "School Policies"
+  url: string;
+  icon: LucideIcon;
+  category: string;
 }
 
 export interface UserProfile {
@@ -109,25 +121,25 @@ export interface UserProfile {
   name: string;
   email: string;
   phoneNumber: string;
-  address?: string; // Optional
+  address?: string;
   profilePhotoUrl?: string;
-  role: 'Parent' | 'Teacher' | 'Admin'; // Example roles
+  role: 'Parent' | 'Teacher' | 'Admin';
 }
 
 export interface ChatMessage {
   id: string;
-  sender: 'user' | 'other'; // 'user' is the current user, 'other' is the person they're chatting with
+  sender: 'user' | 'other';
   text: string;
-  timestamp: string; // ISO date string
-  avatarUrl?: string; // Optional avatar for the 'other' person
+  timestamp: string;
+  avatarUrl?: string;
 }
 
 export interface Conversation {
   id: string;
   participantName: string;
-  participantRole?: string; // e.g., "Teacher - Butterflies Class"
+  participantRole?: string;
   lastMessage: string;
-  lastMessageTimestamp: string; // ISO date string
+  lastMessageTimestamp: string;
   avatarUrl?: string;
   unreadCount?: number;
 }

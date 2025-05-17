@@ -1,6 +1,6 @@
 
-import type { Student, FeedPost, Guardian, Milestone, SchoolEvent, ResourceItem, UserProfile, Comment, CommentAuthor } from './types';
-import { FileText, Youtube, Link as LinkIcon, BookOpen } from 'lucide-react';
+import type { Student, FeedPost, Guardian, Milestone, SchoolEvent, ResourceItem, UserProfile, Comment, CommentAuthor, ReportItem } from './types';
+import { FileText, Youtube, Link as LinkIcon, BookOpen, FileArchive, FileType2 } from 'lucide-react'; // Added FileArchive, FileType2
 
 const guardiansData: Guardian[] = [
   { id: 'g1', name: 'Alice Smith', relation: 'Mother', phoneNumber: '555-0101', email: 'alice.smith@example.com', profilePhotoUrl: 'https://placehold.co/100x100.png' },
@@ -17,6 +17,18 @@ const milestonesData: Milestone[] = [
   { id: 'm4', date: '2024-04-20', title: 'Counts to 10', description: 'Mia can count from 1 to 10.', achieved: true, category: 'Academic' },
   { id: 'm5', date: '2024-05-25', title: 'Painted a Picture', description: 'Completed a finger painting activity expressing creativity.', achieved: true, category: 'Creative' },
 ];
+
+const sampleReportsLeo: ReportItem[] = [
+  { id: 'lr1', title: '2024 Report - Leo Miller', termName: '2024 Term 2', year: 2024, type: 'folio', url: '#', dataAiHint: 'report document' },
+  { id: 'lr2', title: '2023 Report - Leo Miller', termName: '2023 Term 4', year: 2023, type: 'pdf', url: '#', dataAiHint: 'report pdf' },
+  { id: 'lr3', title: '2023 Report - Leo Miller', termName: '2023 Term 2', year: 2023, type: 'pdf', url: '#', dataAiHint: 'report pdf' },
+];
+
+const sampleReportsMia: ReportItem[] = [
+  { id: 'mr1', title: '2024 Report - Mia Garcia', termName: '2024 Term 2', year: 2024, type: 'folio', url: '#', dataAiHint: 'report document' },
+  { id: 'mr2', title: '2023 Report - Mia Garcia', termName: '2023 Term 4', year: 2023, type: 'pdf', url: '#', dataAiHint: 'report pdf' },
+];
+
 
 export const studentsData: Student[] = [
   {
@@ -39,6 +51,7 @@ export const studentsData: Student[] = [
       { date: '2024-05-31', status: 'Present' },
     ],
     milestones: [milestonesData[0], milestonesData[1], milestonesData[2]],
+    reports: sampleReportsLeo,
   },
   {
     id: 's2',
@@ -59,6 +72,7 @@ export const studentsData: Student[] = [
       { date: '2024-05-31', status: 'Present' },
     ],
     milestones: [milestonesData[3], milestonesData[4]],
+    reports: sampleReportsMia,
   },
   {
     id: 's3',
@@ -79,6 +93,7 @@ export const studentsData: Student[] = [
       { date: '2024-05-31', status: 'Absent' },
     ],
     milestones: [],
+    reports: [],
   },
    {
     id: 's4',
@@ -92,6 +107,7 @@ export const studentsData: Student[] = [
     attendanceSummary: { present: 19, absent: 1, totalDays: 20 },
     recentAttendance: [],
     milestones: [milestonesData[0]],
+    reports: [],
   },
 ];
 
