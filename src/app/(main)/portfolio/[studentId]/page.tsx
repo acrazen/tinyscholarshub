@@ -25,7 +25,7 @@ export default function PortfolioDetailPage({ params }: PortfolioDetailPageProps
         <Link href="/portfolio">
           <Button variant="outline" size="lg">
             <ArrowLeft className="mr-2 h-5 w-5" />
-            Back to Portfolios
+            Back to Portfolios Overview
           </Button>
         </Link>
       </div>
@@ -33,8 +33,7 @@ export default function PortfolioDetailPage({ params }: PortfolioDetailPageProps
   }
 
   return (
-    <div className="space-y-6 border-4 border-red-500 p-1"> {/* VISUAL CUE: Red Border */}
-      <h1 className="text-xs text-red-500">DEBUG_PORTFOLIO_V_REAPPLY</h1> {/* VISUAL CUE: Debug Text */}
+    <div className="space-y-6"> {/* Removed debug border and text */}
       {/* Student Header Info */}
       <div className="flex flex-col items-center text-center p-4 md:p-6 bg-card rounded-xl shadow-lg">
         <Avatar className="w-24 h-24 md:w-28 md:h-28 mb-4 border-4 border-background shadow-md">
@@ -72,15 +71,16 @@ export default function PortfolioDetailPage({ params }: PortfolioDetailPageProps
       </Tabs>
 
        <div className="mt-8 text-center">
-        <Link href="/portfolio">
+        {/* This link should probably go to a page that lists all students, if such a page is desired elsewhere */}
+        {/* For now, linking back to the main portfolio page which shows the default student */}
+        <Link href="/portfolio"> 
           <Button variant="outline">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to All Portfolios
+            Back to Portfolio Overview
           </Button>
         </Link>
       </div>
     </div>
   );
 }
-
     
