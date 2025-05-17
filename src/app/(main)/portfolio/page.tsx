@@ -61,13 +61,15 @@ export default function PortfolioPage() {
             value="activities" 
             className="py-3 text-base data-[state=active]:shadow-md data-[state=active]:bg-background data-[state=active]:rounded-md"
           >
-            <Activity className="mr-2 h-5 w-5" /> Activities
+            <Activity className="mr-2 h-5 w-5 flex-shrink-0" />
+            <span>Activities</span>
           </TabsTrigger>
           <TabsTrigger 
             value="reports" 
             className="py-3 text-base data-[state=active]:shadow-md data-[state=active]:bg-background data-[state=active]:rounded-md"
           >
-            <ReportIcon className="mr-2 h-5 w-5" /> Reports
+            <ReportIcon className="mr-2 h-5 w-5 flex-shrink-0" />
+            <span>Reports</span>
           </TabsTrigger>
         </TabsList>
 
@@ -87,4 +89,3 @@ export default function PortfolioPage() {
     </div>
   );
 }
-
