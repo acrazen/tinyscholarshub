@@ -48,7 +48,7 @@ export default function EventBookingPage() {
       </div>
 
       <Tabs defaultValue="upcoming" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3">
+        <TabsList className="grid w-full grid-cols-3"> {/* Changed from grid-cols-2 sm:grid-cols-3 */}
           <TabsTrigger value="upcoming">Upcoming Events</TabsTrigger>
           <TabsTrigger value="past">Past Events</TabsTrigger>
           <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
