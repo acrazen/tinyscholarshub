@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { MilestonesCard } from '@/components/performance/milestones-card';
 import { ReportsTabContent } from '@/components/portfolio/reports-tab-content';
-// Removed StudentProfileView as basic info is now in the header
 
 interface PortfolioDetailPageProps {
   params: { studentId: string };

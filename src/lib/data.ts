@@ -1,6 +1,6 @@
 
 import type { Student, FeedPost, Guardian, Milestone, SchoolEvent, ResourceItem, UserProfile, Comment, CommentAuthor, ReportItem } from './types';
-import { FileText, Youtube, Link as LinkIcon, BookOpen } from 'lucide-react'; // Removed FileArchive, FileType2 as they are used directly in component
+import { FileText, Youtube, Link as LinkIcon, BookOpen } from 'lucide-react';
 
 const guardiansData: Guardian[] = [
   { id: 'g1', name: 'Alice Smith', relation: 'Mother', phoneNumber: '555-0101', email: 'alice.smith@example.com', profilePhotoUrl: 'https://placehold.co/100x100.png' },
