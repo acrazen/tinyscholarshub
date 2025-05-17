@@ -43,3 +43,4 @@ export function ReportsTabContent({ student }: ReportsTabContentProps) {
     </div>
   );
 }
+

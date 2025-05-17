@@ -32,3 +32,4 @@ export function ReportListItem({ report }: ReportListItemProps) {
     </Card>
   );
 }
+
