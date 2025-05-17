@@ -56,20 +56,23 @@ export default function PortfolioPage() {
       </div>
       
       <Tabs defaultValue="reports" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-4 rounded-lg shadow-sm bg-muted"> {/* Changed mb-6 to mb-4 */}
-          <TabsTrigger value="activities" className="py-3 text-base data-[state=active]:shadow-md data-[state=active]:bg-background">
+        <TabsList className="grid w-full grid-cols-2 mb-4 rounded-lg shadow-sm bg-muted">
+          <TabsTrigger 
+            value="activities" 
+            className="py-3 text-base data-[state=active]:shadow-md data-[state=active]:bg-background data-[state=active]:rounded-md"
+          >
             <Activity className="mr-2 h-5 w-5" /> Activities
           </TabsTrigger>
-          <TabsTrigger value="reports" className="py-3 text-base data-[state=active]:shadow-md data-[state=active]:bg-background">
+          <TabsTrigger 
+            value="reports" 
+            className="py-3 text-base data-[state=active]:shadow-md data-[state=active]:bg-background data-[state=active]:rounded-md"
+          >
             <ReportIcon className="mr-2 h-5 w-5" /> Reports
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="activities">
-           {/* Removed wrapping div with space-y-6 */}
             <MilestonesCard milestones={student.milestones} />
-            {/* Consider adding AttendanceCard or other activity-related components here */}
-            {/* e.g., <AttendanceCard student={student} /> */}
         </TabsContent>
         <TabsContent value="reports">
           <ReportsTabContent student={student} />
@@ -84,3 +87,4 @@ export default function PortfolioPage() {
     </div>
   );
 }
+
