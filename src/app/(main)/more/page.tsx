@@ -60,9 +60,10 @@ export default function MorePage() {
               <Card className="shadow-lg rounded-xl hover:shadow-xl transition-shadow duration-300 h-full flex flex-col items-center justify-center p-1 sm:p-1.5 aspect-square bg-card hover:bg-muted/50">
                 {/* Reduced padding on CardContent from p-1 to p-0.5 */}
                 <CardContent className="flex flex-col items-center justify-center text-center p-0.5">
-                  {/* Increased icon size from h-7 w-7 sm:h-8 to h-8 w-8 sm:h-9 sm:w-9 */}
-                  <item.icon className={`h-8 w-8 sm:h-9 sm:w-9 sm:mb-1 ${item.color}`} strokeWidth={1.5} />
-                  <p className="text-[9px] sm:text-[11px] font-medium text-foreground mt-0.5 sm:mt-1 leading-tight">
+                  {/* Increased icon size from h-8 w-8 sm:h-9 to h-9 w-9 sm:h-10 sm:w-10, and mb-1 */}
+                  <item.icon className={`h-9 w-9 sm:h-10 sm:w-10 mb-1 ${item.color}`} strokeWidth={1.5} />
+                  {/* Increased text size from text-[9px] sm:text-[11px] to text-[10px] sm:text-xs */}
+                  <p className="text-[10px] sm:text-xs font-medium text-foreground mt-0.5 sm:mt-1 leading-tight">
                     {item.label}
                   </p>
                 </CardContent>
