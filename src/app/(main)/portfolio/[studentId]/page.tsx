@@ -82,3 +82,5 @@ export default function PortfolioDetailPage({ params }: PortfolioDetailPageProps
     </div>
   );
 }
+
+    

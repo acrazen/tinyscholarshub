@@ -1,9 +1,9 @@
+
 // src/app/(main)/portfolio/page.tsx
 import Link from 'next/link';
 import Image from 'next/image';
 import { studentsData } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, FolderKanban } from 'lucide-react';
 
@@ -24,12 +24,12 @@ export default function PortfolioListPage() {
               <CardHeader className="p-0">
                 <div className="aspect-[4/3] w-full relative">
                   <Image
-                    src={student.profilePhotoUrl}
+                    src={student.profilePhotoUrl} // This should now be a picsum.photos URL from data.ts
                     alt={`${student.firstName} ${student.lastName}`}
                     layout="fill"
                     objectFit="cover"
                     className="rounded-t-xl"
-                    data-ai-hint="student portrait"
+                    data-ai-hint={student.dataAiHint || "student portrait"}
                   />
                 </div>
               </CardHeader>
@@ -53,3 +53,5 @@ export default function PortfolioListPage() {
     </div>
   );
 }
+
+    
