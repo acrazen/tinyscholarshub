@@ -1,3 +1,4 @@
+
 // src/app/(main)/more/page.tsx
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -50,15 +51,18 @@ const moreItems: MoreItem[] = [
 export default function MorePage() {
   return (
     <div>
-      <h1 className="text-3xl font-bold tracking-tight mb-6 text-center md:text-left">More Options</h1>
-      <div className="grid grid-cols-3 gap-1.5 sm:gap-2.5"> {/* Reduced gap */}
+      {/* The h1 "More Options" title has been removed */}
+      <div className="grid grid-cols-3 gap-1.5 sm:gap-2.5">
         {moreItems.map((item, index) => (
           <Link href={item.href} key={item.label} legacyBehavior>
             <a className="block h-full">
-              <Card className="shadow-lg rounded-xl hover:shadow-xl transition-shadow duration-300 h-full flex flex-col items-center justify-center p-1.5 sm:p-2 aspect-square bg-card hover:bg-muted/50"> {/* Reduced padding */}
-                <CardContent className="flex flex-col items-center justify-center text-center p-1"> {/* Adjusted padding */}
-                  <item.icon className={`h-7 w-7 sm:h-8 sm:mb-1 ${item.color}`} strokeWidth={1.5} /> {/* Adjusted size and margin */}
-                  <p className="text-[9px] sm:text-[11px] font-medium text-foreground mt-0.5 sm:mt-1 leading-tight"> {/* Adjusted text size and margin */}
+              {/* Reduced padding on Card from p-1.5 sm:p-2 to p-1 sm:p-1.5 */}
+              <Card className="shadow-lg rounded-xl hover:shadow-xl transition-shadow duration-300 h-full flex flex-col items-center justify-center p-1 sm:p-1.5 aspect-square bg-card hover:bg-muted/50">
+                {/* Reduced padding on CardContent from p-1 to p-0.5 */}
+                <CardContent className="flex flex-col items-center justify-center text-center p-0.5">
+                  {/* Increased icon size from h-7 w-7 sm:h-8 to h-8 w-8 sm:h-9 sm:w-9 */}
+                  <item.icon className={`h-8 w-8 sm:h-9 sm:w-9 sm:mb-1 ${item.color}`} strokeWidth={1.5} />
+                  <p className="text-[9px] sm:text-[11px] font-medium text-foreground mt-0.5 sm:mt-1 leading-tight">
                     {item.label}
                   </p>
                 </CardContent>
