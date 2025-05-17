@@ -3,13 +3,11 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, FolderKanban, GraduationCap, LayoutGrid, Menu, MessageSquare, Settings } from 'lucide-react';
+import { Home, FolderKanban, GraduationCap, LayoutGrid, MessageSquare } from 'lucide-react';
 import { Logo } from '@/components/icons/logo';
 import type { NavItem } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { useState } from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'; // Added Avatar imports
 
 const navItems: NavItem[] = [
   { href: '/', label: 'Home', icon: Home },
@@ -22,7 +20,6 @@ const navItems: NavItem[] = [
 
 export function AppHeader() {
   const pathname = usePathname();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Filter nav items based on current path context (e.g. if in /teacher or /admin)
   // For now, this header is primarily for the (main) parent layout.
@@ -46,7 +43,7 @@ export function AppHeader() {
               className={cn(
                 "px-2 py-1 text-sm font-medium transition-colors hover:text-primary rounded-md",
                 pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
-                  ? "text-primary bg-primary/10"
+                  ? "text-primary bg-primary/10" // Use primary for active link background
                   : "text-muted-foreground"
               )}
             >
@@ -55,41 +52,17 @@ export function AppHeader() {
           ))}
         </nav>
 
-        {/* Mobile Navigation Trigger */}
+        {/* Mobile Profile Avatar Link */}
         <div className="md:hidden">
-          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
-                <span className="sr-only">Toggle Menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-72 p-0 pt-6">
-              <div className="px-6 mb-4">
-                <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Logo />
-                </Link>
-              </div>
-              <nav className="flex flex-col space-y-1 px-4">
-                {currentNavItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={cn(
-                      "flex items-center space-x-3 rounded-md px-3 py-3 text-base font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
-                      pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
-                        ? "bg-accent text-accent-foreground"
-                        : "text-foreground hover:text-accent-foreground"
-                    )}
-                  >
-                    <item.icon className="h-5 w-5" />
-                    <span>{item.label}</span>
-                  </Link>
-                ))}
-              </nav>
-            </SheetContent>
-          </Sheet>
+          <Link href="/more/my-profile" aria-label="My Profile">
+            <Avatar className="h-9 w-9 cursor-pointer">
+              <AvatarImage src="https://placehold.co/40x40.png" alt="My Profile" data-ai-hint="user avatar" />
+              <AvatarFallback className="bg-muted text-muted-foreground">
+                {/* In a real app, use user initials */}
+                U
+              </AvatarFallback>
+            </Avatar>
+          </Link>
         </div>
       </div>
     </header>
