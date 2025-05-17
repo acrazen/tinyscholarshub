@@ -37,7 +37,7 @@ export const studentsData: Student[] = [
     lastName: 'Miller',
     dateOfBirth: '2020-03-15',
     className: 'Butterflies',
-    profilePhotoUrl: 'https://picsum.photos/seed/leo/400/300', // Changed to picsum
+    profilePhotoUrl: 'https://picsum.photos/seed/leo/200/200',
     dataAiHint: 'child portrait',
     allergies: ['Peanuts'],
     notes: 'Loves dinosaurs and building blocks.',
@@ -59,7 +59,7 @@ export const studentsData: Student[] = [
     lastName: 'Garcia',
     dateOfBirth: '2020-07-22',
     className: 'Caterpillars',
-    profilePhotoUrl: 'https://picsum.photos/seed/mia/400/300', // Changed to picsum
+    profilePhotoUrl: 'https://picsum.photos/seed/mia/200/200',
     dataAiHint: 'child portrait',
     notes: 'Enjoys story time and drawing.',
     guardians: [guardiansData[2], guardiansData[3]],
@@ -80,7 +80,7 @@ export const studentsData: Student[] = [
     lastName: 'Davis',
     dateOfBirth: '2021-01-10',
     className: 'Butterflies',
-    profilePhotoUrl: 'https://picsum.photos/seed/noah/400/300', // Changed to picsum
+    profilePhotoUrl: 'https://picsum.photos/seed/noah/200/200',
     dataAiHint: 'child portrait',
     allergies: ['Dairy', 'Gluten'],
     guardians: [guardiansData[4]],
@@ -101,7 +101,7 @@ export const studentsData: Student[] = [
     lastName: 'Chen',
     dateOfBirth: '2020-09-05',
     className: 'Caterpillars',
-    profilePhotoUrl: 'https://picsum.photos/seed/olivia/400/300', // Changed to picsum
+    profilePhotoUrl: 'https://picsum.photos/seed/olivia/200/200',
     dataAiHint: 'child portrait',
     guardians: [guardiansData[0]], // Re-using for example
     attendanceSummary: { present: 19, absent: 1, totalDays: 20 },
@@ -150,7 +150,7 @@ export const feedPostsData: FeedPost[] = [
     author: { name: 'Caterpillars Class', avatarUrl: 'https://picsum.photos/seed/caterpillarsclass/50/50' },
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(), // 2 days ago
     type: 'video',
-    mediaUrl: 'https://picsum.photos/seed/singalong/600/400',
+    mediaUrl: 'https://picsum.photos/seed/singalong/600/400', // This was a placeholder image, ideally a video thumbnail
     dataAiHint: 'kids singing',
     description: 'Sing-along time! 🎶 Our Caterpillars are learning new songs and having so much fun with music and movement. #MusicTime #EarlyLearning Special thanks to @SarahDavis for the song suggestion!',
     likes: 30,
@@ -231,7 +231,7 @@ export const sampleResources: ResourceItem[] = [
     title: 'Healthy Eating Guide for Toddlers',
     description: 'A comprehensive guide to nutrition for young children, including meal ideas.',
     type: 'pdf',
-    url: '#',
+    url: '#', // Placeholder URL
     icon: FileText,
     category: 'Health & Nutrition',
   },
@@ -240,7 +240,7 @@ export const sampleResources: ResourceItem[] = [
     title: 'The Importance of Play in Early Childhood',
     description: 'An insightful article on how play contributes to learning and development.',
     type: 'article',
-    url: '#',
+    url: '#', // Placeholder URL
     icon: BookOpen,
     category: 'Child Development',
   },
@@ -249,7 +249,7 @@ export const sampleResources: ResourceItem[] = [
     title: 'DIY Craft Ideas for Kids',
     description: 'A fun video tutorial with easy craft projects you can do at home.',
     type: 'video',
-    url: '#',
+    url: '#', // Placeholder URL
     icon: Youtube,
     category: 'Activities & Crafts',
   },
@@ -258,7 +258,7 @@ export const sampleResources: ResourceItem[] = [
     title: 'School Calendar 2024-2025',
     description: 'Download the official school academic calendar for the upcoming year.',
     type: 'pdf',
-    url: '#',
+    url: '#', // Placeholder URL
     icon: FileText,
     category: 'School Information',
   },
@@ -267,7 +267,7 @@ export const sampleResources: ResourceItem[] = [
     title: 'Local Library Resources',
     description: 'Link to the local public library website for children\'s programs and books.',
     type: 'link',
-    url: '#',
+    url: '#', // Placeholder URL
     icon: LinkIcon,
     category: 'Community Resources',
   },
@@ -279,12 +279,11 @@ export const sampleUserProfile: UserProfile = {
   email: 'sarah.davis@example.com',
   phoneNumber: '555-123-4567',
   address: '123 Main Street, Anytown, USA 12345',
-  profilePhotoUrl: 'https://picsum.photos/seed/userprofile/200/200', // Changed to picsum
+  profilePhotoUrl: 'https://picsum.photos/seed/userprofile/200/200',
   dataAiHint: 'user avatar',
   role: 'Parent',
 };
 
 
 export const getStudentById = (id: string): Student | undefined => studentsData.find(s => s.id === id);
-
     
