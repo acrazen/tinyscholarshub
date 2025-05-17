@@ -112,22 +112,51 @@ export function FeedItemCard({ post }: FeedItemCardProps) {
     setShowMentionPopover(false); 
   };
 
-  const handleShare = () => {
-    navigator.clipboard.writeText(`${post.description} - Check out this post!`)
-      .then(() => {
+  const handleShare = async () => {
+    const shareData = {
+      title: `Post from ${post.author.name}`,
+      text: post.description,
+      url: window.location.href, // Shares the current page URL. Can be customized for specific post URLs if available.
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
         toast({
-          title: "Shared! (Link Copied)",
-          description: "Post content copied to clipboard.",
+          title: 'Shared successfully!',
+          description: 'The post has been shared.',
         });
-      })
-      .catch(() => {
-         toast({
-          title: "Share via Link",
-          description: "Feature to share not fully implemented. Content available in console.",
+      } catch (error) {
+        // Handle errors, e.g., user cancelled share or API error
+        // Don't show error toast if user simply cancelled
+        if ((error as DOMException).name !== 'AbortError') {
+            toast({
+            variant: 'destructive',
+            title: 'Share failed',
+            description: 'Could not share the post at this time.',
+            });
+        }
+        console.error('Error sharing:', error);
+      }
+    } else {
+      // Fallback for browsers that don't support Web Share API
+      navigator.clipboard.writeText(`${post.description} - Check out this post from ${post.author.name} at ${shareData.url}`)
+        .then(() => {
+          toast({
+            title: 'Link Copied!',
+            description: 'Post content and link copied to clipboard.',
+          });
+        })
+        .catch(() => {
+          toast({
+            variant: 'destructive',
+            title: 'Copy Failed',
+            description: 'Could not copy content to clipboard.',
+          });
         });
-        console.log("Share content:", post.description);
-      });
+    }
   };
+
 
   const handleCommentInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const text = e.target.value;
