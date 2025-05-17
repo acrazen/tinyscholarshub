@@ -26,7 +26,7 @@ export default function MyLearningPage() {
               My Learning section is currently under development.
             </p>
             <p className="text-sm text-muted-foreground mt-2">
-              Soon you'll find personalized learning resources and progress updates here.
+              Soon you'll find learning resources, progress updates, and classroom activities here.
             </p>
           </div>
         </CardContent>
