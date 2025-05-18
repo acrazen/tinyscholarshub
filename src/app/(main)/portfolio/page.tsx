@@ -50,7 +50,7 @@ export default function PortfolioPage() {
       </div>
       
       <Tabs defaultValue="reports" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-4 rounded-lg shadow-sm bg-muted h-auto">
+        <TabsList className="grid w-full grid-cols-2 mb-4 rounded-lg shadow-sm bg-muted h-auto"> {/* Added h-auto */}
           <TabsTrigger 
             value="activities" 
             className="py-2.5 sm:py-3 text-sm sm:text-base data-[state=active]:shadow-md data-[state=active]:bg-background data-[state=active]:rounded-md"
