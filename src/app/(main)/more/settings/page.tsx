@@ -1,6 +1,7 @@
 // src/app/(main)/more/settings/page.tsx
 import { Settings } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 
 export default function SettingsPage() {
   return (
@@ -31,6 +32,12 @@ export default function SettingsPage() {
           </div>
         </CardContent>
       </Card>
+
+      <div className="mt-12 text-center text-sm text-muted-foreground">
+        <Separator className="my-4" />
+        <p>Proudly Made in India</p>
+        <p>By Tiny Scholars Hub</p>
+      </div>
     </div>
   );
 }
