@@ -1,4 +1,3 @@
-
 // src/context/app-customization-context.tsx
 "use client";
 
@@ -19,7 +18,7 @@ interface AppCustomizationContextType {
 const defaultAppName = "Tiny Scholars Hub";
 const defaultIconUrl = null; 
 const defaultPrimaryColor = "25 95% 55%"; // Default Orange
-const defaultSecondaryColor = "190 70% 50%"; // Default Teal
+const defaultSecondaryColor = "25 95% 75%"; // Default Light Orange (was Teal: "190 70% 50%")
 
 const AppCustomizationContext = createContext<AppCustomizationContextType | undefined>(undefined);
 

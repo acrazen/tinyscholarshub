@@ -1,17 +1,18 @@
-
 // src/app/superadmin/dashboard/page.tsx
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Cog, Save, Palette } from "lucide-react";
+import { Cog, Save, Palette, Image as ImageIcon } from "lucide-react";
 import NextImage from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { useAppCustomization } from '@/context/app-customization-context';
 import { Separator } from '@/components/ui/separator';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { HSLColor, parseHslString, hslToString, generateLighterVariants, isValidHslColorString } from '@/lib/color-utils';
 
 export default function SuperAdminDashboardPage() {
   const { 
@@ -31,6 +32,8 @@ export default function SuperAdminDashboardPage() {
   const [formPrimaryColor, setFormPrimaryColor] = useState<string>(currentPrimaryColor);
   const [formSecondaryColor, setFormSecondaryColor] = useState<string>(currentSecondaryColor);
 
+  const [secondaryColorSuggestions, setSecondaryColorSuggestions] = useState<HSLColor[]>([]);
+
   useEffect(() => {
     setFormAppName(currentAppName);
     setFormAppIconUrl(currentAppIconUrl || "");
@@ -38,21 +41,40 @@ export default function SuperAdminDashboardPage() {
     setFormSecondaryColor(currentSecondaryColor);
   }, [currentAppName, currentAppIconUrl, currentPrimaryColor, currentSecondaryColor]);
 
+  // Generate secondary color suggestions when primary color changes
+  useEffect(() => {
+    const parsedPrimary = parseHslString(formPrimaryColor);
+    if (parsedPrimary) {
+      const suggestions = generateLighterVariants(parsedPrimary, 5, 8); // 5 suggestions, 8% lightness increment
+      setSecondaryColorSuggestions(suggestions);
+    } else {
+      setSecondaryColorSuggestions([]);
+    }
+  }, [formPrimaryColor]);
+
   const handleSaveChanges = () => {
+    if (!isValidHslColorString(formPrimaryColor)) {
+      toast({ title: "Invalid Primary Color", description: "Please enter a valid HSL string for primary color (e.g., '25 95% 55%').", variant: "destructive"});
+      return;
+    }
+    if (!isValidHslColorString(formSecondaryColor)) {
+      toast({ title: "Invalid Secondary Color", description: "Please enter a valid HSL string for secondary color.", variant: "destructive"});
+      return;
+    }
+
     setAppName(formAppName);
     setAppIconUrl(formAppIconUrl.trim() ? formAppIconUrl.trim() : null);
-    setPrimaryColor(formPrimaryColor.trim() ? formPrimaryColor.trim() : "25 95% 55%"); // Fallback to default
-    setSecondaryColor(formSecondaryColor.trim() ? formSecondaryColor.trim() : "190 70% 50%"); // Fallback to default
+    setPrimaryColor(formPrimaryColor.trim());
+    setSecondaryColor(formSecondaryColor.trim());
     
     toast({
       title: "Settings Updated",
       description: "App customization settings have been applied.",
     });
   };
-
-  const isValidHslString = (hslString: string) => {
-    // Basic check for HSL format like "H S% L%"
-    return /^\d{1,3}\s\d{1,3}%\s\d{1,3}%$/.test(hslString.trim());
+  
+  const handleSecondarySuggestionSelect = (hslString: string) => {
+    setFormSecondaryColor(hslString);
   };
 
   return (
@@ -96,7 +118,7 @@ export default function SuperAdminDashboardPage() {
              <p className="text-sm text-muted-foreground">
               Provide a URL for the app's main icon/logo. For testing, use a placehold.co or picsum.photos URL.
             </p>
-            {formAppIconUrl && (
+            {formAppIconUrl ? (
               <div className="mt-3 p-3 border rounded-md inline-flex items-center justify-center bg-muted">
                 <NextImage 
                   src={formAppIconUrl} 
@@ -108,13 +130,23 @@ export default function SuperAdminDashboardPage() {
                   unoptimized={true} 
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
+                    const parent = target.parentNode as HTMLElement;
                     target.style.display = 'none'; 
+                    
+                    // Remove previous error message if any
+                    const existingError = parent.querySelector('.error-placeholder');
+                    if (existingError) parent.removeChild(existingError);
+
                     const errorPlaceholder = document.createElement('span');
                     errorPlaceholder.textContent = 'Invalid URL';
-                    errorPlaceholder.className = 'text-destructive text-xs';
-                    target.parentNode?.appendChild(errorPlaceholder);
+                    errorPlaceholder.className = 'text-destructive text-xs error-placeholder';
+                    parent.appendChild(errorPlaceholder);
                   }}
                 />
+              </div>
+            ) : (
+              <div className="mt-3 p-3 border rounded-md inline-flex items-center justify-center bg-muted h-[88px] w-[88px]">
+                <ImageIcon className="h-10 w-10 text-muted-foreground" />
               </div>
             )}
           </div>
@@ -126,7 +158,7 @@ export default function SuperAdminDashboardPage() {
             <h3 className="text-lg font-medium">Theme Colors</h3>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             <div className="space-y-2">
               <Label htmlFor="primaryColor" className="text-base">Primary Color (HSL)</Label>
               <div className="flex items-center space-x-2">
@@ -138,8 +170,8 @@ export default function SuperAdminDashboardPage() {
                   className="text-base flex-grow"
                 />
                 <div 
-                  className="w-8 h-8 rounded-md border" 
-                  style={{ backgroundColor: isValidHslString(formPrimaryColor) ? `hsl(${formPrimaryColor})` : 'transparent' }}
+                  className="w-8 h-8 rounded-md border shrink-0" 
+                  style={{ backgroundColor: isValidHslColorString(formPrimaryColor) ? `hsl(${formPrimaryColor})` : 'transparent' }}
                   title="Primary Color Preview"
                 ></div>
               </div>
@@ -153,20 +185,43 @@ export default function SuperAdminDashboardPage() {
                <div className="flex items-center space-x-2">
                 <Input 
                   id="secondaryColor" 
-                  placeholder="e.g., 190 70% 50%" 
+                  placeholder="e.g., 25 95% 75%" 
                   value={formSecondaryColor}
                   onChange={(e) => setFormSecondaryColor(e.target.value)}
                   className="text-base flex-grow"
                 />
                  <div 
-                  className="w-8 h-8 rounded-md border" 
-                  style={{ backgroundColor: isValidHslString(formSecondaryColor) ? `hsl(${formSecondaryColor})` : 'transparent' }}
+                  className="w-8 h-8 rounded-md border shrink-0" 
+                  style={{ backgroundColor: isValidHslColorString(formSecondaryColor) ? `hsl(${formSecondaryColor})` : 'transparent' }}
                   title="Secondary Color Preview"
                 ></div>
               </div>
               <p className="text-sm text-muted-foreground">
-                Enter HSL values (e.g., "190 70% 50%" for teal).
+                Enter HSL values (e.g., "25 95% 75%" for light orange).
               </p>
+              {secondaryColorSuggestions.length > 0 && (
+                <div className="mt-2 space-y-1">
+                  <Label htmlFor="secondaryColorSuggestions" className="text-xs text-muted-foreground">Or pick a suggestion:</Label>
+                  <Select onValueChange={handleSecondarySuggestionSelect}>
+                    <SelectTrigger id="secondaryColorSuggestions" className="w-full text-sm">
+                      <SelectValue placeholder="Select a light variant..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {secondaryColorSuggestions.map((hsl, index) => {
+                        const hslStr = hslToString(hsl);
+                        return (
+                          <SelectItem key={index} value={hslStr}>
+                            <div className="flex items-center space-x-2">
+                              <div className="w-4 h-4 rounded border" style={{backgroundColor: `hsl(${hslStr})`}}></div>
+                              <span>{hslStr}</span>
+                            </div>
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
           </div>
 
@@ -189,7 +244,8 @@ export default function SuperAdminDashboardPage() {
             <p>- Default Language Settings</p>
             <p>- Master Font Selection (Advanced)</p>
             <p>- Manage Terms of Service / Privacy Policy links</p>
-            <p>- Integration keys for third-party services</p>
+            <p>- Integration keys for third-party services (e.g., payment gateway)</p>
+            <p>- Email notification templates</p>
         </CardContent>
       </Card>
     </div>
