@@ -94,7 +94,7 @@ export function FeedItemCard({ post }: FeedItemCardProps) {
     
     const newComment: Comment = {
       id: `comment-${Date.now()}-${Math.random()}`,
-      author: { id: 'currentUser', name: 'You (Sarah D.)', avatarUrl: 'https://picsum.photos/seed/currentusercomment/40/40' }, // Updated placeholder
+      author: { id: 'currentUser', name: 'You (Sarah D.)', avatarUrl: 'https://picsum.photos/seed/currentusercomment/40/40' },
       text: commentText,
       timestamp: new Date().toISOString(),
       likes: 0,
@@ -124,24 +124,34 @@ export function FeedItemCard({ post }: FeedItemCardProps) {
         await navigator.share(shareData);
         toast({
           title: 'Shared successfully!',
-          description: 'The post has been shared.',
+          description: 'The post was shared using your device\'s native share function.',
         });
       } catch (error) {
-        if ((error as DOMException).name !== 'AbortError') {
+        if ((error as DOMException).name !== 'AbortError') { // AbortError means user cancelled the share dialog
             toast({
             variant: 'destructive',
             title: 'Share failed',
-            description: 'Could not share the post at this time.',
+            description: 'Could not share the post using native share. The link may have been copied instead if supported.',
             });
+             // Attempt clipboard copy as a further fallback if native share failed for other reasons
+            navigator.clipboard.writeText(`${post.description} - Check it out: ${shareData.url}`)
+            .then(() => {
+              toast({
+                title: 'Link Copied!',
+                description: 'Native share failed, but post link copied to clipboard.',
+              });
+            })
+            .catch(() => { /* If clipboard also fails, initial error toast is sufficient */ });
         }
-        console.error('Error sharing:', error);
+        console.error('Error sharing natively:', error);
       }
     } else {
+      // Fallback for browsers that do not support navigator.share
       navigator.clipboard.writeText(`${post.description} - Check out this post from ${post.author.name} at ${shareData.url}`)
         .then(() => {
           toast({
             title: 'Link Copied!',
-            description: 'Post content and link copied to clipboard.',
+            description: 'Native share not available. Post content and link copied to clipboard.',
           });
         })
         .catch(() => {
@@ -282,8 +292,8 @@ export function FeedItemCard({ post }: FeedItemCardProps) {
             variant="ghost" 
             size="sm" 
             className={cn(
-              "text-muted-foreground hover:bg-primary/10 hover:text-primary-foreground", 
-              isLikedByUser ? 'text-primary bg-primary/10 hover:text-primary-foreground' : ''
+              "text-muted-foreground hover:bg-primary/10 hover:text-primary", 
+              isLikedByUser ? 'text-primary bg-primary/10' : '' // When liked, text is already primary. Hover state for liked can remain as is.
             )} 
             onClick={handleLikePost}
           >
@@ -292,7 +302,7 @@ export function FeedItemCard({ post }: FeedItemCardProps) {
           <Button 
             variant="ghost" 
             size="sm" 
-            className="text-muted-foreground hover:text-primary-foreground hover:bg-primary/10" 
+            className="text-muted-foreground hover:text-primary hover:bg-primary/10" 
             onClick={handleCommentButtonClick}
           >
             <MessageCircle className="mr-2 h-4 w-4" /> {currentCommentsCount} Comments
@@ -300,7 +310,7 @@ export function FeedItemCard({ post }: FeedItemCardProps) {
           <Button 
             variant="ghost" 
             size="sm" 
-            className="text-muted-foreground hover:text-primary-foreground hover:bg-primary/10" 
+            className="text-muted-foreground hover:text-primary hover:bg-primary/10" 
             onClick={handleShare}
           >
             <Share2 className="mr-2 h-4 w-4" /> Share
@@ -335,8 +345,8 @@ export function FeedItemCard({ post }: FeedItemCardProps) {
                         variant="ghost"
                         size="xs"
                         className={cn(
-                          "text-xs p-1 h-auto text-muted-foreground hover:bg-primary/10 hover:text-primary-foreground",
-                          comment.isLikedByUser && "text-primary bg-primary/10 hover:text-primary-foreground"
+                          "text-xs p-1 h-auto text-muted-foreground hover:bg-primary/10 hover:text-primary",
+                          comment.isLikedByUser && "text-primary bg-primary/10" // When liked, text is already primary
                         )}
                         onClick={() => handleLikeComment(comment.id)}
                       >
