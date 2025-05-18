@@ -1,8 +1,9 @@
-import { feedPostsData } from '@/lib/data';
+// src/components/feed/daily-feed-section.tsx
+import { getFeedPosts } from '@/lib/services/feedService';
 import { FeedItemCard } from './feed-item-card';
 
-export function DailyFeedSection() {
-  const posts = feedPostsData; // In a real app, this would be fetched
+export async function DailyFeedSection() {
+  const posts = await getFeedPosts(); // In a real app, this would be fetched
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">

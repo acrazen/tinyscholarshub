@@ -1,14 +1,49 @@
 // src/app/(main)/more/resources/page.tsx
-import { LibraryBig, Download, ExternalLink } from 'lucide-react';
+"use client"; 
+
+import { useState, useEffect } from 'react';
+import { LibraryBig, Download, ExternalLink, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { sampleResources } from '@/lib/data';
+import { getResources } from '@/lib/services/resourceService'; // Use service
 import type { ResourceItem } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
+import { useToast } from '@/hooks/use-toast';
+
 
 export default function ResourcesPage() {
-  const resources = sampleResources;
+  const [resources, setResources] = useState<ResourceItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchResources = async () => {
+      setIsLoading(true);
+      try {
+        const fetchedResources = await getResources();
+        setResources(fetchedResources);
+      } catch (error) {
+        console.error("Failed to fetch resources:", error);
+        toast({
+          title: "Error",
+          description: "Could not load resources.",
+          variant: "destructive",
+        });
+      }
+      setIsLoading(false);
+    };
+    fetchResources();
+  }, [toast]);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="ml-2 text-muted-foreground">Loading resources...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">

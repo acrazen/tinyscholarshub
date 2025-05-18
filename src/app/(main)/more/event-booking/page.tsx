@@ -1,22 +1,43 @@
 // src/app/(main)/more/event-booking/page.tsx
 "use client";
 
-import { useState } from 'react';
-import { CalendarPlus, MapPin, Info, CheckCircle, XCircle, CalendarClock, Ticket } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { CalendarPlus, MapPin, Info, CheckCircle, XCircle, CalendarClock, Ticket, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { sampleSchoolEvents } from '@/lib/data';
+import { getSchoolEvents } from '@/lib/services/eventService'; // Use service
 import type { SchoolEvent } from '@/lib/types';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 
 export default function EventBookingPage() {
-  const [events, setEvents] = useState<SchoolEvent[]>(sampleSchoolEvents);
+  const [events, setEvents] = useState<SchoolEvent[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
+  useEffect(() => {
+    const fetchEvents = async () => {
+      setIsLoading(true);
+      try {
+        const fetchedEvents = await getSchoolEvents();
+        setEvents(fetchedEvents);
+      } catch (error) {
+        console.error("Failed to fetch events:", error);
+        toast({
+          title: "Error",
+          description: "Could not load school events.",
+          variant: "destructive",
+        });
+      }
+      setIsLoading(false);
+    };
+    fetchEvents();
+  }, [toast]);
+
   const handleBookingToggle = (eventId: string) => {
+    // In a real app, this would call a service to update booking status
     setEvents(prevEvents =>
       prevEvents.map(event =>
         event.id === eventId ? { ...event, isBooked: !event.isBooked } : event
@@ -26,7 +47,7 @@ export default function EventBookingPage() {
     if (event) {
         toast({
             title: event.isBooked ? "Booking Cancelled" : "Event Booked!",
-            description: `You have ${event.isBooked ? "cancelled your booking for" : "successfully booked"} ${event.title}.`,
+            description: `You have ${event.isBooked ? "cancelled your booking for" : "successfully booked"} ${event.title}. (Simulation)`,
         });
     }
   };
@@ -34,6 +55,15 @@ export default function EventBookingPage() {
   const upcomingEvents = events.filter(event => event.status === 'upcoming');
   const pastEvents = events.filter(event => event.status === 'past');
   const cancelledEvents = events.filter(event => event.status === 'cancelled');
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="ml-2 text-muted-foreground">Loading events...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -48,7 +78,7 @@ export default function EventBookingPage() {
       </div>
 
       <Tabs defaultValue="upcoming" className="w-full">
-        <TabsList className="grid w-full grid-cols-3"> {/* Changed from grid-cols-2 sm:grid-cols-3 */}
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="upcoming">Upcoming Events</TabsTrigger>
           <TabsTrigger value="past">Past Events</TabsTrigger>
           <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
@@ -70,7 +100,7 @@ export default function EventBookingPage() {
           {pastEvents.length > 0 ? (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {pastEvents.map((event) => (
-                <EventCard key={event.id} event={event} onBookToggle={handleBookingToggle} />
+                <EventCard key={event.id} event={event} onBookToggle={handleBookingToggle} isPastOrCancelled={true} />
               ))}
             </div>
           ) : (
@@ -81,7 +111,7 @@ export default function EventBookingPage() {
           {cancelledEvents.length > 0 ? (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {cancelledEvents.map((event) => (
-                <EventCard key={event.id} event={event} onBookToggle={handleBookingToggle} />
+                <EventCard key={event.id} event={event} onBookToggle={handleBookingToggle} isPastOrCancelled={true} />
               ))}
             </div>
           ) : (
@@ -96,9 +126,10 @@ export default function EventBookingPage() {
 interface EventCardProps {
   event: SchoolEvent;
   onBookToggle: (eventId: string) => void;
+  isPastOrCancelled?: boolean;
 }
 
-function EventCard({ event, onBookToggle }: EventCardProps) {
+function EventCard({ event, onBookToggle, isPastOrCancelled = false }: EventCardProps) {
   return (
     <Card className="shadow-lg rounded-xl flex flex-col">
       <CardHeader>
@@ -123,7 +154,7 @@ function EventCard({ event, onBookToggle }: EventCardProps) {
           <span>{event.description}</span>
         </div>
       </CardContent>
-      {event.status === 'upcoming' && (
+      {event.status === 'upcoming' && !isPastOrCancelled && (
         <CardFooter>
           <Button
             className="w-full"

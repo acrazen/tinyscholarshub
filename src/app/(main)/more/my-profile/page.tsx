@@ -1,36 +1,79 @@
-
 // src/app/(main)/more/my-profile/page.tsx
 "use client"; 
 
-import { useState } from 'react';
-import { UserCog, Edit3, Lock, Mail, Phone, MapPin, Save } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { UserCog, Edit3, Lock, Mail, Phone, MapPin, Save, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { sampleUserProfile } from '@/lib/data';
+import { getCurrentUserProfile } from '@/lib/services/userService'; // Use service
 import type { UserProfile } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 
 export default function MyProfilePage() {
-  const [user, setUser] = useState<UserProfile>(sampleUserProfile);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      setIsLoading(true);
+      try {
+        const profile = await getCurrentUserProfile();
+        setUser(profile);
+      } catch (error) {
+         console.error("Failed to fetch profile:", error);
+        toast({
+          title: "Error",
+          description: "Could not load your profile.",
+          variant: "destructive",
+        });
+      }
+      setIsLoading(false);
+    };
+    fetchProfile();
+  }, [toast]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setUser(prev => ({ ...prev, [name]: value }));
+    setUser(prev => prev ? ({ ...prev, [name]: value }) : null);
   };
 
   const handleSaveChanges = () => {
-    console.log("Saving changes:", user);
+    // In a real app, call a service to update the profile:
+    // e.g., const updatedProfile = await updateCurrentUserProfile(user);
+    // For now, just simulate:
+    if (!user) return;
+    console.log("Saving changes (simulated):", user);
     setIsEditing(false);
     toast({
         title: "Profile Updated",
-        description: "Your profile information has been saved.",
+        description: "Your profile information has been saved (simulation).",
     });
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="ml-2 text-muted-foreground">Loading profile...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+     return (
+      <div className="flex flex-col items-center justify-center h-[60vh] text-center p-4">
+        <UserCog className="w-16 h-16 text-destructive mb-4" />
+        <h1 className="text-2xl font-semibold mb-2">Profile Not Loaded</h1>
+        <p className="text-muted-foreground mb-6">We couldn't load your profile information. Please try again later.</p>
+      </div>
+    );
+  }
+
 
   return (
     <div className="space-y-8 max-w-2xl mx-auto">
@@ -127,5 +170,3 @@ export default function MyProfilePage() {
     </div>
   );
 }
-
-    

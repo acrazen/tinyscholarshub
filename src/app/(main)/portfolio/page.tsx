@@ -1,21 +1,21 @@
-
 // src/app/(main)/portfolio/page.tsx
 // This page will now directly show the detailed portfolio for a default student
 
-import { studentsData, getStudentById } from '@/lib/data';
+import { getStudentById, getAllStudents } from '@/lib/services/studentService';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Activity, FileText as ReportIcon, AlertTriangle, ArrowLeft, FolderKanban } from 'lucide-react';
+import { Activity, FileText as ReportIcon, AlertTriangle, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { MilestonesCard } from '@/components/performance/milestones-card';
 import { ReportsTabContent } from '@/components/portfolio/reports-tab-content';
 
-export default function PortfolioPage() {
+export default async function PortfolioPage() {
   // For this page, we'll display the portfolio of the first student as a default.
   // This simulates the view for a logged-in parent viewing their child's portfolio.
-  const studentIdToShow = studentsData[0]?.id; // Get the ID of the first student
-  const student = studentIdToShow ? getStudentById(studentIdToShow) : null;
+  const allStudents = await getAllStudents();
+  const studentIdToShow = allStudents[0]?.id; // Get the ID of the first student
+  const student = studentIdToShow ? await getStudentById(studentIdToShow) : null;
 
   if (!student) {
     return (
@@ -74,13 +74,6 @@ export default function PortfolioPage() {
           <ReportsTabContent student={student} />
         </TabsContent>
       </Tabs>
-
-      {/* 
-        If you still want a way to see other students, you might add a link here 
-        or re-introduce a student selection mechanism on another page.
-        For now, this page directly shows one student's portfolio.
-      */}
     </div>
   );
 }
-

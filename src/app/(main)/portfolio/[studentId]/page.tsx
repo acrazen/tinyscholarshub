@@ -1,6 +1,5 @@
-
 // src/app/(main)/portfolio/[studentId]/page.tsx
-import { getStudentById } from '@/lib/data';
+import { getStudentById } from '@/lib/services/studentService';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Activity, FileText as ReportIcon, AlertTriangle, ArrowLeft } from 'lucide-react';
@@ -13,8 +12,8 @@ interface PortfolioDetailPageProps {
   params: { studentId: string };
 }
 
-export default function PortfolioDetailPage({ params }: PortfolioDetailPageProps) {
-  const student = getStudentById(params.studentId);
+export default async function PortfolioDetailPage({ params }: PortfolioDetailPageProps) {
+  const student = await getStudentById(params.studentId);
 
   if (!student) {
     return (
@@ -33,7 +32,7 @@ export default function PortfolioDetailPage({ params }: PortfolioDetailPageProps
   }
 
   return (
-    <div className="space-y-6"> {/* Removed debug border and text */}
+    <div className="space-y-6">
       {/* Student Header Info */}
       <div className="flex flex-col items-center text-center p-4 md:p-6 bg-card rounded-xl shadow-lg">
         <Avatar className="w-24 h-24 md:w-28 md:h-28 mb-4 border-4 border-background shadow-md">
@@ -61,8 +60,6 @@ export default function PortfolioDetailPage({ params }: PortfolioDetailPageProps
         <TabsContent value="activities">
           <div className="space-y-6">
             <MilestonesCard milestones={student.milestones} />
-            {/* Consider adding AttendanceCard or other activity-related components here */}
-            {/* e.g., <AttendanceCard student={student} /> */}
           </div>
         </TabsContent>
         <TabsContent value="reports">
@@ -71,8 +68,6 @@ export default function PortfolioDetailPage({ params }: PortfolioDetailPageProps
       </Tabs>
 
        <div className="mt-8 text-center">
-        {/* This link should probably go to a page that lists all students, if such a page is desired elsewhere */}
-        {/* For now, linking back to the main portfolio page which shows the default student */}
         <Link href="/portfolio"> 
           <Button variant="outline">
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -83,4 +78,3 @@ export default function PortfolioDetailPage({ params }: PortfolioDetailPageProps
     </div>
   );
 }
-    
