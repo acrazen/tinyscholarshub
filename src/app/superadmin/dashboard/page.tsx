@@ -2,30 +2,38 @@
 // src/app/superadmin/dashboard/page.tsx
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Cog, Image as ImageIcon, Save } from "lucide-react";
+import { Cog, Save } from "lucide-react";
+import NextImage from 'next/image'; // Renamed to avoid conflict with local 'Image' if any
 import { useToast } from '@/hooks/use-toast';
-import Image from 'next/image';
+import { useAppCustomization } from '@/context/app-customization-context';
 
 export default function SuperAdminDashboardPage() {
-  const [appName, setAppName] = useState<string>("Tiny Scholars Hub (Default)");
-  const [appIconUrl, setAppIconUrl] = useState<string>("https://placehold.co/100x100.png?text=AppLogo");
+  const { appName: currentAppName, appIconUrl: currentAppIconUrl, setAppName, setAppIconUrl } = useAppCustomization();
   const { toast } = useToast();
 
+  // Local state for form inputs, initialized from context
+  const [formAppName, setFormAppName] = useState<string>(currentAppName);
+  const [formAppIconUrl, setFormAppIconUrl] = useState<string>(currentAppIconUrl || ""); // Handle null from context
+
+  // Effect to update local form state if context changes (e.g., on initial load)
+  useEffect(() => {
+    setFormAppName(currentAppName);
+    setFormAppIconUrl(currentAppIconUrl || "");
+  }, [currentAppName, currentAppIconUrl]);
+
+
   const handleSaveChanges = () => {
-    // In a real app, this would save to a backend.
-    // Here, we just simulate it.
-    console.log("Simulated Save:", { appName, appIconUrl });
+    setAppName(formAppName);
+    setAppIconUrl(formAppIconUrl.trim() ? formAppIconUrl.trim() : null); // Set to null if empty
     toast({
-      title: "Settings Saved (Simulated)",
-      description: "App name and icon URL have been updated in the local state.",
+      title: "Settings Updated",
+      description: "App name and icon have been updated in the header.",
     });
-    // Note: These changes won't reflect in the actual Logo component
-    // without further integration (e.g., global state/context and backend).
   };
 
   return (
@@ -38,10 +46,7 @@ export default function SuperAdminDashboardPage() {
         <CardHeader>
           <CardTitle>Application Customization</CardTitle>
           <CardDescription>
-            Global settings for white-labeling the application.
-            <span className="block text-xs text-muted-foreground mt-1">
-              (Note: Changes here are for demonstration and won't persist or globally update the app in this prototype.)
-            </span>
+            Global settings for white-labeling the application. Changes will reflect in the app header.
           </CardDescription>
         </CardHeader>
         <CardContent className="p-6 space-y-6">
@@ -50,12 +55,12 @@ export default function SuperAdminDashboardPage() {
             <Input 
               id="appName" 
               placeholder="Enter custom app name" 
-              value={appName}
-              onChange={(e) => setAppName(e.target.value)}
+              value={formAppName}
+              onChange={(e) => setFormAppName(e.target.value)}
               className="text-base"
             />
             <p className="text-sm text-muted-foreground">
-              This name would appear globally (e.g., in the header).
+              This name will appear in the app header. Try 'My School App'.
             </p>
           </div>
           
@@ -64,26 +69,32 @@ export default function SuperAdminDashboardPage() {
             <Input 
               id="appIconUrl" 
               type="url"
-              placeholder="Enter URL for custom app icon" 
-              value={appIconUrl}
-              onChange={(e) => setAppIconUrl(e.target.value)}
+              placeholder="Enter URL for custom app icon (e.g., https://...)" 
+              value={formAppIconUrl}
+              onChange={(e) => setFormAppIconUrl(e.target.value)}
               className="text-base"
             />
              <p className="text-sm text-muted-foreground">
-              Provide a URL for the app's main icon/logo.
+              Provide a URL for the app's main icon/logo (e.g., from placehold.co or picsum.photos for testing).
             </p>
-            {appIconUrl && (
+            {formAppIconUrl && (
               <div className="mt-3 p-3 border rounded-md inline-flex items-center justify-center bg-muted">
-                <Image 
-                  src={appIconUrl} 
+                <NextImage // Use the aliased import
+                  src={formAppIconUrl} 
                   alt="App Icon Preview" 
                   width={64} 
                   height={64} 
                   className="rounded-md object-contain"
                   data-ai-hint="app logo"
+                  unoptimized={true} // To allow various test URLs
                   onError={(e) => {
-                    // Fallback for invalid image URLs during demo
-                    e.currentTarget.src = "https://placehold.co/64x64.png?text=Error";
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none'; // Hide broken image element
+                    // Optionally, show a text placeholder or specific error icon
+                    const errorPlaceholder = document.createElement('span');
+                    errorPlaceholder.textContent = 'Invalid URL';
+                    errorPlaceholder.className = 'text-destructive text-xs';
+                    target.parentNode?.appendChild(errorPlaceholder);
                   }}
                 />
               </div>
@@ -92,7 +103,7 @@ export default function SuperAdminDashboardPage() {
         </CardContent>
         <CardFooter className="border-t pt-6">
           <Button onClick={handleSaveChanges}>
-            <Save className="mr-2 h-4 w-4" /> Save Changes (Simulated)
+            <Save className="mr-2 h-4 w-4" /> Apply Changes
           </Button>
         </CardFooter>
       </Card>
@@ -109,4 +120,3 @@ export default function SuperAdminDashboardPage() {
     </div>
   );
 }
-
