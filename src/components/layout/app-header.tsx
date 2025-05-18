@@ -4,7 +4,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, FolderKanban, GraduationCap, LayoutGrid, MessageSquare } from 'lucide-react';
+import { Home, FolderKanban, GraduationCap, LayoutGrid, MessageSquare, ShieldCheck } from 'lucide-react';
 import { Logo } from '@/components/icons/logo';
 import type { NavItem } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -22,9 +22,6 @@ const navItems: NavItem[] = [
 export function AppHeader() {
   const pathname = usePathname();
 
-  // Filter nav items based on current path context (e.g. if in /teacher or /admin)
-  // For now, this header is primarily for the (main) parent layout.
-  // Teacher/Admin layouts might have their own headers or customize these items.
   const currentNavItems = navItems;
 
 
@@ -44,13 +41,23 @@ export function AppHeader() {
               className={cn(
                 "px-2 py-1 text-sm font-medium transition-colors hover:text-primary rounded-md",
                 pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
-                  ? "text-primary bg-primary/10" // Use primary for active link background
+                  ? "text-primary bg-primary/10"
                   : "text-muted-foreground"
               )}
             >
               {item.label}
             </Link>
           ))}
+           {/* Super Admin Link - Desktop Only */}
+           <Link
+              href="/superadmin/dashboard"
+              className={cn(
+                "px-2 py-1 text-sm font-medium transition-colors hover:text-primary rounded-md text-muted-foreground hidden md:flex items-center",
+                pathname.startsWith('/superadmin') && "text-primary bg-primary/10"
+              )}
+            >
+              <ShieldCheck className="mr-1 h-4 w-4" /> Super Admin
+            </Link>
         </nav>
 
         {/* Mobile Profile Avatar Link */}
@@ -59,7 +66,6 @@ export function AppHeader() {
             <Avatar className="h-9 w-9 cursor-pointer">
               <AvatarImage src="https://picsum.photos/seed/headeravatar/40/40" alt="My Profile" data-ai-hint="user avatar" />
               <AvatarFallback className="bg-muted text-muted-foreground">
-                {/* In a real app, use user initials */}
                 U
               </AvatarFallback>
             </Avatar>
@@ -69,5 +75,4 @@ export function AppHeader() {
     </header>
   );
 }
-
     

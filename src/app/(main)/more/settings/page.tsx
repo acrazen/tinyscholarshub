@@ -1,5 +1,6 @@
+
 // src/app/(main)/more/settings/page.tsx
-import { Settings } from 'lucide-react';
+import { Settings, Heart } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 
@@ -33,11 +34,20 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      <div className="mt-12 text-center text-sm text-muted-foreground">
-        <Separator className="my-4" />
-        <p>Proudly Made in India</p>
-        <p>By Tiny Scholars Hub</p>
+      <div className="mt-12 text-center">
+        <Separator className="my-6" />
+        <div className="flex flex-col items-center space-y-1 text-sm text-muted-foreground">
+          <p className="font-medium text-foreground flex items-center">
+            Proudly Made in India 
+            <Heart className="h-4 w-4 inline-block ml-1.5 text-red-500 fill-red-500" />
+          </p>
+          <p>by <span className="font-semibold text-primary">Tiny Scholars Hub</span></p>
+        </div>
+         <p className="text-xs text-muted-foreground/80 mt-4">
+          Version 1.0.0 (Prototype)
+        </p>
       </div>
     </div>
   );
 }
+
