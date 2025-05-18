@@ -5,7 +5,7 @@
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MessageSquare, ScanLine, GraduationCap, Receipt } from 'lucide-react';
+import { MessageSquare, ScanLine, GraduationCap, IndianRupee } from 'lucide-react'; // Changed Receipt to IndianRupee
 import type { LucideIcon } from 'lucide-react';
 import { useEffect } from 'react';
 
@@ -43,7 +43,7 @@ const shortcutItems: ShortcutItem[] = [
   },
   {
     label: "Statement", // Shortened "Statement of Account" for better fit
-    icon: Receipt,
+    icon: IndianRupee, // Changed from Receipt to IndianRupee
     href: "/more/statement-of-account",
     iconBgColor: "bg-orange-500",
     iconColor: "text-white"
@@ -81,3 +81,4 @@ export function ShortcutNavigation() {
     </div>
   );
 }
+
