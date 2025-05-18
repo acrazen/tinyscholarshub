@@ -63,7 +63,7 @@ export default function MorePage() {
                   {/* Increased icon size from h-8 w-8 sm:h-9 to h-9 w-9 sm:h-10 sm:w-10, and mb-1 */}
                   <item.icon className={`h-9 w-9 sm:h-10 sm:w-10 mb-1 ${item.color}`} strokeWidth={1.5} />
                   {/* Increased text size from text-[9px] sm:text-[11px] to text-[10px] sm:text-xs */}
-                  <p className="text-[10px] sm:text-xs font-medium text-foreground mt-0.5 sm:mt-1 leading-tight">
+                  <p className="text-[13px] sm:text-xs font-medium text-foreground mt-0.5 sm:mt-1 leading-tight">
                     {item.label}
                   </p>
                 </CardContent>

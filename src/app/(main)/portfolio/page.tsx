@@ -34,13 +34,7 @@ export default function PortfolioPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Page Title - consistent with other top-level pages */}
-      <div className="flex items-center justify-center md:justify-start space-x-2 mb-6 md:mb-8 text-center md:text-left">
-        <FolderKanban className="h-7 w-7 sm:h-8 sm:w-8 text-primary" />
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Student Portfolio</h1>
-      </div>
-      
+    <div className="space-y-6"> 
       {/* Student Header Info */}
       <div className="flex flex-col items-center text-center p-4 md:p-6 bg-card rounded-xl shadow-lg">
         <Avatar className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 mb-3 sm:mb-4 border-4 border-background shadow-md">

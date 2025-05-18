@@ -48,8 +48,8 @@ export function MobileBottomNav() {
                 : "text-muted-foreground hover:text-primary hover:bg-primary/5"
             )}
           >
-            <item.icon className={cn("h-7 w-7 mb-0.5", isActive(item.href) ? "text-primary" : "")} />
-            <span className="text-sm font-medium leading-tight text-center">{item.label}</span>
+            <item.icon className={cn("h-7 w-7 mb-1", isActive(item.href) ? "text-primary" : "")} />
+            <span className="text-xs font-medium leading-tight text-center">{item.label}</span>
           </Link>
         ))}
       </div>
