@@ -52,18 +52,17 @@ export default function MorePage() {
   return (
     <div>
       {/* The h1 "More Options" title has been removed */}
-      <div className="grid grid-cols-3 gap-1.5 sm:gap-2.5">
+      {/* Adjusted grid columns for responsiveness and gap */}
+      <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
         {moreItems.map((item, index) => (
           <Link href={item.href} key={item.label} legacyBehavior>
             <a className="block h-full">
-              {/* Reduced padding on Card from p-1.5 sm:p-2 to p-1 sm:p-1.5 */}
               <Card className="shadow-lg rounded-xl hover:shadow-xl transition-shadow duration-300 h-full flex flex-col items-center justify-center p-1 sm:p-1.5 aspect-square bg-card hover:bg-muted/50">
-                {/* Reduced padding on CardContent from p-1 to p-0.5 */}
                 <CardContent className="flex flex-col items-center justify-center text-center p-0.5">
-                  {/* Increased icon size from h-8 w-8 sm:h-9 to h-9 w-9 sm:h-10 sm:w-10, and mb-1 */}
-                  <item.icon className={`h-9 w-9 sm:h-10 sm:w-10 mb-1 ${item.color}`} strokeWidth={1.5} />
-                  {/* Increased text size from text-[9px] sm:text-[11px] to text-[10px] sm:text-xs */}
-                  <p className="text-[13px] sm:text-xs font-medium text-foreground mt-0.5 sm:mt-1 leading-tight">
+                  {/* Adjusted icon sizes for better scaling */}
+                  <item.icon className={`h-8 w-8 sm:h-9 md:h-10 mb-1 sm:mb-1.5 ${item.color}`} strokeWidth={1.5} />
+                  {/* Adjusted text sizes for better readability */}
+                  <p className="text-xs sm:text-sm font-medium text-foreground mt-1 sm:mt-1.5 leading-tight">
                     {item.label}
                   </p>
                 </CardContent>
@@ -75,4 +74,3 @@ export default function MorePage() {
     </div>
   );
 }
-
