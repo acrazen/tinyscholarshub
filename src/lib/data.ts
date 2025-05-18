@@ -1,6 +1,6 @@
 
-import type { Student, FeedPost, Guardian, Milestone, SchoolEvent, ResourceItem, UserProfile, Comment, CommentAuthor, ReportItem } from './types';
-import { FileText, Youtube, Link as LinkIcon, BookOpen, FileArchive } from 'lucide-react'; // Added FileArchive
+import type { Student, FeedPost, Guardian, Milestone, SchoolEvent, ResourceItem, UserProfile, Comment, CommentAuthor, ReportItem, Conversation, ChatMessage } from './types';
+import { FileText, Youtube, Link as LinkIcon, BookOpen, FileArchive } from 'lucide-react';
 
 const guardiansData: Guardian[] = [
   { id: 'g1', name: 'Alice Smith', relation: 'Mother', phoneNumber: '555-0101', email: 'alice.smith@example.com', profilePhotoUrl: 'https://picsum.photos/seed/guardian1/100/100' },
@@ -275,15 +275,57 @@ export const sampleResources: ResourceItem[] = [
 
 export const sampleUserProfile: UserProfile = {
   id: 'user123',
-  name: 'Sarah Davis',
+  name: 'Sarah Davis', // Current user's name
   email: 'sarah.davis@example.com',
   phoneNumber: '555-123-4567',
   address: '123 Main Street, Anytown, USA 12345',
-  profilePhotoUrl: 'https://picsum.photos/seed/userprofile/200/200',
+  profilePhotoUrl: 'https://picsum.photos/seed/currentUser/100/100', // Current user's avatar
   dataAiHint: 'user avatar',
   role: 'Parent',
 };
 
-
 export const getStudentById = (id: string): Student | undefined => studentsData.find(s => s.id === id);
-    
+
+// Sample Data for Messaging
+export const sampleConversations: Conversation[] = [
+  {
+    id: 'convo1',
+    participantName: 'Ms. Emily (Butterflies)',
+    participantRole: 'Teacher',
+    lastMessage: "Don't forget the field trip form for Leo!",
+    lastMessageTimestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 mins ago
+    avatarUrl: 'https://picsum.photos/seed/teacher1/100/100',
+    unreadCount: 2,
+  },
+  {
+    id: 'convo2',
+    participantName: 'Mr. John (Caterpillars)',
+    participantRole: 'Teacher',
+    lastMessage: "Mia had a great day today, she really enjoyed the story time.",
+    lastMessageTimestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
+    avatarUrl: 'https://picsum.photos/seed/teacher2/100/100',
+  },
+  {
+    id: 'convo3',
+    participantName: 'School Admin',
+    participantRole: 'Administration',
+    lastMessage: "Reminder: School fees are due next Friday.",
+    lastMessageTimestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
+    avatarUrl: 'https://picsum.photos/seed/adminmsg/100/100',
+    unreadCount: 1,
+  },
+];
+
+export const sampleMessages: Record<string, ChatMessage[]> = {
+  convo1: [
+    { id: 'msg1-1', sender: 'other', text: "Hi Sarah, just a reminder about Leo's field trip form. Please send it by tomorrow if possible!", timestamp: new Date(Date.now() - 1000 * 60 * 35).toISOString(), avatarUrl: 'https://picsum.photos/seed/teacher1/100/100' },
+    { id: 'msg1-2', sender: 'user', text: "Oh, thanks for the reminder Ms. Emily! I'll get that in today.", timestamp: new Date(Date.now() - 1000 * 60 * 32).toISOString() },
+    { id: 'msg1-3', sender: 'other', text: "Great, thank you!", timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(), avatarUrl: 'https://picsum.photos/seed/teacher1/100/100' },
+  ],
+  convo2: [
+    { id: 'msg2-1', sender: 'other', text: "Mia had a great day today, she really enjoyed the story time about the little blue truck.", timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), avatarUrl: 'https://picsum.photos/seed/teacher2/100/100' },
+  ],
+  convo3: [
+     { id: 'msg3-1', sender: 'other', text: "Dear Parents, a friendly reminder: School fees are due next Friday. Please ensure payments are made on time. Thank you!", timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), avatarUrl: 'https://picsum.photos/seed/adminmsg/100/100' },
+  ]
+};

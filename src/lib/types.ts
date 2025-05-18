@@ -123,15 +123,16 @@ export interface UserProfile {
   phoneNumber: string;
   address?: string;
   profilePhotoUrl?: string;
+  dataAiHint?: string;
   role: 'Parent' | 'Teacher' | 'Admin';
 }
 
 export interface ChatMessage {
   id: string;
-  sender: 'user' | 'other';
+  sender: 'user' | 'other'; // 'user' is the current logged-in user
   text: string;
-  timestamp: string;
-  avatarUrl?: string;
+  timestamp: string; // ISO date string
+  avatarUrl?: string; // Typically for 'other' sender
 }
 
 export interface Conversation {
@@ -139,7 +140,7 @@ export interface Conversation {
   participantName: string;
   participantRole?: string;
   lastMessage: string;
-  lastMessageTimestamp: string;
+  lastMessageTimestamp: string; // ISO date string
   avatarUrl?: string;
   unreadCount?: number;
 }
