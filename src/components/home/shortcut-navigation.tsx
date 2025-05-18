@@ -1,37 +1,40 @@
-
 // src/components/home/shortcut-navigation.tsx
 "use client";
 
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MessageSquare, ScanLine, GraduationCap, IndianRupee } from 'lucide-react'; // Changed Receipt to IndianRupee
+import { MessageSquare, ScanLine, GraduationCap, IndianRupee } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useEffect } from 'react';
+import { useAppCustomization, type AppModuleKey } from '@/context/app-customization-context';
 
 interface ShortcutItem {
   label: string;
   icon: LucideIcon;
   href: string;
   isNew?: boolean;
-  iconBgColor?: string; // Optional: for specific icon background like in the image
-  iconColor?: string; // Optional: for specific icon color
+  iconBgColor?: string;
+  iconColor?: string;
+  moduleKey: AppModuleKey; // Module key to check for visibility
 }
 
-const shortcutItems: ShortcutItem[] = [
+const allShortcutItems: ShortcutItem[] = [
   {
     label: "Messaging",
     icon: MessageSquare,
     href: "/messages",
     iconBgColor: "bg-blue-500",
-    iconColor: "text-white"
+    iconColor: "text-white",
+    moduleKey: 'messaging',
   },
   {
     label: "Check In/Out",
-    icon: ScanLine, // Placeholder icon for Check In/Out
-    href: "#", // Placeholder link
+    icon: ScanLine,
+    href: "#", 
     iconBgColor: "bg-yellow-500",
-    iconColor: "text-white"
+    iconColor: "text-white",
+    moduleKey: 'portfolio', // Example: Tying to portfolio or a new specific module
   },
   {
     label: "My Learning",
@@ -39,26 +42,36 @@ const shortcutItems: ShortcutItem[] = [
     href: "/my-learning",
     isNew: true,
     iconBgColor: "bg-sky-500",
-    iconColor: "text-white"
+    iconColor: "text-white",
+    moduleKey: 'myLearning',
   },
   {
-    label: "Statement", // Shortened "Statement of Account" for better fit
-    icon: IndianRupee, // Changed from Receipt to IndianRupee
+    label: "Statement",
+    icon: IndianRupee,
     href: "/more/statement-of-account",
     iconBgColor: "bg-orange-500",
-    iconColor: "text-white"
+    iconColor: "text-white",
+    moduleKey: 'statementOfAccount',
   },
 ];
 
 export function ShortcutNavigation() {
+  const { moduleSettings } = useAppCustomization();
+
   useEffect(() => {
     console.log("ShortcutNavigation component rendered.");
   }, []);
 
+  const visibleShortcutItems = allShortcutItems.filter(item => moduleSettings[item.moduleKey] !== false);
+
+  if (visibleShortcutItems.length === 0) {
+    return null; // Or a placeholder if no shortcuts are enabled
+  }
+
   return (
-    <div className="mb-6"> {/* Original mb-6 is fine, page.tsx wrapper handles top margin */}
+    <div className="mb-6">
       <div className="grid grid-cols-4 gap-3 sm:gap-4">
-        {shortcutItems.map((item) => (
+        {visibleShortcutItems.map((item) => (
           <Link href={item.href} key={item.label} legacyBehavior>
             <a className="block group">
               <Card className="shadow-md rounded-lg hover:shadow-lg transition-shadow duration-200 overflow-hidden bg-card h-full flex flex-col items-center justify-center aspect-[4/5] sm:aspect-square">
@@ -81,4 +94,3 @@ export function ShortcutNavigation() {
     </div>
   );
 }
-

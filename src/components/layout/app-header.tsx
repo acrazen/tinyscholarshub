@@ -1,4 +1,3 @@
-
 // src/components/layout/app-header.tsx
 "use client";
 
@@ -9,21 +8,38 @@ import { Logo } from '@/components/icons/logo';
 import type { NavItem } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useAppCustomization, type AppModuleKey } from '@/context/app-customization-context';
 
-const navItems: NavItem[] = [
-  { href: '/', label: 'Home', icon: Home },
-  { href: '/portfolio', label: 'Portfolio', icon: FolderKanban },
-  { href: '/my-learning', label: 'My Learning', icon: GraduationCap },
-  { href: '/messages', label: 'Messages', icon: MessageSquare },
-  { href: '/more', label: 'More', icon: LayoutGrid },
-];
+// Map module keys to their primary navigation paths and labels
+const mainNavModuleMap: Record<AppModuleKey, { href: string; label: string; icon: NavItem['icon'] } | null> = {
+  messaging: { href: '/messages', label: 'Messages', icon: MessageSquare },
+  myLearning: { href: '/my-learning', label: 'My Learning', icon: GraduationCap },
+  portfolio: { href: '/portfolio', label: 'Portfolio', icon: FolderKanban },
+  eventBooking: null, // Not a primary nav item, accessed via "More"
+  resources: null, // Not a primary nav item, accessed via "More"
+  statementOfAccount: null, // Not a primary nav item, accessed via "More"
+  eService: null, // Not a primary nav item, accessed via "More"
+  settings: null, // Settings page is in "More"
+  adminManageStudents: null, // Admin specific
+  teacherSmartUpdate: null, // Teacher specific
+};
 
 
 export function AppHeader() {
   const pathname = usePathname();
+  const { moduleSettings } = useAppCustomization();
 
-  const currentNavItems = navItems;
-
+  const baseNavItems: NavItem[] = [
+    { href: '/', label: 'Home', icon: Home },
+    // Dynamically add module-based nav items
+    ...(Object.keys(moduleSettings) as AppModuleKey[]).reduce((acc, key) => {
+      if (moduleSettings[key] && mainNavModuleMap[key]) {
+        acc.push(mainNavModuleMap[key]!);
+      }
+      return acc;
+    }, [] as NavItem[]),
+    { href: '/more', label: 'More', icon: LayoutGrid },
+  ];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -32,9 +48,8 @@ export function AppHeader() {
           <Logo />
         </Link>
 
-        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-1 lg:space-x-2 flex-wrap">
-          {currentNavItems.map((item) => (
+          {baseNavItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
@@ -48,7 +63,6 @@ export function AppHeader() {
               {item.label}
             </Link>
           ))}
-           {/* Super Admin Link - Desktop Only */}
            <Link
               href="/superadmin/dashboard"
               className={cn(
@@ -60,7 +74,6 @@ export function AppHeader() {
             </Link>
         </nav>
 
-        {/* Mobile Profile Avatar Link */}
         <div className="md:hidden">
           <Link href="/more/my-profile" aria-label="My Profile">
             <Avatar className="h-9 w-9 cursor-pointer">
@@ -75,4 +88,3 @@ export function AppHeader() {
     </header>
   );
 }
-    

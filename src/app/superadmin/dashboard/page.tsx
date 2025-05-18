@@ -6,10 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Cog, Save, Palette, Image as ImageIcon } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Cog, Save, Palette, Image as ImageIcon, Puzzle } from "lucide-react";
 import NextImage from 'next/image';
 import { useToast } from '@/hooks/use-toast';
-import { useAppCustomization } from '@/context/app-customization-context';
+import { useAppCustomization, type AppModuleKey } from '@/context/app-customization-context';
 import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
@@ -22,16 +23,33 @@ import {
   hexToHsl
 } from '@/lib/color-utils';
 
+// Define modules that can be toggled
+const manageableModules: { key: AppModuleKey; label: string; description: string }[] = [
+  { key: 'messaging', label: 'Messaging', description: 'Enable/disable direct messaging features.' },
+  { key: 'myLearning', label: 'My Learning', description: 'Enable/disable the "My Learning" section for students/parents.' },
+  { key: 'portfolio', label: 'Portfolio', description: 'Enable/disable the student portfolio viewing feature.' },
+  { key: 'eventBooking', label: 'Event Booking', description: 'Enable/disable school event booking functionality.' },
+  { key: 'resources', label: 'Resources', description: 'Enable/disable access to shared school resources.' },
+  { key: 'statementOfAccount', label: 'Statement of Account', description: 'Enable/disable viewing financial statements.' },
+  { key: 'eService', label: 'eService', description: 'Enable/disable general eServices portal.' },
+  // { key: 'settings', label: 'Settings Page', description: 'Enable/disable user access to the settings page.' }, // Settings usually core
+  { key: 'adminManageStudents', label: 'Admin: Manage Students', description: 'Enable/disable student management for admins.' },
+  { key: 'teacherSmartUpdate', label: 'Teacher: Smart Update', description: 'Enable/disable AI update generator for teachers.' },
+];
+
+
 export default function SuperAdminDashboardPage() {
   const { 
     appName: currentAppName, 
     appIconUrl: currentAppIconUrl, 
     primaryColor: currentPrimaryColor,
     secondaryColor: currentSecondaryColor,
+    moduleSettings,
     setAppName, 
     setAppIconUrl,
     setPrimaryColor,
-    setSecondaryColor
+    setSecondaryColor,
+    toggleModule
   } = useAppCustomization();
   const { toast } = useToast();
 
@@ -42,20 +60,15 @@ export default function SuperAdminDashboardPage() {
 
   const [secondaryColorSuggestions, setSecondaryColorSuggestions] = useState<HSLColor[]>([]);
 
-  // Effect to initialize form state from context
   useEffect(() => {
     setFormAppName(currentAppName);
     setFormAppIconUrl(currentAppIconUrl || "");
-    setRawPrimaryColorInput(currentPrimaryColor); // context always stores HSL
-    setRawSecondaryColorInput(currentSecondaryColor); // context always stores HSL
+    setRawPrimaryColorInput(currentPrimaryColor);
+    setRawSecondaryColorInput(currentSecondaryColor);
   }, [currentAppName, currentAppIconUrl, currentPrimaryColor, currentSecondaryColor]);
 
-  // Generate secondary color suggestions when primary color (from context, which is HSL) changes
-  // or when rawPrimaryColorInput is a valid HSL string
   useEffect(() => {
-    let baseHslForSuggestions: HSLColor | null = parseHslString(currentPrimaryColor); // Default to context HSL
-
-    // If user types a valid HSL in the input, use that for immediate suggestion updates
+    let baseHslForSuggestions: HSLColor | null = parseHslString(currentPrimaryColor);
     const parsedInput = parseHslString(rawPrimaryColorInput);
     if (parsedInput) {
       baseHslForSuggestions = parsedInput;
@@ -67,35 +80,29 @@ export default function SuperAdminDashboardPage() {
     } else {
       setSecondaryColorSuggestions([]);
     }
-  }, [rawPrimaryColorInput, currentPrimaryColor]); // React to raw input for suggestions
+  }, [rawPrimaryColorInput, currentPrimaryColor]);
 
   const handleSaveChanges = () => {
     let finalPrimaryHsl: string | null = null;
     let finalSecondaryHsl: string | null = null;
 
-    // Process Primary Color
     if (isValidHslColorString(rawPrimaryColorInput)) {
       finalPrimaryHsl = rawPrimaryColorInput;
     } else if (isHexColorString(rawPrimaryColorInput)) {
       const hsl = hexToHsl(rawPrimaryColorInput);
-      if (hsl) {
-        finalPrimaryHsl = hslToString(hsl);
-      }
+      if (hsl) finalPrimaryHsl = hslToString(hsl);
     }
 
     if (!finalPrimaryHsl) {
-      toast({ title: "Invalid Primary Color", description: "Primary color must be a valid HSL string (e.g., '25 95% 55%') or HEX code (e.g., '#FF8C00').", variant: "destructive"});
+      toast({ title: "Invalid Primary Color", description: "Primary color must be a valid HSL string or HEX code.", variant: "destructive"});
       return;
     }
 
-    // Process Secondary Color
     if (isValidHslColorString(rawSecondaryColorInput)) {
       finalSecondaryHsl = rawSecondaryColorInput;
     } else if (isHexColorString(rawSecondaryColorInput)) {
       const hsl = hexToHsl(rawSecondaryColorInput);
-      if (hsl) {
-        finalSecondaryHsl = hslToString(hsl);
-      }
+      if (hsl) finalSecondaryHsl = hslToString(hsl);
     }
 
     if (!finalSecondaryHsl) {
@@ -107,27 +114,23 @@ export default function SuperAdminDashboardPage() {
     setAppIconUrl(formAppIconUrl.trim() ? formAppIconUrl.trim() : null);
     setPrimaryColor(finalPrimaryHsl);
     setSecondaryColor(finalSecondaryHsl);
+    // Module settings are updated directly via Switch components, no need to "save" them here for this simulation.
     
     toast({
       title: "Settings Updated",
-      description: "App customization settings have been applied.",
+      description: "App customization settings have been applied (frontend simulation).",
     });
   };
   
   const handleSecondarySuggestionSelect = (hslString: string) => {
-    setRawSecondaryColorInput(hslString); // Update the raw input with the HSL string
+    setRawSecondaryColorInput(hslString);
   };
 
   const getColorPreviewStyle = (colorInput: string): React.CSSProperties => {
-    if (isValidHslColorString(colorInput)) {
-      return { backgroundColor: `hsl(${colorInput})` };
-    }
-    if (isHexColorString(colorInput)) {
-      return { backgroundColor: colorInput };
-    }
+    if (isValidHslColorString(colorInput)) return { backgroundColor: `hsl(${colorInput})` };
+    if (isHexColorString(colorInput)) return { backgroundColor: colorInput };
     return { backgroundColor: 'transparent', border: '1px dashed #ccc' };
   };
-
 
   return (
     <div className="space-y-8">
@@ -135,11 +138,12 @@ export default function SuperAdminDashboardPage() {
         <Cog className="h-8 w-8 text-primary" />
         <h1 className="text-3xl font-bold tracking-tight">Super Admin Dashboard</h1>
       </div>
+      
       <Card className="shadow-lg rounded-xl">
         <CardHeader>
           <CardTitle>Application Customization</CardTitle>
           <CardDescription>
-            Global settings for white-labeling the application. Changes will reflect across the app.
+            Global settings for white-labeling the application. Changes will reflect across the app (frontend simulation).
           </CardDescription>
         </CardHeader>
         <CardContent className="p-6 space-y-6">
@@ -152,9 +156,6 @@ export default function SuperAdminDashboardPage() {
               onChange={(e) => setFormAppName(e.target.value)}
               className="text-base"
             />
-            <p className="text-sm text-muted-foreground">
-              This name will appear in the app header. Try 'My School App'.
-            </p>
           </div>
           
           <div className="space-y-2">
@@ -162,14 +163,11 @@ export default function SuperAdminDashboardPage() {
             <Input 
               id="appIconUrl" 
               type="url"
-              placeholder="Enter URL for custom app icon (e.g., https://...)" 
+              placeholder="Enter URL for custom app icon" 
               value={formAppIconUrl}
               onChange={(e) => setFormAppIconUrl(e.target.value)}
               className="text-base"
             />
-             <p className="text-sm text-muted-foreground">
-              Provide a URL for the app's main icon/logo. For testing, use a placehold.co or picsum.photos URL.
-            </p>
             {formAppIconUrl ? (
               <div className="mt-3 p-3 border rounded-md inline-flex items-center justify-center bg-muted">
                 <NextImage 
@@ -180,19 +178,7 @@ export default function SuperAdminDashboardPage() {
                   className="rounded-md object-contain"
                   data-ai-hint="custom logo"
                   unoptimized={true} 
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    const parent = target.parentNode as HTMLElement;
-                    target.style.display = 'none'; 
-                    
-                    const existingError = parent.querySelector('.error-placeholder');
-                    if (existingError) parent.removeChild(existingError);
-
-                    const errorPlaceholder = document.createElement('span');
-                    errorPlaceholder.textContent = 'Invalid URL';
-                    errorPlaceholder.className = 'text-destructive text-xs error-placeholder';
-                    parent.appendChild(errorPlaceholder);
-                  }}
+                  onError={(e) => { /* Simple error handling for preview */ const target = e.target as HTMLImageElement; target.style.display = 'none'; }}
                 />
               </div>
             ) : (
@@ -208,7 +194,6 @@ export default function SuperAdminDashboardPage() {
             <Palette className="h-5 w-5 text-muted-foreground" />
             <h3 className="text-lg font-medium">Theme Colors</h3>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             <div className="space-y-2">
               <Label htmlFor="primaryColor" className="text-base">Primary Color (HSL or HEX)</Label>
@@ -226,11 +211,7 @@ export default function SuperAdminDashboardPage() {
                   title="Primary Color Preview"
                 ></div>
               </div>
-              <p className="text-sm text-muted-foreground">
-                Enter HSL (e.g., "25 95% 55%") or HEX (e.g., "#FF8C00").
-              </p>
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="secondaryColor" className="text-base">Secondary Color (HSL or HEX)</Label>
                <div className="flex items-center space-x-2">
@@ -247,9 +228,6 @@ export default function SuperAdminDashboardPage() {
                   title="Secondary Color Preview"
                 ></div>
               </div>
-              <p className="text-sm text-muted-foreground">
-                Enter HSL or HEX. Lighter variants of primary are suggested below if primary is HSL.
-              </p>
               {secondaryColorSuggestions.length > 0 && (
                 <div className="mt-2 space-y-1">
                   <Label htmlFor="secondaryColorSuggestions" className="text-xs text-muted-foreground">Or pick a lighter variant (based on Primary HSL):</Label>
@@ -275,32 +253,60 @@ export default function SuperAdminDashboardPage() {
               )}
             </div>
           </div>
-
-
         </CardContent>
         <CardFooter className="border-t pt-6">
           <Button onClick={handleSaveChanges}>
-            <Save className="mr-2 h-4 w-4" /> Apply Changes
+            <Save className="mr-2 h-4 w-4" /> Apply Branding Changes
           </Button>
         </CardFooter>
       </Card>
 
-      <Card className="shadow-lg rounded-xl mt-8">
+      <Card className="shadow-lg rounded-xl">
+        <CardHeader>
+          <div className="flex items-center space-x-2">
+            <Puzzle className="h-5 w-5 text-muted-foreground" />
+            <CardTitle>Module Management</CardTitle>
+          </div>
+          <CardDescription>
+            Enable or disable specific features/modules for this instance of the application.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-6 space-y-4">
+          {manageableModules.map(module => (
+            <div key={module.key} className="flex items-center justify-between p-3 border rounded-lg bg-muted/30 hover:bg-muted/50">
+              <div>
+                <Label htmlFor={`module-${module.key}`} className="text-base font-medium">
+                  {module.label}
+                </Label>
+                <p className="text-xs text-muted-foreground">{module.description}</p>
+              </div>
+              <Switch
+                id={`module-${module.key}`}
+                checked={moduleSettings[module.key] ?? true} // Default to true if not set
+                onCheckedChange={() => toggleModule(module.key)}
+                aria-label={`Toggle ${module.label} module`}
+              />
+            </div>
+          ))}
+        </CardContent>
+         <CardFooter className="border-t pt-6">
+          <p className="text-sm text-muted-foreground">Module changes are applied instantly (frontend simulation).</p>
+        </CardFooter>
+      </Card>
+
+      <Card className="shadow-lg rounded-xl mt-8 opacity-70">
         <CardHeader>
             <CardTitle>Other Global Settings (Ideas)</CardTitle>
             <CardDescription>Placeholders for future super admin configurations.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-2 text-muted-foreground">
-            <p>- Feature Flags (Enable/disable app modules)</p>
+            <p>- Feature Flags (More granular)</p>
             <p>- Default Language Settings & Timezone</p>
-            <p>- Master Font Selection (Advanced)</p>
+            <p>- Master Font Selection</p>
             <p>- Manage Terms of Service / Privacy Policy links</p>
-            <p>- Integration keys for third-party services (e.g., payment gateway, analytics)</p>
-            <p>- Email notification templates & SMTP settings</p>
-            <p>- Branding: Favicon URL</p>
+            <p>- Integration keys (e.g., payment gateway, analytics)</p>
         </CardContent>
       </Card>
     </div>
   );
 }
-
