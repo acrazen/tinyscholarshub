@@ -12,7 +12,15 @@ import { useToast } from '@/hooks/use-toast';
 import { useAppCustomization } from '@/context/app-customization-context';
 import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { HSLColor, parseHslString, hslToString, generateLighterVariants, isValidHslColorString } from '@/lib/color-utils';
+import { 
+  type HSLColor, 
+  parseHslString, 
+  hslToString, 
+  generateLighterVariants, 
+  isValidHslColorString,
+  isHexColorString,
+  hexToHsl
+} from '@/lib/color-utils';
 
 export default function SuperAdminDashboardPage() {
   const { 
@@ -29,43 +37,76 @@ export default function SuperAdminDashboardPage() {
 
   const [formAppName, setFormAppName] = useState<string>(currentAppName);
   const [formAppIconUrl, setFormAppIconUrl] = useState<string>(currentAppIconUrl || "");
-  const [formPrimaryColor, setFormPrimaryColor] = useState<string>(currentPrimaryColor);
-  const [formSecondaryColor, setFormSecondaryColor] = useState<string>(currentSecondaryColor);
+  const [rawPrimaryColorInput, setRawPrimaryColorInput] = useState<string>(currentPrimaryColor);
+  const [rawSecondaryColorInput, setRawSecondaryColorInput] = useState<string>(currentSecondaryColor);
 
   const [secondaryColorSuggestions, setSecondaryColorSuggestions] = useState<HSLColor[]>([]);
 
+  // Effect to initialize form state from context
   useEffect(() => {
     setFormAppName(currentAppName);
     setFormAppIconUrl(currentAppIconUrl || "");
-    setFormPrimaryColor(currentPrimaryColor);
-    setFormSecondaryColor(currentSecondaryColor);
+    setRawPrimaryColorInput(currentPrimaryColor); // context always stores HSL
+    setRawSecondaryColorInput(currentSecondaryColor); // context always stores HSL
   }, [currentAppName, currentAppIconUrl, currentPrimaryColor, currentSecondaryColor]);
 
-  // Generate secondary color suggestions when primary color changes
+  // Generate secondary color suggestions when primary color (from context, which is HSL) changes
+  // or when rawPrimaryColorInput is a valid HSL string
   useEffect(() => {
-    const parsedPrimary = parseHslString(formPrimaryColor);
-    if (parsedPrimary) {
-      const suggestions = generateLighterVariants(parsedPrimary, 5, 8); // 5 suggestions, 8% lightness increment
+    let baseHslForSuggestions: HSLColor | null = parseHslString(currentPrimaryColor); // Default to context HSL
+
+    // If user types a valid HSL in the input, use that for immediate suggestion updates
+    const parsedInput = parseHslString(rawPrimaryColorInput);
+    if (parsedInput) {
+      baseHslForSuggestions = parsedInput;
+    }
+    
+    if (baseHslForSuggestions) {
+      const suggestions = generateLighterVariants(baseHslForSuggestions, 5, 8);
       setSecondaryColorSuggestions(suggestions);
     } else {
       setSecondaryColorSuggestions([]);
     }
-  }, [formPrimaryColor]);
+  }, [rawPrimaryColorInput, currentPrimaryColor]); // React to raw input for suggestions
 
   const handleSaveChanges = () => {
-    if (!isValidHslColorString(formPrimaryColor)) {
-      toast({ title: "Invalid Primary Color", description: "Please enter a valid HSL string for primary color (e.g., '25 95% 55%').", variant: "destructive"});
-      return;
+    let finalPrimaryHsl: string | null = null;
+    let finalSecondaryHsl: string | null = null;
+
+    // Process Primary Color
+    if (isValidHslColorString(rawPrimaryColorInput)) {
+      finalPrimaryHsl = rawPrimaryColorInput;
+    } else if (isHexColorString(rawPrimaryColorInput)) {
+      const hsl = hexToHsl(rawPrimaryColorInput);
+      if (hsl) {
+        finalPrimaryHsl = hslToString(hsl);
+      }
     }
-    if (!isValidHslColorString(formSecondaryColor)) {
-      toast({ title: "Invalid Secondary Color", description: "Please enter a valid HSL string for secondary color.", variant: "destructive"});
+
+    if (!finalPrimaryHsl) {
+      toast({ title: "Invalid Primary Color", description: "Primary color must be a valid HSL string (e.g., '25 95% 55%') or HEX code (e.g., '#FF8C00').", variant: "destructive"});
       return;
     }
 
+    // Process Secondary Color
+    if (isValidHslColorString(rawSecondaryColorInput)) {
+      finalSecondaryHsl = rawSecondaryColorInput;
+    } else if (isHexColorString(rawSecondaryColorInput)) {
+      const hsl = hexToHsl(rawSecondaryColorInput);
+      if (hsl) {
+        finalSecondaryHsl = hslToString(hsl);
+      }
+    }
+
+    if (!finalSecondaryHsl) {
+      toast({ title: "Invalid Secondary Color", description: "Secondary color must be a valid HSL string or HEX code.", variant: "destructive"});
+      return;
+    }
+    
     setAppName(formAppName);
     setAppIconUrl(formAppIconUrl.trim() ? formAppIconUrl.trim() : null);
-    setPrimaryColor(formPrimaryColor.trim());
-    setSecondaryColor(formSecondaryColor.trim());
+    setPrimaryColor(finalPrimaryHsl);
+    setSecondaryColor(finalSecondaryHsl);
     
     toast({
       title: "Settings Updated",
@@ -74,8 +115,19 @@ export default function SuperAdminDashboardPage() {
   };
   
   const handleSecondarySuggestionSelect = (hslString: string) => {
-    setFormSecondaryColor(hslString);
+    setRawSecondaryColorInput(hslString); // Update the raw input with the HSL string
   };
+
+  const getColorPreviewStyle = (colorInput: string): React.CSSProperties => {
+    if (isValidHslColorString(colorInput)) {
+      return { backgroundColor: `hsl(${colorInput})` };
+    }
+    if (isHexColorString(colorInput)) {
+      return { backgroundColor: colorInput };
+    }
+    return { backgroundColor: 'transparent', border: '1px dashed #ccc' };
+  };
+
 
   return (
     <div className="space-y-8">
@@ -133,7 +185,6 @@ export default function SuperAdminDashboardPage() {
                     const parent = target.parentNode as HTMLElement;
                     target.style.display = 'none'; 
                     
-                    // Remove previous error message if any
                     const existingError = parent.querySelector('.error-placeholder');
                     if (existingError) parent.removeChild(existingError);
 
@@ -160,49 +211,49 @@ export default function SuperAdminDashboardPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             <div className="space-y-2">
-              <Label htmlFor="primaryColor" className="text-base">Primary Color (HSL)</Label>
+              <Label htmlFor="primaryColor" className="text-base">Primary Color (HSL or HEX)</Label>
               <div className="flex items-center space-x-2">
                 <Input 
                   id="primaryColor" 
-                  placeholder="e.g., 25 95% 55%" 
-                  value={formPrimaryColor}
-                  onChange={(e) => setFormPrimaryColor(e.target.value)}
+                  placeholder="e.g., 25 95% 55% or #FF8C00" 
+                  value={rawPrimaryColorInput}
+                  onChange={(e) => setRawPrimaryColorInput(e.target.value)}
                   className="text-base flex-grow"
                 />
                 <div 
                   className="w-8 h-8 rounded-md border shrink-0" 
-                  style={{ backgroundColor: isValidHslColorString(formPrimaryColor) ? `hsl(${formPrimaryColor})` : 'transparent' }}
+                  style={getColorPreviewStyle(rawPrimaryColorInput)}
                   title="Primary Color Preview"
                 ></div>
               </div>
               <p className="text-sm text-muted-foreground">
-                Enter HSL values (e.g., "25 95% 55%" for orange).
+                Enter HSL (e.g., "25 95% 55%") or HEX (e.g., "#FF8C00").
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="secondaryColor" className="text-base">Secondary Color (HSL)</Label>
+              <Label htmlFor="secondaryColor" className="text-base">Secondary Color (HSL or HEX)</Label>
                <div className="flex items-center space-x-2">
                 <Input 
                   id="secondaryColor" 
-                  placeholder="e.g., 25 95% 75%" 
-                  value={formSecondaryColor}
-                  onChange={(e) => setFormSecondaryColor(e.target.value)}
+                  placeholder="e.g., 25 95% 75% or #FFA500" 
+                  value={rawSecondaryColorInput}
+                  onChange={(e) => setRawSecondaryColorInput(e.target.value)}
                   className="text-base flex-grow"
                 />
                  <div 
                   className="w-8 h-8 rounded-md border shrink-0" 
-                  style={{ backgroundColor: isValidHslColorString(formSecondaryColor) ? `hsl(${formSecondaryColor})` : 'transparent' }}
+                  style={getColorPreviewStyle(rawSecondaryColorInput)}
                   title="Secondary Color Preview"
                 ></div>
               </div>
               <p className="text-sm text-muted-foreground">
-                Enter HSL values (e.g., "25 95% 75%" for light orange).
+                Enter HSL or HEX. Lighter variants of primary are suggested below if primary is HSL.
               </p>
               {secondaryColorSuggestions.length > 0 && (
                 <div className="mt-2 space-y-1">
-                  <Label htmlFor="secondaryColorSuggestions" className="text-xs text-muted-foreground">Or pick a suggestion:</Label>
-                  <Select onValueChange={handleSecondarySuggestionSelect}>
+                  <Label htmlFor="secondaryColorSuggestions" className="text-xs text-muted-foreground">Or pick a lighter variant (based on Primary HSL):</Label>
+                  <Select onValueChange={handleSecondarySuggestionSelect} value={rawSecondaryColorInput}>
                     <SelectTrigger id="secondaryColorSuggestions" className="w-full text-sm">
                       <SelectValue placeholder="Select a light variant..." />
                     </SelectTrigger>
@@ -241,13 +292,15 @@ export default function SuperAdminDashboardPage() {
         </CardHeader>
         <CardContent className="space-y-2 text-muted-foreground">
             <p>- Feature Flags (Enable/disable app modules)</p>
-            <p>- Default Language Settings</p>
+            <p>- Default Language Settings & Timezone</p>
             <p>- Master Font Selection (Advanced)</p>
             <p>- Manage Terms of Service / Privacy Policy links</p>
-            <p>- Integration keys for third-party services (e.g., payment gateway)</p>
-            <p>- Email notification templates</p>
+            <p>- Integration keys for third-party services (e.g., payment gateway, analytics)</p>
+            <p>- Email notification templates & SMTP settings</p>
+            <p>- Branding: Favicon URL</p>
         </CardContent>
       </Card>
     </div>
   );
 }
+
