@@ -292,8 +292,8 @@ export function FeedItemCard({ post }: FeedItemCardProps) {
             variant="ghost" 
             size="sm" 
             className={cn(
-              "text-muted-foreground hover:bg-primary/10 hover:text-primary", 
-              isLikedByUser ? 'text-primary bg-primary/10' : '' // When liked, text is already primary. Hover state for liked can remain as is.
+              "text-muted-foreground hover:bg-primary/10 hover:text-primary active:bg-primary/10 active:text-primary", 
+              isLikedByUser ? 'text-primary bg-primary/10' : ''
             )} 
             onClick={handleLikePost}
           >
@@ -302,7 +302,7 @@ export function FeedItemCard({ post }: FeedItemCardProps) {
           <Button 
             variant="ghost" 
             size="sm" 
-            className="text-muted-foreground hover:text-primary hover:bg-primary/10" 
+            className="text-muted-foreground hover:text-primary hover:bg-primary/10 active:bg-primary/10 active:text-primary" 
             onClick={handleCommentButtonClick}
           >
             <MessageCircle className="mr-2 h-4 w-4" /> {currentCommentsCount} Comments
@@ -310,7 +310,7 @@ export function FeedItemCard({ post }: FeedItemCardProps) {
           <Button 
             variant="ghost" 
             size="sm" 
-            className="text-muted-foreground hover:text-primary hover:bg-primary/10" 
+            className="text-muted-foreground hover:text-primary hover:bg-primary/10 active:bg-primary/10 active:text-primary" 
             onClick={handleShare}
           >
             <Share2 className="mr-2 h-4 w-4" /> Share
@@ -345,8 +345,8 @@ export function FeedItemCard({ post }: FeedItemCardProps) {
                         variant="ghost"
                         size="xs"
                         className={cn(
-                          "text-xs p-1 h-auto text-muted-foreground hover:bg-primary/10 hover:text-primary",
-                          comment.isLikedByUser && "text-primary bg-primary/10" // When liked, text is already primary
+                          "text-xs p-1 h-auto text-muted-foreground hover:bg-primary/10 hover:text-primary active:bg-primary/10 active:text-primary",
+                          comment.isLikedByUser && "text-primary bg-primary/10"
                         )}
                         onClick={() => handleLikeComment(comment.id)}
                       >
