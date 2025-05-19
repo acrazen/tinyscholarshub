@@ -135,7 +135,7 @@ export default function MessagesPage() {
           selectedConversationId && isMobile && "hidden", // Hide list on mobile if a chat is selected
           !selectedConversationId && !isMobile && "md:flex" // Ensure it's flex on desktop if no convo selected
         )}>
-          <div className="p-4 border-b border-border hidden md:flex items-center justify-between">
+          <div className="p-3 border-b border-border hidden md:flex items-center justify-between">
             <h1 className="text-xl font-semibold flex items-center"><MessageSquare className="mr-2 h-5 w-5 text-primary" /> Chats</h1>
             <Button variant="ghost" size="icon" onClick={handleChatWithTeacher} title="Chat with Class Teacher">
                 <User className="h-5 w-5"/>
