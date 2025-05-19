@@ -2,14 +2,15 @@
 // src/app/(main)/messages/page.tsx
 "use client";
 
-import { useState, useEffect, useRef, type FormEvent } from 'react';
+import { useState, useEffect, useRef, type FormEvent, type KeyboardEvent } from 'react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/ui/input'; // Keep for search
+import { Textarea } from '@/components/ui/textarea'; // For message input
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MessageSquare, Send, Paperclip, Search, User, ArrowLeft, Loader2, MoreVertical } from 'lucide-react';
+import { MessageSquare, Send, Paperclip, Search, User, ArrowLeft, Loader2, MoreVertical, CheckCircle } from 'lucide-react';
 import type { Conversation, ChatMessage } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -18,6 +19,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useRouter } from 'next/navigation';
+import { useChatSettings } from '@/context/chat-settings-context';
 
 export default function MessagesPage() {
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
@@ -29,17 +31,18 @@ export default function MessagesPage() {
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const router = useRouter();
+  const { readReceipts, notificationSound, enterToSend, mediaAutoDownload } = useChatSettings();
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-   useEffect(() => {
+  useEffect(() => {
     if (isClient && !selectedConversationId && !isMobile && sampleConversations.length > 0) {
-      //setSelectedConversationId(sampleConversations[0].id); // Auto-select first conversation on desktop
+      // Auto-select first conversation on desktop if none selected
+      // setSelectedConversationId(sampleConversations[0].id); 
     }
   }, [isClient, selectedConversationId, isMobile]);
-
 
   useEffect(() => {
     if (selectedConversationId) {
@@ -51,12 +54,12 @@ export default function MessagesPage() {
 
   useEffect(() => {
     if (isClient) {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, isClient]);
 
-  const handleSendMessage = (e: FormEvent) => {
-    e.preventDefault();
+  const handleSendMessage = (e?: FormEvent) => {
+    if (e) e.preventDefault();
     if (newMessage.trim() === '' || !selectedConversationId) return;
 
     const newMsg: ChatMessage = {
@@ -67,18 +70,50 @@ export default function MessagesPage() {
     };
     setMessages(prev => [...prev, newMsg]);
 
+    // Simulate updating sample data (in a real app, this would be an API call)
     if (sampleMessages[selectedConversationId]) {
-        sampleMessages[selectedConversationId].push(newMsg);
+      sampleMessages[selectedConversationId].push(newMsg);
     } else {
-        sampleMessages[selectedConversationId] = [newMsg];
+      sampleMessages[selectedConversationId] = [newMsg];
     }
     const convoIndex = sampleConversations.findIndex(c => c.id === selectedConversationId);
     if (convoIndex !== -1) {
-        sampleConversations[convoIndex].lastMessage = newMessage;
-        sampleConversations[convoIndex].lastMessageTimestamp = new Date().toISOString();
+      sampleConversations[convoIndex].lastMessage = newMessage;
+      sampleConversations[convoIndex].lastMessageTimestamp = new Date().toISOString();
     }
 
     setNewMessage('');
+
+    // Simulate receiving a reply for notification/read receipt demo
+    setTimeout(() => {
+        if (selectedConversationId) { // Check if still in a convo
+            const replyMsg: ChatMessage = {
+                id: `reply-${Date.now()}`,
+                sender: 'other',
+                text: "Got it! Thanks for your message.",
+                timestamp: new Date().toISOString(),
+                avatarUrl: sampleConversations.find(c => c.id === selectedConversationId)?.avatarUrl
+            };
+            setMessages(prev => [...prev, replyMsg]);
+            if (sampleMessages[selectedConversationId]) {
+                sampleMessages[selectedConversationId].push(replyMsg);
+            }
+            
+            if (notificationSound) {
+                console.log("SIMULATED: Notification sound would play for new message from other.");
+            }
+            if (mediaAutoDownload !== 'never') {
+                console.log(`SIMULATED: Media (if any) in reply would be handled based on auto-download: ${mediaAutoDownload}`);
+            }
+        }
+    }, 2000);
+  };
+  
+  const handleTextAreaKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (enterToSend && e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
   };
 
   const sortedConversations = isClient ? [...sampleConversations].sort((a, b) =>
@@ -94,38 +129,30 @@ export default function MessagesPage() {
 
   const handleChatWithTeacher = () => {
     if (!isClient) return;
-
-    const firstStudent = studentsData[0]; 
+    const firstStudent = studentsData[0];
     if (!firstStudent) {
-      toast({ title: "No Student Data", description: "Cannot determine class teacher to chat with.", variant: "destructive" });
+      toast({ title: "No Student Data", description: "Cannot determine class teacher.", variant: "destructive" });
       return;
     }
-    
     let teacherConversationNamePart = "";
-    if (firstStudent.className === "Butterflies") {
-        teacherConversationNamePart = "Ms. Emily (Butterflies)";
-    } else if (firstStudent.className === "Caterpillars") {
-        teacherConversationNamePart = "Mr. John (Caterpillars)";
-    }
+    if (firstStudent.className === "Butterflies") teacherConversationNamePart = "Ms. Emily (Butterflies)";
+    else if (firstStudent.className === "Caterpillars") teacherConversationNamePart = "Mr. John (Caterpillars)";
 
     if (!teacherConversationNamePart) {
-        toast({ title: "Teacher Not Identified", description: `Could not identify a teacher for class: ${firstStudent.className}.`, variant: "destructive" });
-        return;
+      toast({ title: "Teacher Not Identified", description: `Could not identify teacher for class: ${firstStudent.className}.`, variant: "destructive" });
+      return;
     }
-    
     const teacherConvo = sampleConversations.find(c => c.participantName.includes(teacherConversationNamePart));
-
     if (teacherConvo) {
       setSelectedConversationId(teacherConvo.id);
     } else {
-      toast({ title: "Teacher Chat Not Found", description: `Could not find a chat with ${teacherConversationNamePart}.`, variant: "destructive" });
+      toast({ title: "Teacher Chat Not Found", description: `Could not find chat with ${teacherConversationNamePart}.`, variant: "destructive" });
     }
   };
 
   const navigateToChatSettings = () => {
     router.push('/messages/settings');
   };
-
 
   if (!isClient) {
     return (
@@ -159,17 +186,16 @@ export default function MessagesPage() {
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Conversation List Sidebar */}
         <aside className={cn(
           "w-full md:w-[320px] lg:w-[360px] border-r border-border flex flex-col bg-card",
-          selectedConversationId && isMobile && "hidden", 
-          !selectedConversationId && isMobile && "flex", 
-          !isMobile && "md:flex" 
+          selectedConversationId && isMobile && "hidden",
+          !selectedConversationId && isMobile && "flex",
+          !isMobile && "md:flex"
         )}>
           <div className="p-3 border-b border-border hidden md:flex items-center justify-between">
             <h1 className="text-xl font-semibold flex items-center"><MessageSquare className="mr-2 h-5 w-5 text-primary" /> Chats</h1>
             <Button variant="ghost" size="icon" onClick={handleChatWithTeacher} title="Chat with Class Teacher">
-                <User className="h-5 w-5"/>
+              <User className="h-5 w-5" />
             </Button>
           </div>
           <div className="p-3 border-b border-border">
@@ -215,26 +241,25 @@ export default function MessagesPage() {
                 )}
               </button>
             )) : (
-                 <p className="p-4 text-sm text-muted-foreground text-center">No conversations found.</p>
+              <p className="p-4 text-sm text-muted-foreground text-center">No conversations found.</p>
             )}
           </ScrollArea>
         </aside>
 
-        {/* Chat Area */}
         <main className={cn(
           "flex-1 flex flex-col bg-background",
-          !selectedConversationId && isMobile && "hidden", 
-          !selectedConversationId && !isMobile && "flex items-center justify-center"
+          !selectedConversationId && isMobile && "hidden",
+          !selectedConversationId && !isMobile && "flex items-center justify-center" // Center placeholder when no chat selected on desktop
         )}>
           {selectedConversation ? (
             <>
               <header className="p-3 border-b border-border bg-card flex items-center space-x-3 shadow-sm">
-                 <Button variant="ghost" size="icon" className="md:hidden mr-1" onClick={() => setSelectedConversationId(null)}>
-                    <ArrowLeft className="h-5 w-5"/>
-                 </Button>
+                <Button variant="ghost" size="icon" className="md:hidden mr-1" onClick={() => setSelectedConversationId(null)}>
+                  <ArrowLeft className="h-5 w-5" />
+                </Button>
                 <Avatar className="h-10 w-10">
                   <AvatarImage src={selectedConversation.avatarUrl} alt={selectedConversation.participantName} data-ai-hint="person chat avatar" />
-                  <AvatarFallback>{selectedConversation.participantName.substring(0,1).toUpperCase()}</AvatarFallback>
+                  <AvatarFallback>{selectedConversation.participantName.substring(0, 1).toUpperCase()}</AvatarFallback>
                 </Avatar>
                 <div>
                   <h2 className="font-semibold text-base">{selectedConversation.participantName}</h2>
@@ -244,13 +269,13 @@ export default function MessagesPage() {
               <ScrollArea className="flex-1 p-4">
                 {messages.map(msg => (
                   <div key={msg.id} className={cn(
-                    "flex items-end space-x-2 max-w-[80%] sm:max-w-[70%] mb-3", 
+                    "flex items-end space-x-2 max-w-[80%] sm:max-w-[70%] mb-3",
                     msg.sender === 'user' ? "ml-auto justify-end" : "mr-auto justify-start"
                   )}>
                     {msg.sender === 'other' && (
                       <Avatar className="h-8 w-8 self-start flex-shrink-0">
-                        <AvatarImage src={msg.avatarUrl} data-ai-hint="chat participant avatar"/>
-                        <AvatarFallback>{selectedConversation.participantName.substring(0,1).toUpperCase()}</AvatarFallback>
+                        <AvatarImage src={msg.avatarUrl} data-ai-hint="chat participant avatar" />
+                        <AvatarFallback>{selectedConversation.participantName.substring(0, 1).toUpperCase()}</AvatarFallback>
                       </Avatar>
                     )}
                     <div className={cn(
@@ -258,16 +283,22 @@ export default function MessagesPage() {
                       msg.sender === 'user' ? "bg-primary text-primary-foreground rounded-br-none" : "bg-card text-card-foreground rounded-bl-none border border-border"
                     )}>
                       <p className="text-sm">{msg.text}</p>
-                       {isClient && (
-                        <p className={cn("text-xs mt-1.5", msg.sender === 'user' ? 'text-primary-foreground/80 text-right' : 'text-muted-foreground text-left')}>
-                            {format(new Date(msg.timestamp), 'p')}
-                        </p>
-                       )}
+                      {isClient && (
+                        <div className={cn("text-xs mt-1.5 flex items-center", msg.sender === 'user' ? 'text-primary-foreground/80 justify-end' : 'text-muted-foreground justify-start')}>
+                          <span>{format(new Date(msg.timestamp), 'p')}</span>
+                          {msg.sender === 'other' && readReceipts && (
+                            <CheckCircle className="h-3 w-3 ml-1 text-blue-500" title="Simulated Read Receipt" />
+                          )}
+                           {msg.sender === 'user' && ( // Simulate "Sent" or "Delivered" for user's own messages
+                            <CheckCircle className="h-3 w-3 ml-1 text-primary-foreground/70" title="Sent" />
+                          )}
+                        </div>
+                      )}
                     </div>
-                     {msg.sender === 'user' && (
+                    {msg.sender === 'user' && (
                       <Avatar className="h-8 w-8 self-start flex-shrink-0">
-                        <AvatarImage src={sampleUserProfile.profilePhotoUrl} data-ai-hint="my avatar"/>
-                        <AvatarFallback>{sampleUserProfile.name.substring(0,1).toUpperCase()}</AvatarFallback>
+                        <AvatarImage src={sampleUserProfile.profilePhotoUrl} data-ai-hint="my avatar" />
+                        <AvatarFallback>{sampleUserProfile.name.substring(0, 1).toUpperCase()}</AvatarFallback>
                       </Avatar>
                     )}
                   </div>
@@ -279,13 +310,14 @@ export default function MessagesPage() {
                   <Paperclip className="h-5 w-5" />
                   <span className="sr-only">Attach file</span>
                 </Button>
-                <Input
-                  type="text"
+                <Textarea
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyDown={handleTextAreaKeyDown}
                   placeholder="Type a message..."
-                  className="flex-1 bg-background focus-visible:ring-1 focus-visible:ring-primary text-sm h-10"
+                  className="flex-1 bg-background focus-visible:ring-1 focus-visible:ring-primary text-sm min-h-[40px] max-h-[120px] resize-none"
                   autoComplete="off"
+                  rows={1}
                 />
                 <Button type="submit" size="icon" disabled={newMessage.trim() === ''} className="w-10 h-10">
                   <Send className="h-5 w-5" />
