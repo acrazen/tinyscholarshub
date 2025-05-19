@@ -8,18 +8,29 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MessageSquare, Send, Paperclip, Search, Settings2, ArrowLeft } from 'lucide-react';
+import { MessageSquare, Send, Paperclip, Search, Settings2, ArrowLeft, Loader2, User } from 'lucide-react'; // Added Loader2 & User
 import type { Conversation, ChatMessage } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { sampleConversations, sampleMessages, sampleUserProfile } from '@/lib/data'; // Import sample data
+import { sampleConversations, sampleMessages, sampleUserProfile, studentsData } from '@/lib/data';
+import { useToast } from '@/hooks/use-toast';
 
 export default function MessagesPage() {
-  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(sampleConversations[0]?.id || null);
+  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isClient, setIsClient] = useState(false); // To track client-side mount
+  const { toast } = useToast();
+
+  useEffect(() => {
+    setIsClient(true); // Component has mounted on the client
+    // Set initial selected conversation only on the client, if not already set
+    if (sampleConversations.length > 0 && !selectedConversationId) {
+      setSelectedConversationId(sampleConversations[0].id);
+    }
+  }, [selectedConversationId]); // Rerun if selectedConversationId changes from elsewhere
 
   useEffect(() => {
     if (selectedConversationId) {
@@ -30,8 +41,10 @@ export default function MessagesPage() {
   }, [selectedConversationId]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (isClient) { // Only scroll once client-side
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, isClient]);
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,10 +52,9 @@ export default function MessagesPage() {
 
     const newMsg: ChatMessage = {
       id: `msg-${Date.now()}`,
-      sender: 'user', // Assuming the current user is always the sender
+      sender: 'user',
       text: newMessage,
       timestamp: new Date().toISOString(),
-      // No avatarUrl for user's own messages in this example
     };
     setMessages(prev => [...prev, newMsg]);
 
@@ -61,29 +73,72 @@ export default function MessagesPage() {
     setNewMessage('');
   };
 
-  const filteredConversations = sampleConversations.filter(convo =>
+  // Sort conversations by lastMessageTimestamp to ensure latest is on top
+  const sortedConversations = [...sampleConversations].sort((a, b) =>
+    new Date(b.lastMessageTimestamp).getTime() - new Date(a.lastMessageTimestamp).getTime()
+  );
+
+  const filteredConversations = sortedConversations.filter(convo =>
     convo.participantName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     convo.lastMessage.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const selectedConversation = sampleConversations.find(c => c.id === selectedConversationId);
 
+  const handleChatWithTeacher = () => {
+    if (!isClient) return; // Ensure this runs client-side
+
+    const firstStudent = studentsData[0];
+    if (!firstStudent) {
+      toast({ title: "No Student Data", description: "Cannot determine class teacher.", variant: "destructive" });
+      return;
+    }
+    
+    let teacherConversationNamePart = "";
+    if (firstStudent.className === "Butterflies") {
+        teacherConversationNamePart = "Ms. Emily (Butterflies)";
+    } else if (firstStudent.className === "Caterpillars") {
+        teacherConversationNamePart = "Mr. John (Caterpillars)";
+    }
+    // Add more else if for other classes and teachers
+
+    const teacherConvo = sampleConversations.find(c => c.participantName.includes(teacherConversationNamePart));
+
+    if (teacherConvo) {
+      setSelectedConversationId(teacherConvo.id);
+    } else {
+      toast({ title: "Teacher Not Found", description: `Could not find a chat with ${teacherConversationNamePart}.`, variant: "destructive" });
+    }
+  };
+
+
+  if (!isClient) {
+    // Render a simple loading state or null on the server and initial client render
+    return (
+      <div className="flex flex-col items-center justify-center" style={{ height: 'calc(100vh - 5rem)' }}>
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        <p className="mt-4 text-muted-foreground">Loading messages...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col" style={{ height: 'calc(100vh - 5rem)' }}> {/* Adjusted height */}
-      {/* Mobile Header */}
+    <div className="flex flex-col" style={{ height: 'calc(100vh - 5rem)' }}>
       <div className="flex items-center justify-between p-4 border-b border-border md:hidden">
         <h1 className="text-2xl font-bold flex items-center"><MessageSquare className="mr-2 h-6 w-6 text-primary" /> Messages</h1>
         <Button variant="ghost" size="icon"><Settings2 className="h-5 w-5" /></Button>
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar - Conversation List */}
         <aside className={cn(
           "w-full md:w-[320px] lg:w-[360px] border-r border-border flex flex-col bg-card",
-          selectedConversationId && "hidden md:flex" // On mobile, hide list if a chat is open
+          selectedConversationId && "hidden md:flex"
         )}>
-          <div className="p-4 border-b border-border hidden md:block">
+          <div className="p-4 border-b border-border hidden md:flex items-center justify-between">
             <h1 className="text-xl font-semibold flex items-center"><MessageSquare className="mr-2 h-5 w-5 text-primary" /> Chats</h1>
+            <Button variant="ghost" size="icon" onClick={handleChatWithTeacher} title="Chat with Class Teacher">
+                <User className="h-5 w-5"/>
+            </Button>
           </div>
           <div className="p-3 border-b border-border">
             <div className="relative">
@@ -113,9 +168,11 @@ export default function MessagesPage() {
                 <div className="flex-1 overflow-hidden">
                   <div className="flex justify-between items-center">
                     <h3 className="font-semibold text-sm truncate">{convo.participantName}</h3>
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      {format(new Date(convo.lastMessageTimestamp), 'p')}
-                    </span>
+                    {isClient && (
+                      <span className="text-xs text-muted-foreground whitespace-nowrap">
+                        {format(new Date(convo.lastMessageTimestamp), 'p')}
+                      </span>
+                    )}
                   </div>
                   <p className="text-xs text-muted-foreground truncate">{convo.lastMessage}</p>
                 </div>
@@ -131,15 +188,14 @@ export default function MessagesPage() {
           </ScrollArea>
         </aside>
 
-        {/* Main Chat Area */}
         <main className={cn(
           "flex-1 flex flex-col bg-background",
-          !selectedConversationId && "hidden md:flex" // Initially hide on mobile if no convo selected
+          !selectedConversationId && "hidden md:flex"
         )}>
           {selectedConversation ? (
             <>
               <header className="p-3 border-b border-border bg-card flex items-center space-x-3 shadow-sm">
-                 <Button variant="ghost" size="icon" className="md:hidden mr-1" onClick={() => setSelectedConversationId(null)}> {/* Back button for mobile */}
+                 <Button variant="ghost" size="icon" className="md:hidden mr-1" onClick={() => setSelectedConversationId(null)}>
                     <ArrowLeft className="h-5 w-5"/>
                  </Button>
                 <Avatar className="h-10 w-10">
@@ -151,7 +207,7 @@ export default function MessagesPage() {
                   <p className="text-xs text-muted-foreground">{selectedConversation.participantRole || 'Online'}</p>
                 </div>
               </header>
-              <ScrollArea className="flex-1 p-4 space-y-2"> {/* Reduced space-y-4 to space-y-2 */}
+              <ScrollArea className="flex-1 p-4 space-y-2">
                 {messages.map(msg => (
                   <div key={msg.id} className={cn(
                     "flex items-end space-x-2 max-w-[80%] sm:max-w-[70%]",
@@ -164,15 +220,17 @@ export default function MessagesPage() {
                       </Avatar>
                     )}
                     <div className={cn(
-                      "p-3 rounded-xl shadow-sm break-words", // Ensure this is text-sm
+                      "p-3 rounded-xl shadow-sm break-words",
                       msg.sender === 'user' ? "bg-primary text-primary-foreground rounded-br-none" : "bg-card text-card-foreground rounded-bl-none border border-border"
                     )}>
-                      <p className="text-sm">{msg.text}</p> {/* Ensure text is sm */}
-                       <p className={cn("text-xs mt-1.5", msg.sender === 'user' ? 'text-primary-foreground/80 text-right' : 'text-muted-foreground text-left')}>
-                        {format(new Date(msg.timestamp), 'p')}
-                      </p>
+                      <p className="text-sm">{msg.text}</p>
+                       {isClient && (
+                        <p className={cn("text-xs mt-1.5", msg.sender === 'user' ? 'text-primary-foreground/80 text-right' : 'text-muted-foreground text-left')}>
+                            {format(new Date(msg.timestamp), 'p')}
+                        </p>
+                       )}
                     </div>
-                     {msg.sender === 'user' && ( // Display current user's avatar on the right
+                     {msg.sender === 'user' && (
                       <Avatar className="h-8 w-8 self-start flex-shrink-0">
                         <AvatarImage src={sampleUserProfile.profilePhotoUrl} data-ai-hint="my avatar"/>
                         <AvatarFallback>{sampleUserProfile.name.substring(0,1).toUpperCase()}</AvatarFallback>
@@ -213,3 +271,4 @@ export default function MessagesPage() {
     </div>
   );
 }
+
