@@ -8,8 +8,10 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { SlidersHorizontal, Bell, DownloadCloud, ShieldCheck } from 'lucide-react'; // Replaced MessageCircleSettings
+import { SlidersHorizontal, DownloadCloud, ShieldCheck } from 'lucide-react'; // Replaced MessageCircleSettings with SlidersHorizontal
 import { useToast } from '@/hooks/use-toast';
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+
 
 export default function ChatSettingsPage() {
   const [readReceipts, setReadReceipts] = useState(true);
@@ -103,31 +105,21 @@ export default function ChatSettingsPage() {
                 <DownloadCloud className="mr-2 h-5 w-5 text-primary" />
                 Media Auto-Download
             </Label>
-            <p className="text-xs text-muted-foreground pb-1">Choose when to automatically download photos and videos.</p>
-            {/* In a real app, this would be a RadioGroup or Select component */}
-            <div className="flex space-x-2">
-                <Button 
-                    variant={mediaAutoDownload === 'wifi' ? 'default' : 'outline'} 
-                    size="sm" 
-                    onClick={() => setMediaAutoDownload('wifi')}
-                >
-                    Wi-Fi Only
-                </Button>
-                <Button 
-                    variant={mediaAutoDownload === 'cellular' ? 'default' : 'outline'} 
-                    size="sm"
-                    onClick={() => setMediaAutoDownload('cellular')}
-                >
-                    Wi-Fi & Cellular
-                </Button>
-                 <Button 
-                    variant={mediaAutoDownload === 'never' ? 'default' : 'outline'} 
-                    size="sm"
-                    onClick={() => setMediaAutoDownload('never')}
-                >
-                    Never
-                </Button>
-            </div>
+            <p className="text-xs text-muted-foreground pb-2">Choose when to automatically download photos and videos.</p>
+            <RadioGroup defaultValue={mediaAutoDownload} onValueChange={setMediaAutoDownload} className="space-y-2">
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted/30">
+                <RadioGroupItem value="wifi" id="wifi" />
+                <Label htmlFor="wifi" className="font-normal flex-grow cursor-pointer">Wi-Fi Only</Label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted/30">
+                <RadioGroupItem value="cellular" id="cellular" />
+                <Label htmlFor="cellular" className="font-normal flex-grow cursor-pointer">Wi-Fi & Cellular</Label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted/30">
+                <RadioGroupItem value="never" id="never" />
+                <Label htmlFor="never" className="font-normal flex-grow cursor-pointer">Never</Label>
+              </div>
+            </RadioGroup>
           </div>
 
           <Separator />

@@ -1,8 +1,10 @@
 
 // src/app/(main)/more/settings/page.tsx
-import { Settings, Heart } from 'lucide-react';
+import { Settings, Heart, MessageCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default function SettingsPage() {
   return (
@@ -22,14 +24,29 @@ export default function SettingsPage() {
           <CardTitle>App Settings</CardTitle>
           <CardDescription>Customize your experience.</CardDescription>
         </CardHeader>
-        <CardContent className="p-6">
-          <div className="text-center py-10">
+        <CardContent className="p-6 space-y-6">
+          <div className="text-center py-6">
             <p className="text-lg text-muted-foreground">
-              Settings page is currently under development.
+              General app settings are currently under development.
             </p>
             <p className="text-sm text-muted-foreground mt-2">
               Soon you'll be able to manage notifications, theme, and other preferences here.
             </p>
+          </div>
+
+          <Separator />
+
+          <div>
+            <h3 className="text-lg font-medium mb-2 flex items-center">
+              <MessageCircle className="mr-2 h-5 w-5 text-primary" />
+              Messaging Preferences
+            </h3>
+            <p className="text-sm text-muted-foreground mb-3">
+              Customize your chat experience, including notifications, read receipts, and more.
+            </p>
+            <Link href="/messages/settings" passHref>
+              <Button variant="outline">Go to Chat Settings</Button>
+            </Link>
           </div>
         </CardContent>
       </Card>
@@ -50,4 +67,3 @@ export default function SettingsPage() {
     </div>
   );
 }
-

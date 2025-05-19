@@ -4,7 +4,7 @@
 
 import {
   Award, Megaphone, CalendarDays, FileSignature, CalendarPlus, LibraryBig,
-  PlaneTakeoff, UserCircle2, ListChecks, IndianRupee, FilePenLine, Settings, SlidersHorizontal
+  PlaneTakeoff, UserCircle2, ListChecks, IndianRupee, FilePenLine, Settings
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
@@ -16,7 +16,7 @@ interface MoreItem {
   icon: LucideIcon;
   color: string;
   href: string;
-  moduleKey?: AppModuleKey | 'chatSettings'; // Allow 'chatSettings' as a special key
+  moduleKey?: AppModuleKey;
 }
 
 const chartColors = [
@@ -39,7 +39,7 @@ const allMoreItems: MoreItem[] = [
   { label: "Survey", icon: ListChecks, color: chartColors[3], href: "#" },
   { label: "Statement of Account", icon: IndianRupee, color: chartColors[4], href: "/more/statement-of-account", moduleKey: 'statementOfAccount' },
   { label: "eService", icon: FilePenLine, color: chartColors[0], href: "/more/eservice", moduleKey: 'eService' },
-  { label: "Chat Settings", icon: SlidersHorizontal, color: chartColors[3], href: "/messages/settings", moduleKey: 'messaging' }, // Or a new moduleKey: 'chatSettings' if desired
+  // Chat Settings removed from here, will be accessed via App Settings
   { label: "App Settings", icon: Settings, color: chartColors[1], href: "/more/settings", moduleKey: 'settings' },
 ];
 
@@ -48,12 +48,6 @@ export default function MorePage() {
 
   const visibleMoreItems = allMoreItems.filter(item => {
     if (item.moduleKey) {
-      // Handle AppModuleKey or the special 'chatSettings' string
-      if (item.moduleKey === 'chatSettings') { 
-        // Assuming chat settings are visible if general messaging is enabled
-        return moduleSettings['messaging'] !== false;
-      }
-      // Cast to AppModuleKey for other cases if TS complains
       return moduleSettings[item.moduleKey as AppModuleKey] !== false;
     }
     return true; // Show if no moduleKey (like "Our Awards")
