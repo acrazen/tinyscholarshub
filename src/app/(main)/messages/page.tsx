@@ -2,36 +2,24 @@
 // src/app/(main)/messages/page.tsx
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MessageSquare, Send, Paperclip, Search, Settings2, ArrowLeft, User as ContactIcon } from 'lucide-react';
+import { MessageSquare, Send, Paperclip, Search, Settings2, ArrowLeft } from 'lucide-react';
 import type { Conversation, ChatMessage } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { sampleConversations, sampleMessages, sampleUserProfile, studentsData } from '@/lib/data'; // Import sample data
-import { useToast } from '@/hooks/use-toast';
+import { sampleConversations, sampleMessages, sampleUserProfile } from '@/lib/data'; // Import sample data
 
 export default function MessagesPage() {
-  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
+  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(sampleConversations[0]?.id || null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const { toast } = useToast();
-
-  useEffect(() => {
-    // This effect runs only on the client, after initial hydration
-    // Determine the initial selected conversation ID here
-    const sortedConversationsList = [...sampleConversations].sort(
-      (a, b) => new Date(b.lastMessageTimestamp).getTime() - new Date(a.lastMessageTimestamp).getTime()
-    );
-    const initialId = sortedConversationsList[0]?.id || null;
-    setSelectedConversationId(initialId);
-  }, []); // Empty dependency array ensures this runs once on mount
 
   useEffect(() => {
     if (selectedConversationId) {
@@ -51,9 +39,10 @@ export default function MessagesPage() {
 
     const newMsg: ChatMessage = {
       id: `msg-${Date.now()}`,
-      sender: 'user',
+      sender: 'user', // Assuming the current user is always the sender
       text: newMessage,
       timestamp: new Date().toISOString(),
+      // No avatarUrl for user's own messages in this example
     };
     setMessages(prev => [...prev, newMsg]);
 
@@ -72,63 +61,29 @@ export default function MessagesPage() {
     setNewMessage('');
   };
 
-  const sortedConversations = useMemo(() => {
-    return [...sampleConversations].sort(
-      (a, b) => new Date(b.lastMessageTimestamp).getTime() - new Date(a.lastMessageTimestamp).getTime()
-    );
-  }, [sampleConversations]); // Re-sort if sampleConversations itself changes reference, though direct mutation won't trigger this useMemo as effectively
-
-  const filteredConversations = sortedConversations.filter(convo =>
+  const filteredConversations = sampleConversations.filter(convo =>
     convo.participantName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     convo.lastMessage.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const selectedConversation = sampleConversations.find(c => c.id === selectedConversationId);
 
-  const handleChatWithTeacher = () => {
-    if (studentsData.length === 0) {
-      toast({ title: "No Student Data", description: "Cannot determine class teacher."});
-      return;
-    }
-    const currentStudent = studentsData[0];
-    const studentClassName = currentStudent.className;
-
-    const teacherConvo = sampleConversations.find(convo =>
-      convo.participantRole === 'Teacher' && convo.participantName.includes(studentClassName)
-    );
-
-    if (teacherConvo) {
-      setSelectedConversationId(teacherConvo.id);
-    } else {
-      const defaultTeacherConvo = sampleConversations.find(convo => convo.participantName.includes("Ms. Emily"));
-      if (defaultTeacherConvo){
-        setSelectedConversationId(defaultTeacherConvo.id);
-         toast({ title: "Teacher Found", description: `Opening chat with ${defaultTeacherConvo.participantName}. (Class-specific match not found)`});
-      } else {
-        toast({ title: "Teacher Not Found", description: `Could not find a conversation for ${studentClassName} class teacher.`});
-      }
-    }
-  };
-
   return (
     <div className="flex flex-col" style={{ height: 'calc(100vh - 5rem)' }}> {/* Adjusted height */}
+      {/* Mobile Header */}
       <div className="flex items-center justify-between p-4 border-b border-border md:hidden">
         <h1 className="text-2xl font-bold flex items-center"><MessageSquare className="mr-2 h-6 w-6 text-primary" /> Messages</h1>
         <Button variant="ghost" size="icon"><Settings2 className="h-5 w-5" /></Button>
       </div>
 
       <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar - Conversation List */}
         <aside className={cn(
           "w-full md:w-[320px] lg:w-[360px] border-r border-border flex flex-col bg-card",
-          selectedConversationId && "hidden md:flex"
+          selectedConversationId && "hidden md:flex" // On mobile, hide list if a chat is open
         )}>
           <div className="p-4 border-b border-border hidden md:block">
-            <div className="flex justify-between items-center">
-              <h1 className="text-xl font-semibold flex items-center"><MessageSquare className="mr-2 h-5 w-5 text-primary" /> Chats</h1>
-              <Button variant="outline" size="sm" onClick={handleChatWithTeacher} className="whitespace-nowrap">
-                <ContactIcon className="mr-1.5 h-4 w-4" /> Chat with Teacher
-              </Button>
-            </div>
+            <h1 className="text-xl font-semibold flex items-center"><MessageSquare className="mr-2 h-5 w-5 text-primary" /> Chats</h1>
           </div>
           <div className="p-3 border-b border-border">
             <div className="relative">
@@ -176,6 +131,7 @@ export default function MessagesPage() {
           </ScrollArea>
         </aside>
 
+        {/* Main Chat Area */}
         <main className={cn(
           "flex-1 flex flex-col bg-background",
           !selectedConversationId && "hidden md:flex" // Initially hide on mobile if no convo selected
@@ -183,7 +139,7 @@ export default function MessagesPage() {
           {selectedConversation ? (
             <>
               <header className="p-3 border-b border-border bg-card flex items-center space-x-3 shadow-sm">
-                 <Button variant="ghost" size="icon" className="md:hidden mr-1" onClick={() => setSelectedConversationId(null)}>
+                 <Button variant="ghost" size="icon" className="md:hidden mr-1" onClick={() => setSelectedConversationId(null)}> {/* Back button for mobile */}
                     <ArrowLeft className="h-5 w-5"/>
                  </Button>
                 <Avatar className="h-10 w-10">
@@ -216,7 +172,7 @@ export default function MessagesPage() {
                         {format(new Date(msg.timestamp), 'p')}
                       </p>
                     </div>
-                     {msg.sender === 'user' && (
+                     {msg.sender === 'user' && ( // Display current user's avatar on the right
                       <Avatar className="h-8 w-8 self-start flex-shrink-0">
                         <AvatarImage src={sampleUserProfile.profilePhotoUrl} data-ai-hint="my avatar"/>
                         <AvatarFallback>{sampleUserProfile.name.substring(0,1).toUpperCase()}</AvatarFallback>
@@ -257,4 +213,3 @@ export default function MessagesPage() {
     </div>
   );
 }
-
