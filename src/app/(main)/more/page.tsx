@@ -1,9 +1,10 @@
+
 // src/app/(main)/more/page.tsx
-"use client"; // Required for using the context hook
+"use client"; 
 
 import {
   Award, Megaphone, CalendarDays, FileSignature, CalendarPlus, LibraryBig,
-  PlaneTakeoff, UserCircle2, ListChecks, IndianRupee, FilePenLine, Settings
+  PlaneTakeoff, UserCircle2, ListChecks, IndianRupee, FilePenLine, Settings, SlidersHorizontal
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
@@ -15,7 +16,7 @@ interface MoreItem {
   icon: LucideIcon;
   color: string;
   href: string;
-  moduleKey?: AppModuleKey; // Optional: key to check against moduleSettings
+  moduleKey?: AppModuleKey | 'chatSettings'; // Allow 'chatSettings' as a special key
 }
 
 const chartColors = [
@@ -38,15 +39,25 @@ const allMoreItems: MoreItem[] = [
   { label: "Survey", icon: ListChecks, color: chartColors[3], href: "#" },
   { label: "Statement of Account", icon: IndianRupee, color: chartColors[4], href: "/more/statement-of-account", moduleKey: 'statementOfAccount' },
   { label: "eService", icon: FilePenLine, color: chartColors[0], href: "/more/eservice", moduleKey: 'eService' },
-  { label: "Settings", icon: Settings, color: chartColors[1], href: "/more/settings", moduleKey: 'settings' },
+  { label: "Chat Settings", icon: SlidersHorizontal, color: chartColors[3], href: "/messages/settings", moduleKey: 'messaging' }, // Or a new moduleKey: 'chatSettings' if desired
+  { label: "App Settings", icon: Settings, color: chartColors[1], href: "/more/settings", moduleKey: 'settings' },
 ];
 
 export default function MorePage() {
   const { moduleSettings } = useAppCustomization();
 
-  const visibleMoreItems = allMoreItems.filter(item => 
-    item.moduleKey ? moduleSettings[item.moduleKey] !== false : true // Show if no moduleKey or if moduleKey is true/undefined
-  );
+  const visibleMoreItems = allMoreItems.filter(item => {
+    if (item.moduleKey) {
+      // Handle AppModuleKey or the special 'chatSettings' string
+      if (item.moduleKey === 'chatSettings') { 
+        // Assuming chat settings are visible if general messaging is enabled
+        return moduleSettings['messaging'] !== false;
+      }
+      // Cast to AppModuleKey for other cases if TS complains
+      return moduleSettings[item.moduleKey as AppModuleKey] !== false;
+    }
+    return true; // Show if no moduleKey (like "Our Awards")
+  });
 
   return (
     <div>
@@ -56,7 +67,7 @@ export default function MorePage() {
             <a className="block h-full">
               <Card className="shadow-lg rounded-xl hover:shadow-xl transition-shadow duration-300 h-full flex flex-col items-center justify-center p-1 sm:p-1.5 aspect-square bg-card hover:bg-muted/50">
                 <CardContent className="flex flex-col items-center justify-center text-center p-0.5">
-                  <item.icon className={`h-8 w-8 sm:h-9 md:h-10 mb-1 sm:mb-1.5 ${item.color}`} strokeWidth={1.5} />
+                  <item.icon className={`h-9 w-9 sm:h-10 md:h-10 mb-1 sm:mb-1.5 ${item.color}`} strokeWidth={1.5} />
                   <p className="text-[10px] sm:text-xs font-medium text-foreground mt-1 sm:mt-1.5 leading-tight">
                     {item.label}
                   </p>

@@ -3,21 +3,21 @@
 "use client";
 
 import { useState, useEffect, useRef, type FormEvent } from 'react';
-import Link from 'next/link'; // Added for navigation
+import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MessageSquare, Send, Paperclip, Search, User, ArrowLeft, Loader2, MoreVertical } from 'lucide-react'; // Added MoreVertical
+import { MessageSquare, Send, Paperclip, Search, User, ArrowLeft, Loader2, MoreVertical } from 'lucide-react';
 import type { Conversation, ChatMessage } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { sampleConversations, sampleMessages, sampleUserProfile, studentsData } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'; // Added DropdownMenu components
-import { useRouter } from 'next/navigation'; // Added for navigation
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { useRouter } from 'next/navigation';
 
 export default function MessagesPage() {
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
@@ -28,7 +28,7 @@ export default function MessagesPage() {
   const [isClient, setIsClient] = useState(false);
   const { toast } = useToast();
   const isMobile = useIsMobile();
-  const router = useRouter(); // For navigation
+  const router = useRouter();
 
   useEffect(() => {
     setIsClient(true);
@@ -36,8 +36,7 @@ export default function MessagesPage() {
 
    useEffect(() => {
     if (isClient && !selectedConversationId && !isMobile && sampleConversations.length > 0) {
-      // Auto-select first conversation on desktop if none is selected and client has mounted
-      // setSelectedConversationId(sampleConversations[0].id); // Commented out to prevent auto-selection on first load
+      //setSelectedConversationId(sampleConversations[0].id); // Auto-select first conversation on desktop
     }
   }, [isClient, selectedConversationId, isMobile]);
 
@@ -123,8 +122,8 @@ export default function MessagesPage() {
     }
   };
 
-  const navigateToSettings = () => {
-    router.push('/more/settings');
+  const navigateToChatSettings = () => {
+    router.push('/messages/settings');
   };
 
 
@@ -152,8 +151,8 @@ export default function MessagesPage() {
             <DropdownMenuItem onClick={handleChatWithTeacher}>
               Chat with Class Teacher
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={navigateToSettings}>
-              Settings
+            <DropdownMenuItem onClick={navigateToChatSettings}>
+              Chat Settings
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -198,7 +197,7 @@ export default function MessagesPage() {
                   <AvatarImage src={convo.avatarUrl} alt={convo.participantName} data-ai-hint="person avatar" />
                   <AvatarFallback>{convo.participantName.substring(0, 1).toUpperCase()}</AvatarFallback>
                 </Avatar>
-                <div className={cn("flex-1 overflow-hidden min-w-0 w-0")}> {/* Added w-0 here */}
+                <div className={cn("flex-1 overflow-hidden min-w-0 w-0")}>
                   <div className="flex justify-between items-center">
                     <h3 className="font-semibold text-sm truncate">{convo.participantName}</h3>
                     {isClient && (
@@ -225,7 +224,7 @@ export default function MessagesPage() {
         <main className={cn(
           "flex-1 flex flex-col bg-background",
           !selectedConversationId && isMobile && "hidden", 
-          !selectedConversationId && !isMobile && "flex items-center justify-center" // Added centering for desktop placeholder
+          !selectedConversationId && !isMobile && "flex items-center justify-center"
         )}>
           {selectedConversation ? (
             <>
@@ -245,7 +244,7 @@ export default function MessagesPage() {
               <ScrollArea className="flex-1 p-4">
                 {messages.map(msg => (
                   <div key={msg.id} className={cn(
-                    "flex items-end space-x-2 max-w-[80%] sm:max-w-[70%] mb-3", // Added mb-3 for spacing
+                    "flex items-end space-x-2 max-w-[80%] sm:max-w-[70%] mb-3", 
                     msg.sender === 'user' ? "ml-auto justify-end" : "mr-auto justify-start"
                   )}>
                     {msg.sender === 'other' && (
@@ -306,4 +305,3 @@ export default function MessagesPage() {
     </div>
   );
 }
-
