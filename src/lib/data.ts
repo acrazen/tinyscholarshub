@@ -111,59 +111,67 @@ export const studentsData: Student[] = [
   },
 ];
 
+// Function to get a student by ID from the mock data
+export const getStudentById = (id: string): Student | undefined => {
+  return studentsData.find(student => student.id === id);
+};
+
 const sampleCommentAuthors: CommentAuthor[] = [
     { id: 'user1', name: 'Sarah D. (Leo\'s Mom)', avatarUrl: 'https://picsum.photos/seed/sarah/40/40' },
     { id: 'user2', name: 'Mike B. (Mia\'s Dad)', avatarUrl: 'https://picsum.photos/seed/mike/40/40' },
     { id: 'teacher1', name: 'Ms. Emily (Butterflies)', avatarUrl: 'https://picsum.photos/seed/emily/40/40' },
 ];
 
+// Using a fixed reference date for calculations to ensure consistency
+const refDate = new Date('2024-07-21T12:00:00.000Z');
+
 export const feedPostsData: FeedPost[] = [
   {
     id: 'fp1',
     author: { name: 'Butterflies Class', avatarUrl: 'https://picsum.photos/seed/butterfliesclass/50/50' },
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
+    timestamp: new Date(refDate.getTime() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours before refDate
     type: 'photo',
     mediaUrl: 'https://picsum.photos/seed/artday/600/400',
     dataAiHint: 'children painting',
     description: 'Our little artists had a blast with finger painting today! So much creativity on display. 🎨 #ArtDay #PreschoolFun Great job @LeoMiller and @MiaGarcia!',
     likes: 15,
     comments: [
-        { id: 'c1-1', author: sampleCommentAuthors[0], text: 'Leo came home so excited about this! Thanks for sharing.', timestamp: new Date(Date.now() - 1000 * 60 * 50).toISOString(), likes: 2, isLikedByUser: false },
-        { id: 'c1-2', author: sampleCommentAuthors[2], text: 'They all did wonderfully! Such talented artists.', timestamp: new Date(Date.now() - 1000 * 60 * 45).toISOString(), likes: 3, isLikedByUser: true },
+        { id: 'c1-1', author: sampleCommentAuthors[0], text: 'Leo came home so excited about this! Thanks for sharing.', timestamp: new Date(refDate.getTime() - 1000 * 60 * 50).toISOString(), likes: 2, isLikedByUser: false },
+        { id: 'c1-2', author: sampleCommentAuthors[2], text: 'They all did wonderfully! Such talented artists.', timestamp: new Date(refDate.getTime() - 1000 * 60 * 45).toISOString(), likes: 3, isLikedByUser: true },
     ],
     commentsCount: 2,
   },
   {
     id: 'fp2',
     author: { name: 'Tiny Scholars Admin', avatarUrl: 'https://picsum.photos/seed/admin/50/50' },
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
+    timestamp: new Date(refDate.getTime() - 1000 * 60 * 60 * 24).toISOString(), // 1 day before refDate
     type: 'text',
     description: "Reminder: Parent-teacher meetings are next week! Please sign up for a slot if you haven't already. We look forward to chatting with you!",
     likes: 22,
     comments: [
-        { id: 'c2-1', author: sampleCommentAuthors[1], text: 'Already booked! Looking forward to it.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 20).toISOString(), likes: 1, isLikedByUser: false },
+        { id: 'c2-1', author: sampleCommentAuthors[1], text: 'Already booked! Looking forward to it.', timestamp: new Date(refDate.getTime() - 1000 * 60 * 60 * 20).toISOString(), likes: 1, isLikedByUser: false },
     ],
     commentsCount: 1,
   },
   {
     id: 'fp3',
     author: { name: 'Caterpillars Class', avatarUrl: 'https://picsum.photos/seed/caterpillarsclass/50/50' },
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(), // 2 days ago
+    timestamp: new Date(refDate.getTime() - 1000 * 60 * 60 * 48).toISOString(), // 2 days before refDate
     type: 'video',
-    mediaUrl: 'https://picsum.photos/seed/singalong/600/400', // This was a placeholder image, ideally a video thumbnail
+    mediaUrl: 'https://picsum.photos/seed/singalong/600/400', 
     dataAiHint: 'kids singing',
     description: 'Sing-along time! 🎶 Our Caterpillars are learning new songs and having so much fun with music and movement. #MusicTime #EarlyLearning Special thanks to @SarahDavis for the song suggestion!',
     likes: 30,
     comments: [
-        { id: 'c3-1', author: sampleCommentAuthors[0], text: 'So cute! Wish I could hear them sing.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 40).toISOString(), likes: 5, isLikedByUser: true },
-        { id: 'c3-2', author: sampleCommentAuthors[1], text: 'Mia loves music time!', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 38).toISOString(), likes: 2, isLikedByUser: false },
+        { id: 'c3-1', author: sampleCommentAuthors[0], text: 'So cute! Wish I could hear them sing.', timestamp: new Date(refDate.getTime() - 1000 * 60 * 60 * 40).toISOString(), likes: 5, isLikedByUser: true },
+        { id: 'c3-2', author: sampleCommentAuthors[1], text: 'Mia loves music time!', timestamp: new Date(refDate.getTime() - 1000 * 60 * 60 * 38).toISOString(), likes: 2, isLikedByUser: false },
     ],
     commentsCount: 2,
   },
   {
     id: 'fp4',
     author: { name: 'Butterflies Class', avatarUrl: 'https://picsum.photos/seed/butterfliesclass2/50/50' },
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString(), // 3 days ago
+    timestamp: new Date(refDate.getTime() - 1000 * 60 * 60 * 72).toISOString(), // 3 days before refDate
     type: 'photo',
     mediaUrl: 'https://picsum.photos/seed/playground/600/400',
     dataAiHint: 'playground fun',
@@ -231,7 +239,7 @@ export const sampleResources: ResourceItem[] = [
     title: 'Healthy Eating Guide for Toddlers',
     description: 'A comprehensive guide to nutrition for young children, including meal ideas.',
     type: 'pdf',
-    url: '#', // Placeholder URL
+    url: '#', 
     icon: FileText,
     category: 'Health & Nutrition',
   },
@@ -240,7 +248,7 @@ export const sampleResources: ResourceItem[] = [
     title: 'The Importance of Play in Early Childhood',
     description: 'An insightful article on how play contributes to learning and development.',
     type: 'article',
-    url: '#', // Placeholder URL
+    url: '#', 
     icon: BookOpen,
     category: 'Child Development',
   },
@@ -249,7 +257,7 @@ export const sampleResources: ResourceItem[] = [
     title: 'DIY Craft Ideas for Kids',
     description: 'A fun video tutorial with easy craft projects you can do at home.',
     type: 'video',
-    url: '#', // Placeholder URL
+    url: '#', 
     icon: Youtube,
     category: 'Activities & Crafts',
   },
@@ -258,7 +266,7 @@ export const sampleResources: ResourceItem[] = [
     title: 'School Calendar 2024-2025',
     description: 'Download the official school academic calendar for the upcoming year.',
     type: 'pdf',
-    url: '#', // Placeholder URL
+    url: '#', 
     icon: FileText,
     category: 'School Information',
   },
@@ -267,7 +275,7 @@ export const sampleResources: ResourceItem[] = [
     title: 'Local Library Resources',
     description: 'Link to the local public library website for children\'s programs and books.',
     type: 'link',
-    url: '#', // Placeholder URL
+    url: '#', 
     icon: LinkIcon,
     category: 'Community Resources',
   },
@@ -275,25 +283,23 @@ export const sampleResources: ResourceItem[] = [
 
 export const sampleUserProfile: UserProfile = {
   id: 'user123',
-  name: 'Sarah Davis', // Current user's name
+  name: 'Sarah Davis', 
   email: 'sarah.davis@example.com',
   phoneNumber: '555-123-4567',
   address: '123 Main Street, Anytown, USA 12345',
-  profilePhotoUrl: 'https://picsum.photos/seed/currentUser/100/100', // Current user's avatar
+  profilePhotoUrl: 'https://picsum.photos/seed/currentUser/100/100', 
   dataAiHint: 'user avatar',
   role: 'Parent',
 };
 
-export const getStudentById = (id: string): Student | undefined => studentsData.find(s => s.id === id);
 
-// Sample Data for Messaging
 export const sampleConversations: Conversation[] = [
   {
     id: 'convo1',
     participantName: 'Ms. Emily (Butterflies)',
     participantRole: 'Teacher',
     lastMessage: "Don't forget the field trip form for Leo!",
-    lastMessageTimestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 mins ago
+    lastMessageTimestamp: new Date(refDate.getTime() - 1000 * 60 * 30).toISOString(), 
     avatarUrl: 'https://picsum.photos/seed/teacher1/100/100',
     unreadCount: 2,
   },
@@ -302,7 +308,7 @@ export const sampleConversations: Conversation[] = [
     participantName: 'Mr. John (Caterpillars)',
     participantRole: 'Teacher',
     lastMessage: "Mia had a great day today, she really enjoyed the story time.",
-    lastMessageTimestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
+    lastMessageTimestamp: new Date(refDate.getTime() - 1000 * 60 * 60 * 2).toISOString(), 
     avatarUrl: 'https://picsum.photos/seed/teacher2/100/100',
   },
   {
@@ -310,7 +316,7 @@ export const sampleConversations: Conversation[] = [
     participantName: 'School Admin',
     participantRole: 'Administration',
     lastMessage: "Reminder: School fees are due next Friday.",
-    lastMessageTimestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
+    lastMessageTimestamp: new Date(refDate.getTime() - 1000 * 60 * 60 * 24).toISOString(), 
     avatarUrl: 'https://picsum.photos/seed/adminmsg/100/100',
     unreadCount: 1,
   },
@@ -318,14 +324,14 @@ export const sampleConversations: Conversation[] = [
 
 export const sampleMessages: Record<string, ChatMessage[]> = {
   convo1: [
-    { id: 'msg1-1', sender: 'other', text: "Hi Sarah, just a reminder about Leo's field trip form. Please send it by tomorrow if possible!", timestamp: new Date(Date.now() - 1000 * 60 * 35).toISOString(), avatarUrl: 'https://picsum.photos/seed/teacher1/100/100' },
-    { id: 'msg1-2', sender: 'user', text: "Oh, thanks for the reminder Ms. Emily! I'll get that in today.", timestamp: new Date(Date.now() - 1000 * 60 * 32).toISOString() },
-    { id: 'msg1-3', sender: 'other', text: "Great, thank you!", timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(), avatarUrl: 'https://picsum.photos/seed/teacher1/100/100' },
+    { id: 'msg1-1', sender: 'other', text: "Hi Sarah, just a reminder about Leo's field trip form. Please send it by tomorrow if possible!", timestamp: new Date(refDate.getTime() - 1000 * 60 * 35).toISOString(), avatarUrl: 'https://picsum.photos/seed/teacher1/100/100' },
+    { id: 'msg1-2', sender: 'user', text: "Oh, thanks for the reminder Ms. Emily! I'll get that in today.", timestamp: new Date(refDate.getTime() - 1000 * 60 * 32).toISOString() },
+    { id: 'msg1-3', sender: 'other', text: "Great, thank you!", timestamp: new Date(refDate.getTime() - 1000 * 60 * 30).toISOString(), avatarUrl: 'https://picsum.photos/seed/teacher1/100/100' },
   ],
   convo2: [
-    { id: 'msg2-1', sender: 'other', text: "Mia had a great day today, she really enjoyed the story time about the little blue truck.", timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), avatarUrl: 'https://picsum.photos/seed/teacher2/100/100' },
+    { id: 'msg2-1', sender: 'other', text: "Mia had a great day today, she really enjoyed the story time about the little blue truck.", timestamp: new Date(refDate.getTime() - 1000 * 60 * 60 * 2).toISOString(), avatarUrl: 'https://picsum.photos/seed/teacher2/100/100' },
   ],
   convo3: [
-     { id: 'msg3-1', sender: 'other', text: "Dear Parents, a friendly reminder: School fees are due next Friday. Please ensure payments are made on time. Thank you!", timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), avatarUrl: 'https://picsum.photos/seed/adminmsg/100/100' },
+     { id: 'msg3-1', sender: 'other', text: "Dear Parents, a friendly reminder: School fees are due next Friday. Please ensure payments are made on time. Thank you!", timestamp: new Date(refDate.getTime() - 1000 * 60 * 60 * 24).toISOString(), avatarUrl: 'https://picsum.photos/seed/adminmsg/100/100' },
   ]
 };
