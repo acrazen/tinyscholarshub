@@ -4,7 +4,7 @@
 
 import {
   Award, Megaphone, CalendarDays, FileSignature, CalendarPlus, LibraryBig,
-  PlaneTakeoff, UserCircle2, ListChecks, IndianRupee, FilePenLine, Settings
+  PlaneTakeoff, UserCircle2, ListChecks, IndianRupee, FilePenLine, Settings, SlidersHorizontal
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
@@ -28,7 +28,7 @@ const chartColors = [
 ];
 
 const allMoreItems: MoreItem[] = [
-  { label: "Our Awards", icon: Award, color: chartColors[0], href: "#" },
+  { label: "Our Awards", icon: Award, color: chartColors[0], href: "/more/awards" }, // Updated href
   { label: "Announcements", icon: Megaphone, color: chartColors[1], href: "#" },
   { label: "Calendar", icon: CalendarDays, color: chartColors[2], href: "#" },
   { label: "eConsent", icon: FileSignature, color: chartColors[3], href: "#" },
@@ -39,7 +39,6 @@ const allMoreItems: MoreItem[] = [
   { label: "Survey", icon: ListChecks, color: chartColors[3], href: "#" },
   { label: "Statement of Account", icon: IndianRupee, color: chartColors[4], href: "/more/statement-of-account", moduleKey: 'statementOfAccount' },
   { label: "eService", icon: FilePenLine, color: chartColors[0], href: "/more/eservice", moduleKey: 'eService' },
-  // Chat Settings removed from here, will be accessed via App Settings
   { label: "App Settings", icon: Settings, color: chartColors[1], href: "/more/settings", moduleKey: 'settings' },
 ];
 
