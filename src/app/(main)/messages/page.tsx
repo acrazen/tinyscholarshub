@@ -16,20 +16,22 @@ import { sampleConversations, sampleMessages, sampleUserProfile, studentsData } 
 import { useToast } from '@/hooks/use-toast';
 
 export default function MessagesPage() {
-  const initialSelectedConversationId = useMemo(() => {
-    const sortedConversations = [...sampleConversations].sort(
-      (a, b) => new Date(b.lastMessageTimestamp).getTime() - new Date(a.lastMessageTimestamp).getTime()
-    );
-    return sortedConversations[0]?.id || null;
-  }, []);
-  
-  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(initialSelectedConversationId);
+  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const { toast } = useToast();
 
+  useEffect(() => {
+    // This effect runs only on the client, after initial hydration
+    // Determine the initial selected conversation ID here
+    const sortedConversationsList = [...sampleConversations].sort(
+      (a, b) => new Date(b.lastMessageTimestamp).getTime() - new Date(a.lastMessageTimestamp).getTime()
+    );
+    const initialId = sortedConversationsList[0]?.id || null;
+    setSelectedConversationId(initialId);
+  }, []); // Empty dependency array ensures this runs once on mount
 
   useEffect(() => {
     if (selectedConversationId) {
@@ -49,12 +51,13 @@ export default function MessagesPage() {
 
     const newMsg: ChatMessage = {
       id: `msg-${Date.now()}`,
-      sender: 'user', 
+      sender: 'user',
       text: newMessage,
       timestamp: new Date().toISOString(),
     };
     setMessages(prev => [...prev, newMsg]);
 
+    // Simulate updating the sample data (in a real app, this would be an API call)
     if (sampleMessages[selectedConversationId]) {
         sampleMessages[selectedConversationId].push(newMsg);
     } else {
@@ -73,12 +76,7 @@ export default function MessagesPage() {
     return [...sampleConversations].sort(
       (a, b) => new Date(b.lastMessageTimestamp).getTime() - new Date(a.lastMessageTimestamp).getTime()
     );
-  }, []); 
-  // Note: sampleConversations itself is mutated by handleSendMessage. 
-  // For a real app, this sorting should happen on data derived from state or props that properly re-render.
-  // For this prototype with direct data mutation, this useMemo might not re-sort visually after sending a new message
-  // until a component re-render is triggered by other means. A more robust state management would be needed.
-
+  }, [sampleConversations]); // Re-sort if sampleConversations itself changes reference, though direct mutation won't trigger this useMemo as effectively
 
   const filteredConversations = sortedConversations.filter(convo =>
     convo.participantName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -88,24 +86,20 @@ export default function MessagesPage() {
   const selectedConversation = sampleConversations.find(c => c.id === selectedConversationId);
 
   const handleChatWithTeacher = () => {
-    // For prototype: Assume first student, find their class teacher.
-    // Real app: Determine current user's child and their teacher.
     if (studentsData.length === 0) {
       toast({ title: "No Student Data", description: "Cannot determine class teacher."});
       return;
     }
-    const currentStudent = studentsData[0]; // e.g., Leo Miller
-    const studentClassName = currentStudent.className; // e.g., "Butterflies"
+    const currentStudent = studentsData[0];
+    const studentClassName = currentStudent.className;
 
-    // Find teacher by matching class name in participantName
-    const teacherConvo = sampleConversations.find(convo => 
+    const teacherConvo = sampleConversations.find(convo =>
       convo.participantRole === 'Teacher' && convo.participantName.includes(studentClassName)
     );
 
     if (teacherConvo) {
       setSelectedConversationId(teacherConvo.id);
     } else {
-      // Fallback to a known teacher if specific class teacher not found, or show error
       const defaultTeacherConvo = sampleConversations.find(convo => convo.participantName.includes("Ms. Emily"));
       if (defaultTeacherConvo){
         setSelectedConversationId(defaultTeacherConvo.id);
@@ -116,9 +110,8 @@ export default function MessagesPage() {
     }
   };
 
-
   return (
-    <div className="flex flex-col" style={{ height: 'calc(100vh - 5rem)' }}>
+    <div className="flex flex-col" style={{ height: 'calc(100vh - 5rem)' }}> {/* Adjusted height */}
       <div className="flex items-center justify-between p-4 border-b border-border md:hidden">
         <h1 className="text-2xl font-bold flex items-center"><MessageSquare className="mr-2 h-6 w-6 text-primary" /> Messages</h1>
         <Button variant="ghost" size="icon"><Settings2 className="h-5 w-5" /></Button>
@@ -127,7 +120,7 @@ export default function MessagesPage() {
       <div className="flex flex-1 overflow-hidden">
         <aside className={cn(
           "w-full md:w-[320px] lg:w-[360px] border-r border-border flex flex-col bg-card",
-          selectedConversationId && "hidden md:flex" 
+          selectedConversationId && "hidden md:flex"
         )}>
           <div className="p-4 border-b border-border hidden md:block">
             <div className="flex justify-between items-center">
@@ -139,9 +132,9 @@ export default function MessagesPage() {
           </div>
           <div className="p-3 border-b border-border">
             <div className="relative">
-              <Input 
-                placeholder="Search messages..." 
-                className="pl-10 bg-background text-sm" 
+              <Input
+                placeholder="Search messages..."
+                className="pl-10 bg-background text-sm"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -185,7 +178,7 @@ export default function MessagesPage() {
 
         <main className={cn(
           "flex-1 flex flex-col bg-background",
-          !selectedConversationId && "hidden md:flex"
+          !selectedConversationId && "hidden md:flex" // Initially hide on mobile if no convo selected
         )}>
           {selectedConversation ? (
             <>
@@ -202,7 +195,7 @@ export default function MessagesPage() {
                   <p className="text-xs text-muted-foreground">{selectedConversation.participantRole || 'Online'}</p>
                 </div>
               </header>
-              <ScrollArea className="flex-1 p-4 space-y-4">
+              <ScrollArea className="flex-1 p-4 space-y-2"> {/* Reduced space-y-4 to space-y-2 */}
                 {messages.map(msg => (
                   <div key={msg.id} className={cn(
                     "flex items-end space-x-2 max-w-[80%] sm:max-w-[70%]",
@@ -215,17 +208,17 @@ export default function MessagesPage() {
                       </Avatar>
                     )}
                     <div className={cn(
-                      "p-3 rounded-xl shadow-sm break-words",
+                      "p-3 rounded-xl shadow-sm break-words", // Ensure this is text-sm
                       msg.sender === 'user' ? "bg-primary text-primary-foreground rounded-br-none" : "bg-card text-card-foreground rounded-bl-none border border-border"
                     )}>
-                      <p className="text-sm">{msg.text}</p>
+                      <p className="text-sm">{msg.text}</p> {/* Ensure text is sm */}
                        <p className={cn("text-xs mt-1.5", msg.sender === 'user' ? 'text-primary-foreground/80 text-right' : 'text-muted-foreground text-left')}>
                         {format(new Date(msg.timestamp), 'p')}
                       </p>
                     </div>
                      {msg.sender === 'user' && (
                       <Avatar className="h-8 w-8 self-start flex-shrink-0">
-                        <AvatarImage src={sampleUserProfile.profilePhotoUrl} data-ai-hint="my avatar"/> 
+                        <AvatarImage src={sampleUserProfile.profilePhotoUrl} data-ai-hint="my avatar"/>
                         <AvatarFallback>{sampleUserProfile.name.substring(0,1).toUpperCase()}</AvatarFallback>
                       </Avatar>
                     )}
@@ -264,3 +257,4 @@ export default function MessagesPage() {
     </div>
   );
 }
+
