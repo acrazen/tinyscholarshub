@@ -3,24 +3,38 @@
 import type { ReportItem } from '@/lib/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, Download, FileType2 } from 'lucide-react'; // Using FileText as a generic "Folio" and FileType2 for PDF
+import { FileText, Download, FileType2, FileArchive } from 'lucide-react';
 import Link from 'next/link';
 
 interface ReportListItemProps {
   report: ReportItem;
 }
 
+// Map icon names to actual Lucide components
+const iconComponents: Record<NonNullable<ReportItem['iconName']>, React.FC<React.SVGProps<SVGSVGElement>>> = {
+  FileArchive: FileArchive,
+  FileText: FileText,
+  FileType2: FileType2,
+};
+
 export function ReportListItem({ report }: ReportListItemProps) {
-  // Use FileText for 'folio' and FileType2 for 'pdf'
-  const Icon = report.type === 'pdf' ? FileType2 : FileText; 
+  // Use a default icon if iconName is not specified or not found in the map
+  const IconToRender = report.iconName && iconComponents[report.iconName] ? iconComponents[report.iconName] : FileText;
+  
+  // Fallback logic based on type if iconName is missing
+  let EffectiveIcon = IconToRender;
+  if (!report.iconName) {
+    EffectiveIcon = report.type === 'pdf' ? FileType2 : FileText;
+  }
+
 
   return (
     <Card className="shadow-md rounded-lg hover:shadow-lg transition-shadow duration-200">
       <CardContent className="p-3 sm:p-4 flex items-center space-x-3 sm:space-x-4">
         <div className="flex-shrink-0 p-2 sm:p-3 bg-primary/10 rounded-md">
-          <Icon className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+          <EffectiveIcon className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
         </div>
-        <div className="flex-grow min-w-0"> {/* Added min-w-0 for better flex handling of truncate */}
+        <div className="flex-grow min-w-0">
           <h3 className="text-sm font-semibold text-foreground truncate">{report.title}</h3>
           <p className="text-xs text-muted-foreground">{report.termName}</p>
         </div>

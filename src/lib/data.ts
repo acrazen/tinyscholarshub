@@ -1,5 +1,5 @@
 
-import type { Student, FeedPost, Guardian, Milestone, SchoolEvent, ResourceItem, UserProfile, Comment, CommentAuthor, ReportItem, Conversation, ChatMessage, ChildAward } from './types';
+import type { Student, FeedPost, Guardian, Milestone, SchoolEvent, ResourceItem, UserProfile, Comment, CommentAuthor, ReportItem, ChildAward } from './types';
 import { FileText, Youtube, Link as LinkIcon, BookOpen, FileArchive } from 'lucide-react';
 
 const guardiansData: Guardian[] = [
@@ -19,14 +19,14 @@ const milestonesData: Milestone[] = [
 ];
 
 const sampleReportsLeo: ReportItem[] = [
-  { id: 'lr1', title: 'Term 2 Folio - 2024', termName: '2024 Term 2', year: 2024, type: 'folio', url: '#', icon: FileArchive, dataAiHint: 'report document' },
-  { id: 'lr2', title: 'Term 4 Report Card - 2023', termName: '2023 Term 4', year: 2023, type: 'pdf', url: '#', icon: FileText, dataAiHint: 'report pdf' },
-  { id: 'lr3', title: 'Term 2 Report Card - 2023', termName: '2023 Term 2', year: 2023, type: 'pdf', url: '#', icon: FileText, dataAiHint: 'report pdf' },
+  { id: 'lr1', title: 'Term 2 Folio - 2024', termName: '2024 Term 2', year: 2024, type: 'folio', url: '#', iconName: 'FileArchive', dataAiHint: 'report document' },
+  { id: 'lr2', title: 'Term 4 Report Card - 2023', termName: '2023 Term 4', year: 2023, type: 'pdf', url: '#', iconName: 'FileText', dataAiHint: 'report pdf' },
+  { id: 'lr3', title: 'Term 2 Report Card - 2023', termName: '2023 Term 2', year: 2023, type: 'pdf', url: '#', iconName: 'FileText', dataAiHint: 'report pdf' },
 ];
 
 const sampleReportsMia: ReportItem[] = [
-  { id: 'mr1', title: 'Term 2 Folio - 2024', termName: '2024 Term 2', year: 2024, type: 'folio', url: '#', icon: FileArchive, dataAiHint: 'report document' },
-  { id: 'mr2', title: 'Term 4 Report Card - 2023', termName: '2023 Term 4', year: 2023, type: 'pdf', url: '#', icon: FileText, dataAiHint: 'report pdf' },
+  { id: 'mr1', title: 'Term 2 Folio - 2024', termName: '2024 Term 2', year: 2024, type: 'folio', url: '#', iconName: 'FileArchive', dataAiHint: 'report document' },
+  { id: 'mr2', title: 'Term 4 Report Card - 2023', termName: '2023 Term 4', year: 2023, type: 'pdf', url: '#', iconName: 'FileText', dataAiHint: 'report pdf' },
 ];
 
 const sampleChildAwardsLeo: ChildAward[] = [

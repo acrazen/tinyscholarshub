@@ -31,7 +31,7 @@ export interface ReportItem {
   year: number;
   type: 'folio' | 'pdf';
   url: string; // URL to the report file or view
-  icon?: LucideIcon; // Optional: if we want to specify icons directly in data
+  iconName?: 'FileArchive' | 'FileText' | 'FileType2'; // Store icon name as string
   dataAiHint?: string;
 }
 
