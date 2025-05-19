@@ -8,12 +8,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MessageSquare, Send, Paperclip, Search, Settings2, ArrowLeft, Loader2, User } from 'lucide-react'; // Added Loader2 & User
+import { MessageSquare, Send, Paperclip, Search, Settings2, ArrowLeft, Loader2, User } from 'lucide-react';
 import type { Conversation, ChatMessage } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { sampleConversations, sampleMessages, sampleUserProfile, studentsData } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile'; // Import useIsMobile
 
 export default function MessagesPage() {
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
@@ -21,16 +22,18 @@ export default function MessagesPage() {
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [isClient, setIsClient] = useState(false); // To track client-side mount
+  const [isClient, setIsClient] = useState(false);
   const { toast } = useToast();
+  const isMobile = useIsMobile(); // Use the hook
 
   useEffect(() => {
-    setIsClient(true); // Component has mounted on the client
-    // Set initial selected conversation only on the client, if not already set
-    if (sampleConversations.length > 0 && !selectedConversationId) {
+    setIsClient(true);
+    // Auto-select first conversation on desktop if no conversation is selected
+    // On mobile, users should see the list first.
+    if (isClient && sampleConversations.length > 0 && !selectedConversationId && !isMobile) {
       setSelectedConversationId(sampleConversations[0].id);
     }
-  }, [selectedConversationId]); // Rerun if selectedConversationId changes from elsewhere
+  }, [selectedConversationId, isClient, isMobile]); // Add isMobile to dependencies
 
   useEffect(() => {
     if (selectedConversationId) {
@@ -41,7 +44,7 @@ export default function MessagesPage() {
   }, [selectedConversationId]);
 
   useEffect(() => {
-    if (isClient) { // Only scroll once client-side
+    if (isClient) {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, isClient]);
@@ -58,7 +61,6 @@ export default function MessagesPage() {
     };
     setMessages(prev => [...prev, newMsg]);
 
-    // Simulate updating the sample data (in a real app, this would be an API call)
     if (sampleMessages[selectedConversationId]) {
         sampleMessages[selectedConversationId].push(newMsg);
     } else {
@@ -73,7 +75,6 @@ export default function MessagesPage() {
     setNewMessage('');
   };
 
-  // Sort conversations by lastMessageTimestamp to ensure latest is on top
   const sortedConversations = [...sampleConversations].sort((a, b) =>
     new Date(b.lastMessageTimestamp).getTime() - new Date(a.lastMessageTimestamp).getTime()
   );
@@ -86,7 +87,7 @@ export default function MessagesPage() {
   const selectedConversation = sampleConversations.find(c => c.id === selectedConversationId);
 
   const handleChatWithTeacher = () => {
-    if (!isClient) return; // Ensure this runs client-side
+    if (!isClient) return;
 
     const firstStudent = studentsData[0];
     if (!firstStudent) {
@@ -100,8 +101,7 @@ export default function MessagesPage() {
     } else if (firstStudent.className === "Caterpillars") {
         teacherConversationNamePart = "Mr. John (Caterpillars)";
     }
-    // Add more else if for other classes and teachers
-
+    
     const teacherConvo = sampleConversations.find(c => c.participantName.includes(teacherConversationNamePart));
 
     if (teacherConvo) {
@@ -113,7 +113,6 @@ export default function MessagesPage() {
 
 
   if (!isClient) {
-    // Render a simple loading state or null on the server and initial client render
     return (
       <div className="flex flex-col items-center justify-center" style={{ height: 'calc(100vh - 5rem)' }}>
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -130,9 +129,11 @@ export default function MessagesPage() {
       </div>
 
       <div className="flex flex-1 overflow-hidden">
+        {/* Conversation List Sidebar */}
         <aside className={cn(
           "w-full md:w-[320px] lg:w-[360px] border-r border-border flex flex-col bg-card",
-          selectedConversationId && "hidden md:flex"
+          selectedConversationId && isMobile && "hidden", // Hide list on mobile if a chat is selected
+          !selectedConversationId && !isMobile && "md:flex" // Ensure it's flex on desktop if no convo selected
         )}>
           <div className="p-4 border-b border-border hidden md:flex items-center justify-between">
             <h1 className="text-xl font-semibold flex items-center"><MessageSquare className="mr-2 h-5 w-5 text-primary" /> Chats</h1>
@@ -188,9 +189,11 @@ export default function MessagesPage() {
           </ScrollArea>
         </aside>
 
+        {/* Chat Area */}
         <main className={cn(
           "flex-1 flex flex-col bg-background",
-          !selectedConversationId && "hidden md:flex"
+          !selectedConversationId && isMobile && "hidden", // Hide chat area on mobile if no chat is selected
+           (!selectedConversationId && !isMobile) && "flex" // Ensure main area visible on desktop to show placeholder
         )}>
           {selectedConversation ? (
             <>
@@ -207,10 +210,10 @@ export default function MessagesPage() {
                   <p className="text-xs text-muted-foreground">{selectedConversation.participantRole || 'Online'}</p>
                 </div>
               </header>
-              <ScrollArea className="flex-1 p-4 space-y-2">
+              <ScrollArea className="flex-1 p-4"> {/* Removed space-y-2 from here */}
                 {messages.map(msg => (
                   <div key={msg.id} className={cn(
-                    "flex items-end space-x-2 max-w-[80%] sm:max-w-[70%]",
+                    "flex items-end space-x-2 max-w-[80%] sm:max-w-[70%] mb-3", // Added mb-3 for spacing
                     msg.sender === 'user' ? "ml-auto justify-end" : "mr-auto justify-start"
                   )}>
                     {msg.sender === 'other' && (
