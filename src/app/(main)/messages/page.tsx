@@ -33,7 +33,7 @@ export default function MessagesPage() {
     if (sampleConversations.length > 0 && !selectedConversationId && !isMobile) {
       setSelectedConversationId(sampleConversations[0].id);
     }
-  }, [selectedConversationId, isMobile]); // Removed isClient from deps as setIsClient will trigger re-render
+  }, [selectedConversationId, isMobile]);
 
   useEffect(() => {
     if (selectedConversationId) {
@@ -70,6 +70,7 @@ export default function MessagesPage() {
     if (convoIndex !== -1) {
         sampleConversations[convoIndex].lastMessage = newMessage;
         sampleConversations[convoIndex].lastMessageTimestamp = new Date().toISOString();
+        // Manually re-sort if needed for immediate visual feedback, or rely on next filter/sort pass
     }
 
     setNewMessage('');
@@ -167,7 +168,7 @@ export default function MessagesPage() {
                   <AvatarImage src={convo.avatarUrl} alt={convo.participantName} data-ai-hint="person avatar" />
                   <AvatarFallback>{convo.participantName.substring(0, 1).toUpperCase()}</AvatarFallback>
                 </Avatar>
-                <div className="flex-1 overflow-hidden min-w-0"> {/* Added min-w-0 here */}
+                <div className="flex-1 overflow-hidden min-w-0 w-0"> {/* Added w-0 here */}
                   <div className="flex justify-between items-center">
                     <h3 className="font-semibold text-sm truncate">{convo.participantName}</h3>
                     {isClient && (
