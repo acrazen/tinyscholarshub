@@ -3,7 +3,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Award as AwardIcon, Trophy, Star, Sparkles, UserCheck } from 'lucide-react';
+import { Award as AwardIcon, Trophy, Star, Sparkles, UserCheck, BookOpen, type LucideIcon } from 'lucide-react'; // Added BookOpen and LucideIcon
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
@@ -221,3 +221,4 @@ export default function AwardsAndRecognitionsPage() {
     </div>
   );
 }
+
