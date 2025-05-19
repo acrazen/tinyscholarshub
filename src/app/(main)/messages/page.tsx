@@ -30,10 +30,10 @@ export default function MessagesPage() {
     setIsClient(true);
     // Auto-select first conversation on desktop if no conversation is selected
     // On mobile, users should see the list first.
-    if (isClient && sampleConversations.length > 0 && !selectedConversationId && !isMobile) {
+    if (sampleConversations.length > 0 && !selectedConversationId && !isMobile) {
       setSelectedConversationId(sampleConversations[0].id);
     }
-  }, [selectedConversationId, isClient, isMobile]); // Add isMobile to dependencies
+  }, [selectedConversationId, isMobile]); // Removed isClient from deps as setIsClient will trigger re-render
 
   useEffect(() => {
     if (selectedConversationId) {
@@ -132,8 +132,9 @@ export default function MessagesPage() {
         {/* Conversation List Sidebar */}
         <aside className={cn(
           "w-full md:w-[320px] lg:w-[360px] border-r border-border flex flex-col bg-card",
-          selectedConversationId && isMobile && "hidden", // Hide list on mobile if a chat is selected
-          !selectedConversationId && !isMobile && "md:flex" // Ensure it's flex on desktop if no convo selected
+          selectedConversationId && isMobile && "hidden", 
+          !selectedConversationId && isMobile && "flex", // Show list on mobile if no chat selected
+          !isMobile && "md:flex" // Always flex on desktop
         )}>
           <div className="p-3 border-b border-border hidden md:flex items-center justify-between">
             <h1 className="text-xl font-semibold flex items-center"><MessageSquare className="mr-2 h-5 w-5 text-primary" /> Chats</h1>
@@ -166,7 +167,7 @@ export default function MessagesPage() {
                   <AvatarImage src={convo.avatarUrl} alt={convo.participantName} data-ai-hint="person avatar" />
                   <AvatarFallback>{convo.participantName.substring(0, 1).toUpperCase()}</AvatarFallback>
                 </Avatar>
-                <div className="flex-1 overflow-hidden">
+                <div className="flex-1 overflow-hidden min-w-0"> {/* Added min-w-0 here */}
                   <div className="flex justify-between items-center">
                     <h3 className="font-semibold text-sm truncate">{convo.participantName}</h3>
                     {isClient && (
@@ -192,8 +193,8 @@ export default function MessagesPage() {
         {/* Chat Area */}
         <main className={cn(
           "flex-1 flex flex-col bg-background",
-          !selectedConversationId && isMobile && "hidden", // Hide chat area on mobile if no chat is selected
-           (!selectedConversationId && !isMobile) && "flex" // Ensure main area visible on desktop to show placeholder
+          !selectedConversationId && isMobile && "hidden", 
+          !selectedConversationId && !isMobile && "flex" 
         )}>
           {selectedConversation ? (
             <>
@@ -210,10 +211,10 @@ export default function MessagesPage() {
                   <p className="text-xs text-muted-foreground">{selectedConversation.participantRole || 'Online'}</p>
                 </div>
               </header>
-              <ScrollArea className="flex-1 p-4"> {/* Removed space-y-2 from here */}
+              <ScrollArea className="flex-1 p-4">
                 {messages.map(msg => (
                   <div key={msg.id} className={cn(
-                    "flex items-end space-x-2 max-w-[80%] sm:max-w-[70%] mb-3", // Added mb-3 for spacing
+                    "flex items-end space-x-2 max-w-[80%] sm:max-w-[70%] mb-3",
                     msg.sender === 'user' ? "ml-auto justify-end" : "mr-auto justify-start"
                   )}>
                     {msg.sender === 'other' && (
