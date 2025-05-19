@@ -35,6 +35,15 @@ export interface ReportItem {
   dataAiHint?: string;
 }
 
+export interface ChildAward {
+  id: string;
+  title: string;
+  description: string;
+  dateAwarded: string; // ISO date string
+  category: 'Academic' | 'Sports' | 'Arts' | 'Citizenship' | 'Effort';
+  // Optional: icon?: LucideIcon; imageUrl?: string;
+}
+
 export interface Student {
   id: string;
   firstName: string;
@@ -53,7 +62,8 @@ export interface Student {
   };
   recentAttendance: AttendanceRecord[];
   milestones: Milestone[];
-  reports?: ReportItem[]; // Added reports
+  reports?: ReportItem[];
+  childAwards?: ChildAward[]; // Added for child-specific awards
 }
 
 export interface CommentAuthor {
