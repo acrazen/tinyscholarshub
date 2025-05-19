@@ -2,29 +2,37 @@
 // src/app/(main)/messages/page.tsx
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MessageSquare, Send, Paperclip, Search, Settings2, ArrowLeft } from 'lucide-react';
+import { MessageSquare, Send, Paperclip, Search, Settings2, ArrowLeft, User as ContactIcon } from 'lucide-react';
 import type { Conversation, ChatMessage } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { sampleConversations, sampleMessages, sampleUserProfile } from '@/lib/data'; // Import sample data
+import { sampleConversations, sampleMessages, sampleUserProfile, studentsData } from '@/lib/data'; // Import sample data
+import { useToast } from '@/hooks/use-toast';
 
 export default function MessagesPage() {
-  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(sampleConversations[0]?.id || null);
+  const initialSelectedConversationId = useMemo(() => {
+    const sortedConversations = [...sampleConversations].sort(
+      (a, b) => new Date(b.lastMessageTimestamp).getTime() - new Date(a.lastMessageTimestamp).getTime()
+    );
+    return sortedConversations[0]?.id || null;
+  }, []);
+  
+  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(initialSelectedConversationId);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const { toast } = useToast();
 
 
   useEffect(() => {
     if (selectedConversationId) {
-      // In a real app, fetch messages for selectedConversationId
       setMessages(sampleMessages[selectedConversationId] || []);
     } else {
       setMessages([]);
@@ -41,59 +49,93 @@ export default function MessagesPage() {
 
     const newMsg: ChatMessage = {
       id: `msg-${Date.now()}`,
-      sender: 'user', // Current user is always the sender here
+      sender: 'user', 
       text: newMessage,
       timestamp: new Date().toISOString(),
-      // User's avatar is shown next to their messages, not in the message object itself typically
     };
     setMessages(prev => [...prev, newMsg]);
 
-    // Simulate saving to backend/updating sample data for persistence in demo
     if (sampleMessages[selectedConversationId]) {
         sampleMessages[selectedConversationId].push(newMsg);
     } else {
         sampleMessages[selectedConversationId] = [newMsg];
     }
-    // Update conversation's last message for the sidebar
     const convoIndex = sampleConversations.findIndex(c => c.id === selectedConversationId);
     if (convoIndex !== -1) {
         sampleConversations[convoIndex].lastMessage = newMessage;
         sampleConversations[convoIndex].lastMessageTimestamp = new Date().toISOString();
-        // Move the updated conversation to the top of the list
-        const updatedConvo = sampleConversations.splice(convoIndex, 1)[0];
-        sampleConversations.unshift(updatedConvo);
     }
 
     setNewMessage('');
   };
 
-  const filteredConversations = sampleConversations.filter(convo =>
+  const sortedConversations = useMemo(() => {
+    return [...sampleConversations].sort(
+      (a, b) => new Date(b.lastMessageTimestamp).getTime() - new Date(a.lastMessageTimestamp).getTime()
+    );
+  }, []); 
+  // Note: sampleConversations itself is mutated by handleSendMessage. 
+  // For a real app, this sorting should happen on data derived from state or props that properly re-render.
+  // For this prototype with direct data mutation, this useMemo might not re-sort visually after sending a new message
+  // until a component re-render is triggered by other means. A more robust state management would be needed.
+
+
+  const filteredConversations = sortedConversations.filter(convo =>
     convo.participantName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     convo.lastMessage.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const selectedConversation = sampleConversations.find(c => c.id === selectedConversationId);
 
-  // Adjust page height accounting for header, and potential bottom nav on mobile
-  const mainContentHeight = "h-[calc(100vh-var(--header-height,4rem)-var(--mobile-nav-height,0rem)-2rem)] md:h-[calc(100vh-var(--header-height,4rem)-2rem)]";
-  // For mobile, if bottom nav is present, its height is 4rem (approx 64px). Let's use a CSS var for it for flexibility.
-  // Setting --header-height in a style tag in RootLayout might be better, but for now, using a common value.
+  const handleChatWithTeacher = () => {
+    // For prototype: Assume first student, find their class teacher.
+    // Real app: Determine current user's child and their teacher.
+    if (studentsData.length === 0) {
+      toast({ title: "No Student Data", description: "Cannot determine class teacher."});
+      return;
+    }
+    const currentStudent = studentsData[0]; // e.g., Leo Miller
+    const studentClassName = currentStudent.className; // e.g., "Butterflies"
+
+    // Find teacher by matching class name in participantName
+    const teacherConvo = sampleConversations.find(convo => 
+      convo.participantRole === 'Teacher' && convo.participantName.includes(studentClassName)
+    );
+
+    if (teacherConvo) {
+      setSelectedConversationId(teacherConvo.id);
+    } else {
+      // Fallback to a known teacher if specific class teacher not found, or show error
+      const defaultTeacherConvo = sampleConversations.find(convo => convo.participantName.includes("Ms. Emily"));
+      if (defaultTeacherConvo){
+        setSelectedConversationId(defaultTeacherConvo.id);
+         toast({ title: "Teacher Found", description: `Opening chat with ${defaultTeacherConvo.participantName}. (Class-specific match not found)`});
+      } else {
+        toast({ title: "Teacher Not Found", description: `Could not find a conversation for ${studentClassName} class teacher.`});
+      }
+    }
+  };
+
 
   return (
-    <div className="flex flex-col" style={{ height: 'calc(100vh - 5rem)' }}> {/* Approx header height */}
+    <div className="flex flex-col" style={{ height: 'calc(100vh - 5rem)' }}>
       <div className="flex items-center justify-between p-4 border-b border-border md:hidden">
         <h1 className="text-2xl font-bold flex items-center"><MessageSquare className="mr-2 h-6 w-6 text-primary" /> Messages</h1>
         <Button variant="ghost" size="icon"><Settings2 className="h-5 w-5" /></Button>
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar - Conversation List */}
         <aside className={cn(
           "w-full md:w-[320px] lg:w-[360px] border-r border-border flex flex-col bg-card",
-          selectedConversationId && "hidden md:flex" // Hide list on mobile when chat is open
+          selectedConversationId && "hidden md:flex" 
         )}>
           <div className="p-4 border-b border-border hidden md:block">
-             <h1 className="text-xl font-semibold flex items-center"><MessageSquare className="mr-2 h-5 w-5 text-primary" /> Chats</h1>
+            <div className="flex justify-between items-center">
+              <h1 className="text-xl font-semibold flex items-center"><MessageSquare className="mr-2 h-5 w-5 text-primary" /> Chats</h1>
+              <Button variant="outline" size="sm" onClick={handleChatWithTeacher} className="whitespace-nowrap">
+                <ContactIcon className="mr-1.5 h-4 w-4" /> Chat with Teacher
+              </Button>
+            </div>
           </div>
           <div className="p-3 border-b border-border">
             <div className="relative">
@@ -141,10 +183,9 @@ export default function MessagesPage() {
           </ScrollArea>
         </aside>
 
-        {/* Main Chat Area */}
         <main className={cn(
           "flex-1 flex flex-col bg-background",
-          !selectedConversationId && "hidden md:flex" // Hide chat area on mobile if no chat selected
+          !selectedConversationId && "hidden md:flex"
         )}>
           {selectedConversation ? (
             <>
@@ -184,7 +225,6 @@ export default function MessagesPage() {
                     </div>
                      {msg.sender === 'user' && (
                       <Avatar className="h-8 w-8 self-start flex-shrink-0">
-                        {/* Ensure sampleUserProfile is correctly imported and used */}
                         <AvatarImage src={sampleUserProfile.profilePhotoUrl} data-ai-hint="my avatar"/> 
                         <AvatarFallback>{sampleUserProfile.name.substring(0,1).toUpperCase()}</AvatarFallback>
                       </Avatar>
