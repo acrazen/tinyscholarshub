@@ -2,19 +2,22 @@
 // src/app/(main)/messages/page.tsx
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, type FormEvent } from 'react';
+import Link from 'next/link'; // Added for navigation
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MessageSquare, Send, Paperclip, Search, User, ArrowLeft, Loader2 } from 'lucide-react'; // Changed Settings2 to User
+import { MessageSquare, Send, Paperclip, Search, User, ArrowLeft, Loader2, MoreVertical } from 'lucide-react'; // Added MoreVertical
 import type { Conversation, ChatMessage } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { sampleConversations, sampleMessages, sampleUserProfile, studentsData } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'; // Added DropdownMenu components
+import { useRouter } from 'next/navigation'; // Added for navigation
 
 export default function MessagesPage() {
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
@@ -25,13 +28,19 @@ export default function MessagesPage() {
   const [isClient, setIsClient] = useState(false);
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  const router = useRouter(); // For navigation
 
   useEffect(() => {
     setIsClient(true);
-    if (sampleConversations.length > 0 && !selectedConversationId && !isMobile) {
-      // setSelectedConversationId(sampleConversations[0].id); // Auto-select removed for mobile-first list view
+  }, []);
+
+   useEffect(() => {
+    if (isClient && !selectedConversationId && !isMobile && sampleConversations.length > 0) {
+      // Auto-select first conversation on desktop if none is selected and client has mounted
+      // setSelectedConversationId(sampleConversations[0].id); // Commented out to prevent auto-selection on first load
     }
-  }, [selectedConversationId, isMobile]);
+  }, [isClient, selectedConversationId, isMobile]);
+
 
   useEffect(() => {
     if (selectedConversationId) {
@@ -47,7 +56,7 @@ export default function MessagesPage() {
     }
   }, [messages, isClient]);
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = (e: FormEvent) => {
     e.preventDefault();
     if (newMessage.trim() === '' || !selectedConversationId) return;
 
@@ -73,9 +82,9 @@ export default function MessagesPage() {
     setNewMessage('');
   };
 
-  const sortedConversations = [...sampleConversations].sort((a, b) =>
+  const sortedConversations = isClient ? [...sampleConversations].sort((a, b) =>
     new Date(b.lastMessageTimestamp).getTime() - new Date(a.lastMessageTimestamp).getTime()
-  );
+  ) : [];
 
   const filteredConversations = sortedConversations.filter(convo =>
     convo.participantName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -87,20 +96,18 @@ export default function MessagesPage() {
   const handleChatWithTeacher = () => {
     if (!isClient) return;
 
-    const firstStudent = studentsData[0]; // Assuming the logged-in parent's child is the first student
+    const firstStudent = studentsData[0]; 
     if (!firstStudent) {
       toast({ title: "No Student Data", description: "Cannot determine class teacher to chat with.", variant: "destructive" });
       return;
     }
     
     let teacherConversationNamePart = "";
-    // Determine teacher based on class name
     if (firstStudent.className === "Butterflies") {
         teacherConversationNamePart = "Ms. Emily (Butterflies)";
     } else if (firstStudent.className === "Caterpillars") {
         teacherConversationNamePart = "Mr. John (Caterpillars)";
     }
-    // Add more else if blocks for other classes and teachers as needed
 
     if (!teacherConversationNamePart) {
         toast({ title: "Teacher Not Identified", description: `Could not identify a teacher for class: ${firstStudent.className}.`, variant: "destructive" });
@@ -112,8 +119,12 @@ export default function MessagesPage() {
     if (teacherConvo) {
       setSelectedConversationId(teacherConvo.id);
     } else {
-      toast({ title: "Teacher Chat Not Found", description: `Could not find a chat with ${teacherConversationNamePart}. You might need to start a new conversation or contact support.`, variant: "destructive" });
+      toast({ title: "Teacher Chat Not Found", description: `Could not find a chat with ${teacherConversationNamePart}.`, variant: "destructive" });
     }
+  };
+
+  const navigateToSettings = () => {
+    router.push('/more/settings');
   };
 
 
@@ -130,7 +141,22 @@ export default function MessagesPage() {
     <div className="flex flex-col" style={{ height: 'calc(100vh - 5rem)' }}>
       <div className="flex items-center justify-between p-4 border-b border-border md:hidden">
         <h1 className="text-2xl font-bold flex items-center"><MessageSquare className="mr-2 h-6 w-6 text-primary" /> Messages</h1>
-        {/* Removed Settings2 icon from mobile header too, as it's being replaced */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <MoreVertical className="h-5 w-5" />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={handleChatWithTeacher}>
+              Chat with Class Teacher
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={navigateToSettings}>
+              Settings
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <div className="flex flex-1 overflow-hidden">
@@ -172,7 +198,7 @@ export default function MessagesPage() {
                   <AvatarImage src={convo.avatarUrl} alt={convo.participantName} data-ai-hint="person avatar" />
                   <AvatarFallback>{convo.participantName.substring(0, 1).toUpperCase()}</AvatarFallback>
                 </Avatar>
-                <div className="flex-1 overflow-hidden min-w-0 w-0">
+                <div className={cn("flex-1 overflow-hidden min-w-0 w-0")}> {/* Added w-0 here */}
                   <div className="flex justify-between items-center">
                     <h3 className="font-semibold text-sm truncate">{convo.participantName}</h3>
                     {isClient && (
@@ -199,7 +225,7 @@ export default function MessagesPage() {
         <main className={cn(
           "flex-1 flex flex-col bg-background",
           !selectedConversationId && isMobile && "hidden", 
-          !selectedConversationId && !isMobile && "flex" 
+          !selectedConversationId && !isMobile && "flex items-center justify-center" // Added centering for desktop placeholder
         )}>
           {selectedConversation ? (
             <>
@@ -219,7 +245,7 @@ export default function MessagesPage() {
               <ScrollArea className="flex-1 p-4">
                 {messages.map(msg => (
                   <div key={msg.id} className={cn(
-                    "flex items-end space-x-2 max-w-[80%] sm:max-w-[70%] mb-3",
+                    "flex items-end space-x-2 max-w-[80%] sm:max-w-[70%] mb-3", // Added mb-3 for spacing
                     msg.sender === 'user' ? "ml-auto justify-end" : "mr-auto justify-start"
                   )}>
                     {msg.sender === 'other' && (
@@ -280,3 +306,4 @@ export default function MessagesPage() {
     </div>
   );
 }
+
