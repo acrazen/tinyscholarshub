@@ -131,7 +131,7 @@ export default function AwardsAndRecognitionsPage() {
               const IconComponent = categoryIcons[award.category] || AwardIcon;
               return (
                 <Card key={award.id} className="shadow-lg rounded-xl flex flex-col">
-                  <CardHeader className="flex flex-row items-start space-x-4 p-5 bg-card">
+                  <CardHeader className="flex flex-row items-start space-x-4 p-5 bg-muted/20">
                      <div className={`p-3 bg-${categoryColors[award.category].split(' ')[0].replace('bg-','primary')}/10 rounded-lg shadow-sm flex-shrink-0`}>
                         <IconComponent className={`h-8 w-8 text-${categoryColors[award.category].split(' ')[1].replace('text-','primary')}`} />
                     </div>
