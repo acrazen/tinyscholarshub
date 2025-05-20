@@ -4,9 +4,9 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, FolderKanban, GraduationCap, LayoutGrid, MessageSquare, ShieldCheck, UserCog, Briefcase } from 'lucide-react'; // Added UserCog, Briefcase
+import { Home, FolderKanban, GraduationCap, LayoutGrid, MessageSquare, ShieldCheck, UserCog, Briefcase } from 'lucide-react';
 import { Logo } from '@/components/icons/logo';
-import type { NavItem, UserRole } from '@/lib/types';
+import type { NavItem } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAppCustomization, type AppModuleKey } from '@/context/app-customization-context';
@@ -28,15 +28,12 @@ const mainNavModuleMap: Record<AppModuleKey, { href: string; label: string; icon
 
 export function AppHeader() {
   const pathname = usePathname();
-  const { moduleSettings, currentUserRole } = useAppCustomization(); // Get currentUserRole
+  const { moduleSettings, currentUserRole } = useAppCustomization();
 
   const baseNavItems: NavItem[] = [
     { href: '/', label: 'Home', icon: Home },
-    // Dynamically add module-based nav items
     ...(Object.keys(moduleSettings) as AppModuleKey[]).reduce((acc, key) => {
       if (moduleSettings[key] && mainNavModuleMap[key]) {
-        // Further filter based on role if needed for main nav items
-        // For now, main user nav items are primarily for 'Parent' role
         if (currentUserRole === 'Parent') {
             acc.push(mainNavModuleMap[key]!);
         }
@@ -46,7 +43,6 @@ export function AppHeader() {
     { href: '/more', label: 'More', icon: LayoutGrid },
   ];
 
-  // Determine if admin/teacher/superadmin links should be shown
   const showAdminLink = currentUserRole === 'Admin';
   const showTeacherLink = currentUserRole === 'Teacher';
   const showSuperAdminLink = currentUserRole === 'SuperAdmin';
@@ -112,7 +108,6 @@ export function AppHeader() {
         </nav>
 
         <div className="md:hidden">
-          {/* Avatar link logic might depend on the role, or always point to a generic profile/settings */}
           <Link href={currentUserRole === 'Parent' ? "/more/my-profile" : "/more/settings"} aria-label="My Profile or Settings">
             <Avatar className="h-9 w-9 cursor-pointer">
               <AvatarImage src="https://picsum.photos/seed/headeravatar/40/40" alt="User Profile" data-ai-hint="user avatar" />
