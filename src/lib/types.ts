@@ -41,7 +41,6 @@ export interface ChildAward {
   description: string;
   dateAwarded: string; // ISO date string
   category: 'Academic' | 'Sports' | 'Arts' | 'Citizenship' | 'Effort';
-  // Optional: icon?: LucideIcon; imageUrl?: string;
 }
 
 export interface Student {
@@ -63,7 +62,7 @@ export interface Student {
   recentAttendance: AttendanceRecord[];
   milestones: Milestone[];
   reports?: ReportItem[];
-  childAwards?: ChildAward[]; // Added for child-specific awards
+  childAwards?: ChildAward[];
 }
 
 export interface CommentAuthor {
@@ -154,3 +153,16 @@ export interface Conversation {
   avatarUrl?: string;
   unreadCount?: number;
 }
+
+// Added for school awards section
+export interface SchoolAward {
+  id: string;
+  title: string;
+  awardingBody: string;
+  year: string;
+  description: string;
+  iconName?: 'Trophy' | 'Star' | string; // Changed from JSX.Element to string
+  imageUrl?: string;
+  dataAiHint?: string;
+}
+

@@ -1,6 +1,6 @@
 
-import type { Student, FeedPost, Guardian, Milestone, SchoolEvent, ResourceItem, UserProfile, Comment, CommentAuthor, ReportItem, ChildAward } from './types';
-import { FileText, Youtube, Link as LinkIcon, BookOpen, FileArchive } from 'lucide-react';
+import type { Student, FeedPost, Guardian, Milestone, SchoolEvent, ResourceItem, UserProfile, Comment, CommentAuthor, ReportItem, ChildAward, SchoolAward } from './types';
+import { FileText, Youtube, Link as LinkIcon, BookOpen, FileArchive, Trophy, Star } from 'lucide-react';
 
 const guardiansData: Guardian[] = [
   { id: 'g1', name: 'Alice Smith', relation: 'Mother', phoneNumber: '555-0101', email: 'alice.smith@example.com', profilePhotoUrl: 'https://picsum.photos/seed/guardian1/100/100' },
@@ -136,14 +136,11 @@ const sampleCommentAuthors: CommentAuthor[] = [
     { id: 'teacher1', name: 'Ms. Emily (Butterflies)', avatarUrl: 'https://picsum.photos/seed/emily/40/40' },
 ];
 
-// Using a fixed reference date for calculations to ensure consistency
-const refDate = new Date('2024-07-21T12:00:00.000Z');
-
 export const feedPostsData: FeedPost[] = [
   {
     id: 'fp1',
     author: { name: 'Butterflies Class', avatarUrl: 'https://picsum.photos/seed/butterfliesclass/50/50' },
-    timestamp: '2024-07-21T10:00:00.000Z', // Fixed timestamp
+    timestamp: '2024-07-21T10:00:00.000Z',
     type: 'photo',
     mediaUrl: 'https://picsum.photos/seed/artday/600/400',
     dataAiHint: 'children painting',
@@ -158,7 +155,7 @@ export const feedPostsData: FeedPost[] = [
   {
     id: 'fp2',
     author: { name: 'Tiny Scholars Admin', avatarUrl: 'https://picsum.photos/seed/admin/50/50' },
-    timestamp: '2024-07-20T12:00:00.000Z', // Fixed timestamp
+    timestamp: '2024-07-20T12:00:00.000Z',
     type: 'text',
     description: "Reminder: Parent-teacher meetings are next week! Please sign up for a slot if you haven't already. We look forward to chatting with you!",
     likes: 22,
@@ -170,7 +167,7 @@ export const feedPostsData: FeedPost[] = [
   {
     id: 'fp3',
     author: { name: 'Caterpillars Class', avatarUrl: 'https://picsum.photos/seed/caterpillarsclass/50/50' },
-    timestamp: '2024-07-19T12:00:00.000Z', // Fixed timestamp
+    timestamp: '2024-07-19T12:00:00.000Z',
     type: 'video',
     mediaUrl: 'https://picsum.photos/seed/singalong/600/400',
     dataAiHint: 'kids singing',
@@ -185,7 +182,7 @@ export const feedPostsData: FeedPost[] = [
   {
     id: 'fp4',
     author: { name: 'Butterflies Class', avatarUrl: 'https://picsum.photos/seed/butterfliesclass2/50/50' },
-    timestamp: '2024-07-18T12:00:00.000Z', // Fixed timestamp
+    timestamp: '2024-07-18T12:00:00.000Z',
     type: 'photo',
     mediaUrl: 'https://picsum.photos/seed/playground/600/400',
     dataAiHint: 'playground fun',
@@ -349,3 +346,52 @@ export const sampleMessages: Record<string, ChatMessage[]> = {
      { id: 'msg3-1', sender: 'other', text: "Dear Parents, a friendly reminder: School fees are due next Friday. Please ensure payments are made on time. Thank you!", timestamp: '2024-07-20T12:00:00.000Z', avatarUrl: 'https://picsum.photos/seed/adminmsg/100/100' },
   ]
 };
+
+
+export const sampleSchoolAwards: SchoolAward[] = [
+  {
+    id: 'award1',
+    title: 'Best Early Learning Center 2023',
+    awardingBody: 'National Education Excellence',
+    year: '2023',
+    description: 'Recognized for innovative teaching methodologies and nurturing environment. This award highlights our commitment to providing a top-tier educational experience for young learners. We focus on a play-based curriculum that encourages curiosity and development in all key areas. Our teachers are dedicated professionals who create a supportive and stimulating atmosphere for every child.',
+    iconName: 'Trophy', // Changed from JSX to string name
+    imageUrl: 'https://picsum.photos/seed/award1/600/400',
+    dataAiHint: "award trophy",
+  },
+  {
+    id: 'award2',
+    title: 'Child Safety Excellence Award',
+    awardingBody: 'SafeKids Foundation',
+    year: '2022',
+    description: 'Awarded for maintaining the highest standards of child safety and security. We prioritize the well-being of our students above all else. Our facilities are regularly inspected, and our staff undergoes rigorous safety training. This award is a testament to our unwavering dedication to creating a safe and secure learning environment where children can thrive without worry.',
+    // iconName is omitted as per original data, will fallback to imageUrl or default
+    imageUrl: 'https://picsum.photos/seed/award2/600/400',
+    dataAiHint: "safety shield",
+  },
+  {
+    id: 'award3',
+    title: 'Green School Initiative Award',
+    awardingBody: 'Environmental Education Board',
+    year: '2023',
+    description: 'For outstanding efforts in promoting environmental awareness and sustainability among young children. We believe in teaching our students the importance of caring for our planet from an early age. Our green initiatives include recycling programs, a school garden, and lessons on nature and conservation. This award inspires us to continue fostering a love for the environment.',
+    iconName: 'Star', // Changed from JSX to string name
+    imageUrl: 'https://picsum.photos/seed/award3/600/400',
+    dataAiHint: "green award",
+  },
+  {
+    id: 'award4',
+    title: 'Community Engagement Award',
+    awardingBody: 'Local Community Council',
+    year: '2021',
+    description: 'Acknowledged for fostering strong relationships with local families and community members. We see ourselves as an integral part of the community and strive to build open and supportive connections. This includes regular parent involvement activities, community events, and partnerships with local organizations. This award reflects our commitment to being a true community hub.',
+    // iconName is omitted
+    imageUrl: 'https://picsum.photos/seed/award4/600/400',
+    dataAiHint: "community hands",
+  },
+];
+
+export const getSchoolAwardById = async (id: string): Promise<SchoolAward | undefined> => {
+  return Promise.resolve(sampleSchoolAwards.find(award => award.id === id));
+};
+

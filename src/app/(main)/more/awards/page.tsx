@@ -3,68 +3,19 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Award as AwardIcon, Trophy, Star, Sparkles, UserCheck, BookOpen, type LucideIcon } from 'lucide-react'; // Added BookOpen and LucideIcon
+import { Award as AwardIcon, Trophy, Star, Sparkles, UserCheck, BookOpen, type LucideIcon, ArrowRight, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
-import type { Student, ChildAward } from '@/lib/types';
-import { getStudentById } from '@/lib/services/studentService'; // Using service
-import { studentsData } from '@/lib/data'; // Direct import for schoolAwardsData for now
+import Link from 'next/link';
+import type { Student, ChildAward, SchoolAward } from '@/lib/types';
+import { getStudentById } from '@/lib/services/studentService';
+import { studentsData, sampleSchoolAwards } from '@/lib/data'; // Using direct import for sampleSchoolAwards
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
-
-interface SchoolAward {
-  id: string;
-  title: string;
-  awardingBody: string;
-  year: string;
-  description: string;
-  icon?: JSX.Element;
-  imageUrl?: string;
-  dataAiHint?: string;
-}
-
-// This data remains for general school awards
-const schoolAwardsData: SchoolAward[] = [
-  {
-    id: 'award1',
-    title: 'Best Early Learning Center 2023',
-    awardingBody: 'National Education Excellence',
-    year: '2023',
-    description: 'Recognized for innovative teaching methodologies and nurturing environment.',
-    icon: <Trophy className="h-8 w-8 text-yellow-500" />,
-    dataAiHint: "award trophy",
-  },
-  {
-    id: 'award2',
-    title: 'Child Safety Excellence Award',
-    awardingBody: 'SafeKids Foundation',
-    year: '2022',
-    description: 'Awarded for maintaining the highest standards of child safety and security.',
-    imageUrl: 'https://picsum.photos/seed/safetyaward/80/80', // Updated placeholder
-    dataAiHint: "safety shield",
-  },
-  {
-    id: 'award3',
-    title: 'Green School Initiative Award',
-    awardingBody: 'Environmental Education Board',
-    year: '2023',
-    description: 'For outstanding efforts in promoting environmental awareness and sustainability.',
-    icon: <Star className="h-8 w-8 text-green-500 fill-green-500" />,
-    dataAiHint: "green award",
-  },
-  {
-    id: 'award4',
-    title: 'Community Engagement Award',
-    awardingBody: 'Local Community Council',
-    year: '2021',
-    description: 'Acknowledged for fostering strong relationships with local families and community members.',
-    imageUrl: 'https://picsum.photos/seed/communityaward/80/80', // Updated placeholder
-    dataAiHint: "community hands",
-  },
-];
+import { Button } from '@/components/ui/button';
 
 const categoryColors: Record<ChildAward['category'], string> = {
   'Academic': 'bg-blue-100 text-blue-700 border-blue-300',
@@ -82,6 +33,12 @@ const categoryIcons: Record<ChildAward['category'], LucideIcon> = {
     'Effort': Star,
 };
 
+const schoolAwardIconMap: Record<string, LucideIcon> = {
+  'Trophy': Trophy,
+  'Star': Star,
+  // Add other specific icon names if used in sampleSchoolAwards
+};
+
 
 export default function AwardsAndRecognitionsPage() {
   const [student, setStudent] = useState<Student | null>(null);
@@ -92,7 +49,6 @@ export default function AwardsAndRecognitionsPage() {
     const fetchStudentData = async () => {
       setIsLoading(true);
       try {
-        // For prototype, always fetch the first student to simulate "my child"
         if (studentsData.length > 0) {
           const fetchedStudent = await getStudentById(studentsData[0].id);
           if (fetchedStudent) {
@@ -112,6 +68,41 @@ export default function AwardsAndRecognitionsPage() {
     fetchStudentData();
   }, [toast]);
 
+  const renderSchoolAwardIcon = (award: SchoolAward) => {
+    if (award.iconName && schoolAwardIconMap[award.iconName]) {
+      const IconComponent = schoolAwardIconMap[award.iconName];
+      let iconColor = "text-muted-foreground"; // Default color
+      if (award.iconName === 'Trophy') iconColor = "text-yellow-500";
+      if (award.iconName === 'Star') iconColor = "text-green-500 fill-green-500";
+      
+      return (
+        <div className="p-3 bg-background rounded-lg shadow-sm flex-shrink-0">
+          <IconComponent className={`h-8 w-8 ${iconColor}`} />
+        </div>
+      );
+    }
+    if (award.imageUrl) {
+      return (
+        <div className="p-1 bg-background rounded-lg shadow-sm flex-shrink-0 relative w-16 h-16">
+          <Image
+            src={award.imageUrl}
+            alt={`${award.title} icon`}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="rounded-md object-cover"
+            data-ai-hint={award.dataAiHint || "award image"}
+          />
+        </div>
+      );
+    }
+    return (
+      <div className="p-3 bg-background rounded-lg shadow-sm flex-shrink-0">
+        <AwardIcon className="h-8 w-8 text-muted-foreground" />
+      </div>
+    );
+  };
+
+
   return (
     <div className="space-y-10">
       <div className="flex flex-col items-center text-center">
@@ -124,7 +115,6 @@ export default function AwardsAndRecognitionsPage() {
         </p>
       </div>
 
-      {/* Section for My Child's Awards */}
       <section>
         <h2 className="text-2xl font-semibold mb-2 text-center sm:text-left">My Child's Awards & Achievements</h2>
         <p className="text-muted-foreground mb-6 text-center sm:text-left">
@@ -173,41 +163,32 @@ export default function AwardsAndRecognitionsPage() {
 
       <Separator className="my-10" />
 
-      {/* Section for School Awards */}
       <section>
         <h2 className="text-2xl font-semibold mb-6 text-center sm:text-left">Our School's Recognitions</h2>
-        {schoolAwardsData.length > 0 ? (
+        {(sampleSchoolAwards && sampleSchoolAwards.filter(a => !!a).length > 0) ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {schoolAwardsData.map((award) => (
-              <Card key={award.id} className="shadow-lg rounded-xl flex flex-col">
-                <CardHeader className="flex flex-row items-start space-x-4 p-5 bg-muted/20">
-                  {award.icon ? (
-                    <div className="p-3 bg-background rounded-lg shadow-sm flex-shrink-0">
-                      {award.icon}
+            {sampleSchoolAwards.filter(a => !!a).map((award) => ( // Added filter for robustness
+                <Card key={award.id} className="shadow-lg rounded-xl flex flex-col hover:shadow-xl transition-shadow">
+                   <Link href={`/more/awards/school/${award.id}`} className="flex flex-col h-full">
+                    <CardHeader className="flex flex-row items-start space-x-4 p-5 bg-muted/20">
+                      {renderSchoolAwardIcon(award)}
+                      <div className="flex-grow">
+                          <CardTitle className="text-xl group-hover:text-primary transition-colors">{award.title}</CardTitle>
+                          <CardDescription className="text-sm">
+                          Awarded by: {award.awardingBody} - {award.year}
+                          </CardDescription>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-5 flex-grow">
+                    <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{award.description}</p>
+                    </CardContent>
+                    <div className="p-4 mt-auto border-t">
+                        <Button variant="link" className="p-0 h-auto text-primary">
+                            Read More <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
                     </div>
-                  ) : award.imageUrl ? (
-                    <div className="p-1 bg-background rounded-lg shadow-sm flex-shrink-0">
-                      <Image 
-                          src={award.imageUrl} 
-                          alt={`${award.title} icon`} 
-                          width={60} 
-                          height={60} 
-                          className="rounded-md object-contain"
-                          data-ai-hint={award.dataAiHint || "award image"}
-                      />
-                    </div>
-                  ) : <div className="p-3 bg-background rounded-lg shadow-sm flex-shrink-0"><AwardIcon className="h-8 w-8 text-muted-foreground" /></div> }
-                  <div className="flex-grow">
-                    <CardTitle className="text-xl">{award.title}</CardTitle>
-                    <CardDescription className="text-sm">
-                      Awarded by: {award.awardingBody} - {award.year}
-                    </CardDescription>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-5 flex-grow">
-                  <p className="text-sm text-muted-foreground leading-relaxed">{award.description}</p>
-                </CardContent>
-              </Card>
+                  </Link>
+                </Card>
             ))}
           </div>
         ) : (
@@ -221,4 +202,3 @@ export default function AwardsAndRecognitionsPage() {
     </div>
   );
 }
-
