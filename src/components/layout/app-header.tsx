@@ -1,11 +1,12 @@
+
 // src/components/layout/app-header.tsx
 "use client";
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, FolderKanban, GraduationCap, LayoutGrid, MessageSquare, ShieldCheck } from 'lucide-react';
+import { Home, FolderKanban, GraduationCap, LayoutGrid, MessageSquare, ShieldCheck, UserCog, Briefcase } from 'lucide-react'; // Added UserCog, Briefcase
 import { Logo } from '@/components/icons/logo';
-import type { NavItem } from '@/lib/types';
+import type { NavItem, UserRole } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAppCustomization, type AppModuleKey } from '@/context/app-customization-context';
@@ -27,19 +28,28 @@ const mainNavModuleMap: Record<AppModuleKey, { href: string; label: string; icon
 
 export function AppHeader() {
   const pathname = usePathname();
-  const { moduleSettings } = useAppCustomization();
+  const { moduleSettings, currentUserRole } = useAppCustomization(); // Get currentUserRole
 
   const baseNavItems: NavItem[] = [
     { href: '/', label: 'Home', icon: Home },
     // Dynamically add module-based nav items
     ...(Object.keys(moduleSettings) as AppModuleKey[]).reduce((acc, key) => {
       if (moduleSettings[key] && mainNavModuleMap[key]) {
-        acc.push(mainNavModuleMap[key]!);
+        // Further filter based on role if needed for main nav items
+        // For now, main user nav items are primarily for 'Parent' role
+        if (currentUserRole === 'Parent') {
+            acc.push(mainNavModuleMap[key]!);
+        }
       }
       return acc;
     }, [] as NavItem[]),
     { href: '/more', label: 'More', icon: LayoutGrid },
   ];
+
+  // Determine if admin/teacher/superadmin links should be shown
+  const showAdminLink = currentUserRole === 'Admin';
+  const showTeacherLink = currentUserRole === 'Teacher';
+  const showSuperAdminLink = currentUserRole === 'SuperAdmin';
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -49,7 +59,8 @@ export function AppHeader() {
         </Link>
 
         <nav className="hidden md:flex items-center space-x-1 lg:space-x-2 flex-wrap">
-          {baseNavItems.map((item) => (
+          {/* Parent/User specific main navigation */}
+          {currentUserRole === 'Parent' && baseNavItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
@@ -63,21 +74,48 @@ export function AppHeader() {
               {item.label}
             </Link>
           ))}
-           <Link
-              href="/superadmin/dashboard"
+          
+          {/* Role-specific dashboard links */}
+          {showAdminLink && (
+             <Link
+              href="/admin/dashboard"
               className={cn(
-                "px-2 py-1 text-sm font-medium transition-colors hover:text-primary rounded-md text-muted-foreground hidden md:flex items-center",
-                pathname.startsWith('/superadmin') && "text-primary bg-primary/10"
+                "px-2 py-1 text-sm font-medium transition-colors hover:text-primary rounded-md text-muted-foreground flex items-center",
+                pathname.startsWith('/admin') && "text-primary bg-primary/10"
               )}
             >
-              <ShieldCheck className="mr-1 h-4 w-4" /> Super Admin
+              <UserCog className="mr-1 h-4 w-4" /> Admin Dashboard
             </Link>
+          )}
+          {showTeacherLink && (
+             <Link
+              href="/teacher/dashboard"
+              className={cn(
+                "px-2 py-1 text-sm font-medium transition-colors hover:text-primary rounded-md text-muted-foreground flex items-center",
+                pathname.startsWith('/teacher') && "text-primary bg-primary/10"
+              )}
+            >
+              <Briefcase className="mr-1 h-4 w-4" /> Teacher Dashboard
+            </Link>
+          )}
+           {showSuperAdminLink && (
+             <Link
+                href="/superadmin/dashboard"
+                className={cn(
+                  "px-2 py-1 text-sm font-medium transition-colors hover:text-primary rounded-md text-muted-foreground flex items-center",
+                  pathname.startsWith('/superadmin') && "text-primary bg-primary/10"
+                )}
+              >
+                <ShieldCheck className="mr-1 h-4 w-4" /> Super Admin
+              </Link>
+           )}
         </nav>
 
         <div className="md:hidden">
-          <Link href="/more/my-profile" aria-label="My Profile">
+          {/* Avatar link logic might depend on the role, or always point to a generic profile/settings */}
+          <Link href={currentUserRole === 'Parent' ? "/more/my-profile" : "/more/settings"} aria-label="My Profile or Settings">
             <Avatar className="h-9 w-9 cursor-pointer">
-              <AvatarImage src="https://picsum.photos/seed/headeravatar/40/40" alt="My Profile" data-ai-hint="user avatar" />
+              <AvatarImage src="https://picsum.photos/seed/headeravatar/40/40" alt="User Profile" data-ai-hint="user avatar" />
               <AvatarFallback className="bg-muted text-muted-foreground">
                 U
               </AvatarFallback>

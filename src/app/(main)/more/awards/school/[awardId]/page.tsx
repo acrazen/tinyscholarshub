@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, CalendarDays, Building, Info, AlertTriangle } from 'lucide-react';
+import { Award as AwardIcon, ArrowLeft, CalendarDays, Building, Info, AlertTriangle } from 'lucide-react';
 // import { format } from 'date-fns'; // Year is just a string, format not needed for it
 
 interface AwardDetailPageProps {
@@ -71,7 +71,7 @@ export default async function AwardDetailPage({ params }: AwardDetailPageProps) 
             </h1>
             <div className="flex flex-col sm:flex-row sm:items-center text-sm text-muted-foreground space-y-1 sm:space-y-0 sm:space-x-4">
               <div className="flex items-center">
-                <Building className="h-4 w-4 mr-1.5 text-primary" />
+                <AwardIcon className="h-4 w-4 mr-1.5 text-primary" />
                 <span>Awarded by: {award.awardingBody}</span>
               </div>
               <div className="flex items-center">

@@ -1,8 +1,10 @@
+
 // src/context/app-customization-context.tsx
 "use client";
 
 import type { ReactNode } from 'react';
 import { createContext, useContext, useState, useCallback } from 'react';
+import type { UserRole } from '@/lib/types'; // Import UserRole
 
 // Define module keys - these should match keys used in nav items and page links
 export type AppModuleKey = 
@@ -25,18 +27,20 @@ interface AppCustomizationContextType {
   primaryColor: string; // HSL string, e.g., "25 95% 55%"
   secondaryColor: string; // HSL string
   moduleSettings: ModuleSettings;
+  currentUserRole: UserRole; // Added currentUserRole
   setAppName: (name: string) => void;
   setAppIconUrl: (url: string | null) => void;
   setPrimaryColor: (color: string) => void;
   setSecondaryColor: (color: string) => void;
   setModuleSettings: (settings: ModuleSettings) => void;
   toggleModule: (moduleKey: AppModuleKey) => void;
+  setCurrentUserRole: (role: UserRole) => void; // Added setCurrentUserRole
 }
 
 const defaultAppName = "Tiny Scholars Hub";
 const defaultIconUrl = null; 
-const defaultPrimaryColor = "25 95% 55%";
-const defaultSecondaryColor = "25 95% 75%";
+const defaultPrimaryColor = "25 95% 55%"; // Playful Orange
+const defaultSecondaryColor = "25 95% 75%"; // Light Playful Orange (derived from primary)
 
 const defaultModuleSettings: ModuleSettings = {
   messaging: true,
@@ -59,6 +63,7 @@ export function AppCustomizationProvider({ children }: { children: ReactNode }) 
   const [primaryColor, setPrimaryColorState] = useState<string>(defaultPrimaryColor);
   const [secondaryColor, setSecondaryColorState] = useState<string>(defaultSecondaryColor);
   const [moduleSettings, setModuleSettingsState] = useState<ModuleSettings>(defaultModuleSettings);
+  const [currentUserRole, setCurrentUserRoleState] = useState<UserRole>('Parent'); // Default to 'Parent'
 
   const setAppName = useCallback((name: string) => {
     setAppNameState(name || defaultAppName); 
@@ -87,6 +92,10 @@ export function AppCustomizationProvider({ children }: { children: ReactNode }) 
     }));
   }, []);
 
+  const setCurrentUserRole = useCallback((role: UserRole) => {
+    setCurrentUserRoleState(role);
+  }, []);
+
   return (
     <AppCustomizationContext.Provider value={{ 
       appName, 
@@ -94,12 +103,14 @@ export function AppCustomizationProvider({ children }: { children: ReactNode }) 
       primaryColor,
       secondaryColor,
       moduleSettings,
+      currentUserRole, // Provide role
       setAppName, 
       setAppIconUrl,
       setPrimaryColor,
       setSecondaryColor,
       setModuleSettings,
       toggleModule,
+      setCurrentUserRole, // Provide role setter
     }}>
       {children}
     </AppCustomizationContext.Provider>

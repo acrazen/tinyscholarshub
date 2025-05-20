@@ -1,3 +1,4 @@
+
 // src/app/superadmin/dashboard/page.tsx
 "use client";
 
@@ -7,10 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Cog, Save, Palette, Image as ImageIcon, Puzzle } from "lucide-react";
+import { Cog, Save, Palette, Image as ImageIcon, Puzzle, Users2 } from "lucide-react";
 import NextImage from 'next/image';
 import { useToast } from '@/hooks/use-toast';
-import { useAppCustomization, type AppModuleKey } from '@/context/app-customization-context';
+import { useAppCustomization, type AppModuleKey, type UserRole } from '@/context/app-customization-context';
 import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
@@ -37,6 +38,7 @@ const manageableModules: { key: AppModuleKey; label: string; description: string
   { key: 'teacherSmartUpdate', label: 'Teacher: Smart Update', description: 'Enable/disable AI update generator for teachers.' },
 ];
 
+const userRoles: UserRole[] = ['SuperAdmin', 'Admin', 'Teacher', 'Parent'];
 
 export default function SuperAdminDashboardPage() {
   const { 
@@ -45,11 +47,13 @@ export default function SuperAdminDashboardPage() {
     primaryColor: currentPrimaryColor,
     secondaryColor: currentSecondaryColor,
     moduleSettings,
+    currentUserRole, // Get current role
     setAppName, 
     setAppIconUrl,
     setPrimaryColor,
     setSecondaryColor,
-    toggleModule
+    toggleModule,
+    setCurrentUserRole // Get role setter
   } = useAppCustomization();
   const { toast } = useToast();
 
@@ -114,7 +118,6 @@ export default function SuperAdminDashboardPage() {
     setAppIconUrl(formAppIconUrl.trim() ? formAppIconUrl.trim() : null);
     setPrimaryColor(finalPrimaryHsl);
     setSecondaryColor(finalSecondaryHsl);
-    // Module settings are updated directly via Switch components, no need to "save" them here for this simulation.
     
     toast({
       title: "Settings Updated",
@@ -178,7 +181,7 @@ export default function SuperAdminDashboardPage() {
                   className="rounded-md object-contain"
                   data-ai-hint="custom logo"
                   unoptimized={true} 
-                  onError={(e) => { /* Simple error handling for preview */ const target = e.target as HTMLImageElement; target.style.display = 'none'; }}
+                  onError={(e) => { const target = e.target as HTMLImageElement; target.style.display = 'none'; }}
                 />
               </div>
             ) : (
@@ -259,6 +262,33 @@ export default function SuperAdminDashboardPage() {
             <Save className="mr-2 h-4 w-4" /> Apply Branding Changes
           </Button>
         </CardFooter>
+      </Card>
+
+      <Card className="shadow-lg rounded-xl">
+        <CardHeader>
+          <div className="flex items-center space-x-2">
+            <Users2 className="h-5 w-5 text-muted-foreground" />
+            <CardTitle>User Role Simulation</CardTitle>
+          </div>
+          <CardDescription>
+            Switch the current user role to test UI changes (frontend simulation only).
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-6 space-y-2">
+          <Label htmlFor="userRoleSelect" className="text-base">Current Simulated Role</Label>
+          <Select value={currentUserRole} onValueChange={(value) => setCurrentUserRole(value as UserRole)}>
+            <SelectTrigger id="userRoleSelect" className="w-full md:w-1/2 text-base">
+              <SelectValue placeholder="Select a role..." />
+            </SelectTrigger>
+            <SelectContent>
+              {userRoles.map((role) => (
+                <SelectItem key={role} value={role} className="text-base">
+                  {role}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </CardContent>
       </Card>
 
       <Card className="shadow-lg rounded-xl">

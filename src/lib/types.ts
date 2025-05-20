@@ -1,6 +1,8 @@
 
 import type { LucideIcon } from 'lucide-react';
 
+export type UserRole = 'SuperAdmin' | 'Admin' | 'Teacher' | 'Parent';
+
 export interface Guardian {
   id: string;
   name: string;
@@ -133,7 +135,7 @@ export interface UserProfile {
   address?: string;
   profilePhotoUrl?: string;
   dataAiHint?: string;
-  role: 'Parent' | 'Teacher' | 'Admin';
+  role: 'Parent' | 'Teacher' | 'Admin'; // This is the role for the user's own profile
 }
 
 export interface ChatMessage {
@@ -165,4 +167,3 @@ export interface SchoolAward {
   imageUrl?: string;
   dataAiHint?: string;
 }
-
