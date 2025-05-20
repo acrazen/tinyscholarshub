@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Cog, Save, Palette, Image as ImageIcon, Puzzle, Users2 } from "lucide-react";
+import { Cog, Save, Palette, Image as ImageIcon, Puzzle, Users2, School, PlusCircle, Briefcase } from "lucide-react";
 import NextImage from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { useAppCustomization, type AppModuleKey, type UserRole } from '@/context/app-customization-context';
@@ -74,7 +74,7 @@ export default function SuperAdminDashboardPage() {
   useEffect(() => {
     let baseHslForSuggestions: HSLColor | null = parseHslString(currentPrimaryColor);
     const parsedInput = parseHslString(rawPrimaryColorInput);
-    if (parsedInput) {
+    if (parsedInput && isValidHslColorString(rawPrimaryColorInput)) { // Ensure the input is valid HSL for suggestions
       baseHslForSuggestions = parsedInput;
     }
     
@@ -86,7 +86,7 @@ export default function SuperAdminDashboardPage() {
     }
   }, [rawPrimaryColorInput, currentPrimaryColor]);
 
-  const handleSaveChanges = () => {
+  const handleBrandingSaveChanges = () => {
     let finalPrimaryHsl: string | null = null;
     let finalSecondaryHsl: string | null = null;
 
@@ -98,7 +98,7 @@ export default function SuperAdminDashboardPage() {
     }
 
     if (!finalPrimaryHsl) {
-      toast({ title: "Invalid Primary Color", description: "Primary color must be a valid HSL string or HEX code.", variant: "destructive"});
+      toast({ title: "Invalid Primary Color", description: "Primary color must be a valid HSL string (e.g., 'H S% L%') or HEX code (e.g., '#RRGGBB').", variant: "destructive"});
       return;
     }
 
@@ -110,7 +110,7 @@ export default function SuperAdminDashboardPage() {
     }
 
     if (!finalSecondaryHsl) {
-      toast({ title: "Invalid Secondary Color", description: "Secondary color must be a valid HSL string or HEX code.", variant: "destructive"});
+      toast({ title: "Invalid Secondary Color", description: "Secondary color must be a valid HSL string (e.g., 'H S% L%') or HEX code (e.g., '#RRGGBB').", variant: "destructive"});
       return;
     }
     
@@ -258,9 +258,49 @@ export default function SuperAdminDashboardPage() {
           </div>
         </CardContent>
         <CardFooter className="border-t pt-6">
-          <Button onClick={handleSaveChanges}>
+          <Button onClick={handleBrandingSaveChanges}>
             <Save className="mr-2 h-4 w-4" /> Apply Branding Changes
           </Button>
+        </CardFooter>
+      </Card>
+
+      <Card className="shadow-lg rounded-xl">
+        <CardHeader>
+          <div className="flex items-center space-x-2">
+            <School className="h-5 w-5 text-muted-foreground" />
+            <CardTitle>School & Tenant Management (Conceptual)</CardTitle>
+          </div>
+          <CardDescription>
+            Simulate features for managing different school instances (tenants). Backend required for actual functionality.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-6 space-y-6">
+          <Button 
+            onClick={() => toast({ title: "Feature Placeholder", description: "Registering a new school requires backend setup for database, subdomains, etc."})}
+            className="w-full md:w-auto"
+          >
+            <PlusCircle className="mr-2 h-4 w-4" /> Register New School (Simulated)
+          </Button>
+          <div className="mt-4 p-4 border rounded-lg bg-muted/30">
+            <h4 className="font-semibold text-foreground mb-2">Manage Existing Schools</h4>
+            <p className="text-sm text-muted-foreground">
+              This section would list registered schools, allowing you to configure their packages, admins, and subdomains.
+              (Requires backend integration)
+            </p>
+          </div>
+           <div className="mt-4 p-4 border rounded-lg bg-muted/30">
+            <h4 className="font-semibold text-foreground mb-2">Tenant Configuration Ideas</h4>
+            <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                <li>Subdomain Allocation (e.g., schoolname.tinyscholarshub.com)</li>
+                <li>Package/Subscription Level Management</li>
+                <li>Assigning School-Specific Admins</li>
+                <li>Feature Flags per School/Tenant</li>
+                <li>Custom Billing & Invoicing Details</li>
+            </ul>
+          </div>
+        </CardContent>
+         <CardFooter className="border-t pt-6">
+          <p className="text-sm text-muted-foreground">School management features are conceptual and require backend development.</p>
         </CardFooter>
       </Card>
 
@@ -323,20 +363,9 @@ export default function SuperAdminDashboardPage() {
           <p className="text-sm text-muted-foreground">Module changes are applied instantly (frontend simulation).</p>
         </CardFooter>
       </Card>
-
-      <Card className="shadow-lg rounded-xl mt-8 opacity-70">
-        <CardHeader>
-            <CardTitle>Other Global Settings (Ideas)</CardTitle>
-            <CardDescription>Placeholders for future super admin configurations.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-2 text-muted-foreground">
-            <p>- Feature Flags (More granular)</p>
-            <p>- Default Language Settings & Timezone</p>
-            <p>- Master Font Selection</p>
-            <p>- Manage Terms of Service / Privacy Policy links</p>
-            <p>- Integration keys (e.g., payment gateway, analytics)</p>
-        </CardContent>
-      </Card>
     </div>
   );
 }
+
+
+    

@@ -4,7 +4,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, FolderKanban, GraduationCap, LayoutGrid, MessageSquare, ShieldCheck, UserCog, Briefcase } from 'lucide-react';
+import { Home, FolderKanban, GraduationCap, LayoutGrid, MessageSquare, ShieldCheck, UserCog, Briefcase, Settings } from 'lucide-react'; // Added Settings
 import { Logo } from '@/components/icons/logo';
 import type { NavItem } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -16,13 +16,13 @@ const mainNavModuleMap: Record<AppModuleKey, { href: string; label: string; icon
   messaging: { href: '/messages', label: 'Messages', icon: MessageSquare },
   myLearning: { href: '/my-learning', label: 'My Learning', icon: GraduationCap },
   portfolio: { href: '/portfolio', label: 'Portfolio', icon: FolderKanban },
-  eventBooking: null, // Not a primary nav item, accessed via "More"
-  resources: null, // Not a primary nav item, accessed via "More"
-  statementOfAccount: null, // Not a primary nav item, accessed via "More"
-  eService: null, // Not a primary nav item, accessed via "More"
-  settings: null, // Settings page is in "More"
-  adminManageStudents: null, // Admin specific
-  teacherSmartUpdate: null, // Teacher specific
+  eventBooking: null, 
+  resources: null, 
+  statementOfAccount: null, 
+  eService: null, 
+  settings: null, // Settings page is in "More" or directly accessible
+  adminManageStudents: null, 
+  teacherSmartUpdate: null, 
 };
 
 
@@ -33,15 +33,21 @@ export function AppHeader() {
   const baseNavItems: NavItem[] = [
     { href: '/', label: 'Home', icon: Home },
     ...(Object.keys(moduleSettings) as AppModuleKey[]).reduce((acc, key) => {
-      if (moduleSettings[key] && mainNavModuleMap[key]) {
+      const moduleConfig = mainNavModuleMap[key];
+      if (moduleSettings[key] !== false && moduleConfig) { // Check if not explicitly false
+        // Only add main nav items if the user role is Parent
         if (currentUserRole === 'Parent') {
-            acc.push(mainNavModuleMap[key]!);
+            acc.push(moduleConfig);
         }
       }
       return acc;
     }, [] as NavItem[]),
-    { href: '/more', label: 'More', icon: LayoutGrid },
   ];
+  // Add "More" link if Parent role
+  if (currentUserRole === 'Parent') {
+    baseNavItems.push({ href: '/more', label: 'More', icon: LayoutGrid });
+  }
+
 
   const showAdminLink = currentUserRole === 'Admin';
   const showTeacherLink = currentUserRole === 'Teacher';
@@ -107,17 +113,29 @@ export function AppHeader() {
            )}
         </nav>
 
-        <div className="md:hidden">
-          <Link href={currentUserRole === 'Parent' ? "/more/my-profile" : "/more/settings"} aria-label="My Profile or Settings">
-            <Avatar className="h-9 w-9 cursor-pointer">
-              <AvatarImage src="https://picsum.photos/seed/headeravatar/40/40" alt="User Profile" data-ai-hint="user avatar" />
-              <AvatarFallback className="bg-muted text-muted-foreground">
-                U
-              </AvatarFallback>
-            </Avatar>
-          </Link>
+        <div className="flex items-center space-x-2">
+            {/* Settings icon for Admin/Teacher on desktop */}
+            {(currentUserRole === 'Admin' || currentUserRole === 'Teacher') && (
+                 <Link href="/more/settings" className="hidden md:flex items-center p-2 text-muted-foreground hover:text-primary" aria-label="Settings">
+                    <Settings className="h-5 w-5" />
+                 </Link>
+            )}
+
+            {/* Avatar for profile/settings on mobile for all roles, or Parent on desktop */}
+            <div className={cn("md:hidden", currentUserRole === 'Parent' && "md:block")}>
+              <Link href={currentUserRole === 'Parent' ? "/more/my-profile" : "/more/settings"} aria-label="My Profile or Settings">
+                <Avatar className="h-9 w-9 cursor-pointer">
+                  <AvatarImage src="https://picsum.photos/seed/headeravatar/40/40" alt="User Profile" data-ai-hint="user avatar" />
+                  <AvatarFallback className="bg-muted text-muted-foreground">
+                    U
+                  </AvatarFallback>
+                </Avatar>
+              </Link>
+            </div>
         </div>
       </div>
     </header>
   );
 }
+
+    

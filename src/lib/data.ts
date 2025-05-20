@@ -293,7 +293,7 @@ export const sampleResources: ResourceItem[] = [
 ];
 
 export const sampleUserProfile: UserProfile = {
-  id: 'user123',
+  id: 'userParent123', // Default parent user
   name: 'Sarah Davis',
   email: 'sarah.davis@example.com',
   phoneNumber: '555-123-4567',
@@ -301,6 +301,37 @@ export const sampleUserProfile: UserProfile = {
   profilePhotoUrl: 'https://picsum.photos/seed/currentUser/100/100',
   dataAiHint: 'user avatar',
   role: 'Parent',
+};
+
+// Additional sample user profiles for role simulation
+export const sampleAdminProfile: UserProfile = {
+  id: 'userAdmin456',
+  name: 'Mr. Admin Principal',
+  email: 'admin@tinyscholarshub.com',
+  phoneNumber: '555-987-6543',
+  profilePhotoUrl: 'https://picsum.photos/seed/adminUser/100/100',
+  dataAiHint: 'admin avatar',
+  role: 'Admin',
+};
+
+export const sampleTeacherProfile: UserProfile = {
+  id: 'userTeacher789',
+  name: 'Ms. Emily Teacher',
+  email: 'emily.teacher@tinyscholarshub.com',
+  phoneNumber: '555-555-5555',
+  profilePhotoUrl: 'https://picsum.photos/seed/teacherUser/100/100',
+  dataAiHint: 'teacher avatar',
+  role: 'Teacher',
+};
+
+export const sampleSuperAdminProfile: UserProfile = {
+  id: 'userSuperAdmin001',
+  name: 'Super User',
+  email: 'super@tinyscholars.app',
+  phoneNumber: '555-000-0001',
+  profilePhotoUrl: 'https://picsum.photos/seed/superadminUser/100/100',
+  dataAiHint: 'superadmin avatar',
+  role: 'SuperAdmin',
 };
 
 
@@ -355,7 +386,7 @@ export const sampleSchoolAwards: SchoolAward[] = [
     awardingBody: 'National Education Excellence',
     year: '2023',
     description: 'Recognized for innovative teaching methodologies and nurturing environment. This award highlights our commitment to providing a top-tier educational experience for young learners. We focus on a play-based curriculum that encourages curiosity and development in all key areas. Our teachers are dedicated professionals who create a supportive and stimulating atmosphere for every child.',
-    iconName: 'Trophy', // Changed from JSX to string name
+    iconName: 'Trophy', 
     imageUrl: 'https://picsum.photos/seed/award1/600/400',
     dataAiHint: "award trophy",
   },
@@ -365,7 +396,6 @@ export const sampleSchoolAwards: SchoolAward[] = [
     awardingBody: 'SafeKids Foundation',
     year: '2022',
     description: 'Awarded for maintaining the highest standards of child safety and security. We prioritize the well-being of our students above all else. Our facilities are regularly inspected, and our staff undergoes rigorous safety training. This award is a testament to our unwavering dedication to creating a safe and secure learning environment where children can thrive without worry.',
-    // iconName is omitted as per original data, will fallback to imageUrl or default
     imageUrl: 'https://picsum.photos/seed/award2/600/400',
     dataAiHint: "safety shield",
   },
@@ -375,7 +405,7 @@ export const sampleSchoolAwards: SchoolAward[] = [
     awardingBody: 'Environmental Education Board',
     year: '2023',
     description: 'For outstanding efforts in promoting environmental awareness and sustainability among young children. We believe in teaching our students the importance of caring for our planet from an early age. Our green initiatives include recycling programs, a school garden, and lessons on nature and conservation. This award inspires us to continue fostering a love for the environment.',
-    iconName: 'Star', // Changed from JSX to string name
+    iconName: 'Star', 
     imageUrl: 'https://picsum.photos/seed/award3/600/400',
     dataAiHint: "green award",
   },
@@ -385,7 +415,6 @@ export const sampleSchoolAwards: SchoolAward[] = [
     awardingBody: 'Local Community Council',
     year: '2021',
     description: 'Acknowledged for fostering strong relationships with local families and community members. We see ourselves as an integral part of the community and strive to build open and supportive connections. This includes regular parent involvement activities, community events, and partnerships with local organizations. This award reflects our commitment to being a true community hub.',
-    // iconName is omitted
     imageUrl: 'https://picsum.photos/seed/award4/600/400',
     dataAiHint: "community hands",
   },
@@ -395,3 +424,5 @@ export const getSchoolAwardById = async (id: string): Promise<SchoolAward | unde
   return Promise.resolve(sampleSchoolAwards.find(award => award.id === id));
 };
 
+
+    
