@@ -15,9 +15,12 @@ interface AwardDetailPageProps {
 
 // Required for static export with dynamic routes
 export async function generateStaticParams() {
-  return sampleSchoolAwards.filter(a => !!a).map((award) => ({ // Added filter for robustness
-    awardId: award.id,
-  }));
+  // Ensure robust handling in case sampleSchoolAwards has undefined entries
+  return sampleSchoolAwards
+    .filter(award => !!award && !!award.id) // Filter out any undefined or id-less awards
+    .map((award) => ({
+      awardId: award.id,
+    }));
 }
 
 export default async function AwardDetailPage({ params }: AwardDetailPageProps) {
