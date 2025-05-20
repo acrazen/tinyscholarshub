@@ -1,6 +1,6 @@
 
 // src/app/(main)/more/awards/school/[awardId]/page.tsx
-import { getSchoolAwardById } from '@/lib/data'; 
+import { getSchoolAwardById, sampleSchoolAwards } from '@/lib/data'; // Import sampleSchoolAwards
 import type { SchoolAward } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,13 @@ import { ArrowLeft, CalendarDays, Building, Info, AlertTriangle } from 'lucide-r
 
 interface AwardDetailPageProps {
   params: { awardId: string };
+}
+
+// Required for static export with dynamic routes
+export async function generateStaticParams() {
+  return sampleSchoolAwards.filter(a => !!a).map((award) => ({ // Added filter for robustness
+    awardId: award.id,
+  }));
 }
 
 export default async function AwardDetailPage({ params }: AwardDetailPageProps) {
@@ -88,4 +95,3 @@ export default async function AwardDetailPage({ params }: AwardDetailPageProps) 
     </div>
   );
 }
-
