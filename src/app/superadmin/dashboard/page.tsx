@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Cog, Save, Palette, Image as ImageIcon, Puzzle, Users2, School, PlusCircle, Briefcase } from "lucide-react";
 import NextImage from 'next/image';
 import { useToast } from '@/hooks/use-toast';
-import { useAppCustomization, type AppModuleKey, type UserRole } from '@/context/app-customization-context';
+import { useAppCustomization, type AppModuleKey } from '@/context/app-customization-context';
 import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
@@ -23,8 +23,8 @@ import {
   isHexColorString,
   hexToHsl
 } from '@/lib/color-utils';
+import type { UserRole } from '@/lib/types'; // Import UserRole
 
-// Define modules that can be toggled
 const manageableModules: { key: AppModuleKey; label: string; description: string }[] = [
   { key: 'messaging', label: 'Messaging', description: 'Enable/disable direct messaging features.' },
   { key: 'myLearning', label: 'My Learning', description: 'Enable/disable the "My Learning" section for students/parents.' },
@@ -33,12 +33,16 @@ const manageableModules: { key: AppModuleKey; label: string; description: string
   { key: 'resources', label: 'Resources', description: 'Enable/disable access to shared school resources.' },
   { key: 'statementOfAccount', label: 'Statement of Account', description: 'Enable/disable viewing financial statements.' },
   { key: 'eService', label: 'eService', description: 'Enable/disable general eServices portal.' },
-  // { key: 'settings', label: 'Settings Page', description: 'Enable/disable user access to the settings page.' }, // Settings usually core
-  { key: 'adminManageStudents', label: 'Admin: Manage Students', description: 'Enable/disable student management for admins.' },
-  { key: 'teacherSmartUpdate', label: 'Teacher: Smart Update', description: 'Enable/disable AI update generator for teachers.' },
+  { key: 'settings', label: 'Settings Page Access', description: 'Enable/disable user access to the main settings page.' },
+  { key: 'adminManageStudents', label: 'School Admin: Manage Students', description: 'Enable/disable student management for School Admins.' },
+  { key: 'teacherSmartUpdate', label: 'Teacher: Smart Update', description: 'Enable/disable AI update generator for Teachers.' },
 ];
 
-const userRoles: UserRole[] = ['SuperAdmin', 'Admin', 'Teacher', 'Parent'];
+const allUserRoles: UserRole[] = [
+  'SuperAdmin', 'AppManager_Sales', 'AppManager_Finance', 'AppManager_Support',
+  'SchoolAdmin', 'SchoolDataEditor', 'SchoolFinanceManager',
+  'ClassTeacher', 'Teacher', 'Parent', 'Subscriber'
+];
 
 export default function SuperAdminDashboardPage() {
   const { 
@@ -47,13 +51,13 @@ export default function SuperAdminDashboardPage() {
     primaryColor: currentPrimaryColor,
     secondaryColor: currentSecondaryColor,
     moduleSettings,
-    currentUserRole, // Get current role
+    currentUser, 
+    tempSetUserRole, // Use tempSetUserRole for the role switcher
     setAppName, 
     setAppIconUrl,
     setPrimaryColor,
     setSecondaryColor,
     toggleModule,
-    setCurrentUserRole // Get role setter
   } = useAppCustomization();
   const { toast } = useToast();
 
@@ -72,10 +76,11 @@ export default function SuperAdminDashboardPage() {
   }, [currentAppName, currentAppIconUrl, currentPrimaryColor, currentSecondaryColor]);
 
   useEffect(() => {
-    let baseHslForSuggestions: HSLColor | null = parseHslString(currentPrimaryColor);
-    const parsedInput = parseHslString(rawPrimaryColorInput);
-    if (parsedInput && isValidHslColorString(rawPrimaryColorInput)) { // Ensure the input is valid HSL for suggestions
-      baseHslForSuggestions = parsedInput;
+    let baseHslForSuggestions: HSLColor | null = null;
+    if (isValidHslColorString(rawPrimaryColorInput)) {
+      baseHslForSuggestions = parseHslString(rawPrimaryColorInput);
+    } else if (isHexColorString(rawPrimaryColorInput)) {
+      baseHslForSuggestions = hexToHsl(rawPrimaryColorInput);
     }
     
     if (baseHslForSuggestions) {
@@ -84,7 +89,7 @@ export default function SuperAdminDashboardPage() {
     } else {
       setSecondaryColorSuggestions([]);
     }
-  }, [rawPrimaryColorInput, currentPrimaryColor]);
+  }, [rawPrimaryColorInput]);
 
   const handleBrandingSaveChanges = () => {
     let finalPrimaryHsl: string | null = null;
@@ -134,6 +139,16 @@ export default function SuperAdminDashboardPage() {
     if (isHexColorString(colorInput)) return { backgroundColor: colorInput };
     return { backgroundColor: 'transparent', border: '1px dashed #ccc' };
   };
+
+  if (currentUser?.role !== 'SuperAdmin') {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh]">
+        <Briefcase className="h-12 w-12 text-destructive mb-4" />
+        <h1 className="text-2xl font-semibold">Access Denied</h1>
+        <p className="text-muted-foreground">You do not have permission to view this page.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -233,7 +248,7 @@ export default function SuperAdminDashboardPage() {
               </div>
               {secondaryColorSuggestions.length > 0 && (
                 <div className="mt-2 space-y-1">
-                  <Label htmlFor="secondaryColorSuggestions" className="text-xs text-muted-foreground">Or pick a lighter variant (based on Primary HSL):</Label>
+                  <Label htmlFor="secondaryColorSuggestions" className="text-xs text-muted-foreground">Or pick a lighter variant (based on Primary):</Label>
                   <Select onValueChange={handleSecondarySuggestionSelect} value={rawSecondaryColorInput}>
                     <SelectTrigger id="secondaryColorSuggestions" className="w-full text-sm">
                       <SelectValue placeholder="Select a light variant..." />
@@ -311,23 +326,27 @@ export default function SuperAdminDashboardPage() {
             <CardTitle>User Role Simulation</CardTitle>
           </div>
           <CardDescription>
-            Switch the current user role to test UI changes (frontend simulation only).
+            Switch the current user's role to test UI changes (frontend simulation only).
           </CardDescription>
         </CardHeader>
         <CardContent className="p-6 space-y-2">
           <Label htmlFor="userRoleSelect" className="text-base">Current Simulated Role</Label>
-          <Select value={currentUserRole} onValueChange={(value) => setCurrentUserRole(value as UserRole)}>
+          <Select 
+            value={currentUser?.role || 'Parent'} 
+            onValueChange={(value) => tempSetUserRole(value as UserRole)}
+          >
             <SelectTrigger id="userRoleSelect" className="w-full md:w-1/2 text-base">
               <SelectValue placeholder="Select a role..." />
             </SelectTrigger>
             <SelectContent>
-              {userRoles.map((role) => (
+              {allUserRoles.map((role) => (
                 <SelectItem key={role} value={role} className="text-base">
                   {role}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
+           {currentUser && <p className="text-xs text-muted-foreground mt-1">Current User ID: {currentUser.id}, Email: {currentUser.email}</p>}
         </CardContent>
       </Card>
 
@@ -352,7 +371,7 @@ export default function SuperAdminDashboardPage() {
               </div>
               <Switch
                 id={`module-${module.key}`}
-                checked={moduleSettings[module.key] ?? true} // Default to true if not set
+                checked={moduleSettings[module.key] ?? true} 
                 onCheckedChange={() => toggleModule(module.key)}
                 aria-label={`Toggle ${module.label} module`}
               />
@@ -366,6 +385,3 @@ export default function SuperAdminDashboardPage() {
     </div>
   );
 }
-
-
-    

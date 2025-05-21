@@ -1,7 +1,29 @@
 
 import type { LucideIcon } from 'lucide-react';
 
-export type UserRole = 'SuperAdmin' | 'Admin' | 'Teacher' | 'Parent';
+// Updated and expanded UserRole type
+export type UserRole = 
+  | 'SuperAdmin'          // App provider, highest level
+  | 'AppManager_Sales'    // App management team - Sales focus
+  | 'AppManager_Finance'  // App management team - Finance focus
+  | 'AppManager_Support'  // App management team - Support focus
+  | 'SchoolAdmin'         // Admin for a specific school
+  | 'SchoolDataEditor'    // School staff for editing general school info
+  | 'SchoolFinanceManager'// School staff for school-specific finance
+  | 'ClassTeacher'        // Teacher assigned to specific class(es), potentially more powers
+  | 'Teacher'             // General teacher
+  | 'Parent'              // Parent of a student
+  | 'Student_User'        // If students themselves were to log in (less common for preschool)
+  | 'Subscriber';         // User with limited access, e.g., newsletter
+
+export interface AuthenticatedUser {
+  id: string;
+  email?: string;
+  role: UserRole;
+  // You might add schoolId here if the user is tied to a specific school
+  schoolId?: string; 
+  // Other user-specific details from Supabase auth or your users table
+}
 
 export interface Guardian {
   id: string;
@@ -33,7 +55,7 @@ export interface ReportItem {
   year: number;
   type: 'folio' | 'pdf';
   url: string; // URL to the report file or view
-  iconName?: 'FileArchive' | 'FileText' | 'FileType2'; // Store icon name as string
+  iconName?: 'FileArchive' | 'FileText' | 'FileType2';
   dataAiHint?: string;
 }
 
@@ -52,7 +74,7 @@ export interface Student {
   dateOfBirth: string; // ISO date string
   className: string;
   profilePhotoUrl: string;
-  dataAiHint?: string; // Added for student profile photo
+  dataAiHint?: string;
   allergies?: string[];
   notes?: string;
   guardians: Guardian[];
@@ -79,11 +101,11 @@ export interface Comment {
   text: string;
   timestamp: string; // ISO date string
   likes: number;
-  isLikedByUser?: boolean; // For UI state
+  isLikedByUser?: boolean;
 }
 
 export interface FeedPost {
-  id: string;
+  id:string;
   author: {
     name: string;
     avatarUrl: string;
@@ -103,7 +125,7 @@ export interface NavItem {
   label:string;
   icon: LucideIcon;
   active?: boolean;
-  roles?: ('parent' | 'teacher' | 'admin')[];
+  roles?: UserRole[]; // Updated to use the new UserRole type
 }
 
 export interface SchoolEvent {
@@ -127,6 +149,7 @@ export interface ResourceItem {
   category: string;
 }
 
+// UserProfile is for the current logged-in user's own profile management page
 export interface UserProfile {
   id: string;
   name: string;
@@ -135,15 +158,15 @@ export interface UserProfile {
   address?: string;
   profilePhotoUrl?: string;
   dataAiHint?: string;
-  role: 'Parent' | 'Teacher' | 'Admin'; // This is the role for the user's own profile
+  role: UserRole; // User's own role for their profile display
 }
 
 export interface ChatMessage {
   id: string;
-  sender: 'user' | 'other'; // 'user' is the current logged-in user
+  sender: 'user' | 'other';
   text: string;
   timestamp: string; // ISO date string
-  avatarUrl?: string; // Typically for 'other' sender
+  avatarUrl?: string;
 }
 
 export interface Conversation {
@@ -156,14 +179,13 @@ export interface Conversation {
   unreadCount?: number;
 }
 
-// Added for school awards section
 export interface SchoolAward {
   id: string;
   title: string;
   awardingBody: string;
   year: string;
   description: string;
-  iconName?: 'Trophy' | 'Star' | string; // Changed from JSX.Element to string
+  iconName?: 'Trophy' | 'Star' | string;
   imageUrl?: string;
   dataAiHint?: string;
 }
