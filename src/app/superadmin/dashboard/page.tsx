@@ -27,9 +27,9 @@ import {
   Briefcase,
   Building,
   DollarSign,
-  Edit3,
   Settings,
-  ExternalLink
+  ExternalLink,
+  Link as LinkIcon
 } from 'lucide-react';
 import NextImage from 'next/image';
 import { useToast } from '@/hooks/use-toast';
@@ -46,16 +46,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogClose,
-} from "@/components/ui/dialog";
-import {
   type HSLColor,
   parseHslString,
   hslToString,
@@ -65,6 +55,7 @@ import {
   hexToHsl,
 } from '@/lib/color-utils';
 import type { UserRole } from '@/lib/types';
+import Link from 'next/link';
 
 const manageableModules: {
   key: AppModuleKey;
@@ -173,21 +164,6 @@ export default function SuperAdminDashboardPage() {
     HSLColor[]
   >([]);
 
-  const [isRegisterSchoolDialogOpen, setIsRegisterSchoolDialogOpen] = useState(false);
-  // Conceptual form state for Register New School dialog
-  const [newSchoolName, setNewSchoolName] = useState('');
-  const [newSchoolSubdomain, setNewSchoolSubdomain] = useState('');
-  const [newSchoolAdminEmail, setNewSchoolAdminEmail] = useState('');
-  const [newSchoolSubscriptionModel, setNewSchoolSubscriptionModel] = useState('perStudentMonthly');
-  const [newSchoolPricePerStudent, setNewSchoolPricePerStudent] = useState('');
-  const [newSchoolFlatFee, setNewSchoolFlatFee] = useState('');
-  const [newSchoolMaxAdmins, setNewSchoolMaxAdmins] = useState('1');
-  const [newSchoolMaxTeachers, setNewSchoolMaxTeachers] = useState('5');
-  const [newSchoolMaxClassTeachers, setNewSchoolMaxClassTeachers] = useState('2');
-  const [newSchoolStudentLimit, setNewSchoolStudentLimit] = useState('50');
-  const [newSchoolPackageName, setNewSchoolPackageName] = useState('');
-
-
   useEffect(() => {
     setFormAppName(currentAppName);
     setFormAppIconUrl(currentAppIconUrl || '');
@@ -279,40 +255,6 @@ export default function SuperAdminDashboardPage() {
     return { backgroundColor: 'transparent', border: '1px dashed #ccc' };
   };
 
-  const handleCreateSchoolConceptual = () => {
-    // In a real app, this would submit the form data to the backend
-    console.log("Conceptual School Creation Data:", {
-      name: newSchoolName,
-      subdomain: newSchoolSubdomain,
-      adminEmail: newSchoolAdminEmail,
-      subscriptionModel: newSchoolSubscriptionModel,
-      pricePerStudent: newSchoolPricePerStudent,
-      flatFee: newSchoolFlatFee,
-      maxAdmins: newSchoolMaxAdmins,
-      maxTeachers: newSchoolMaxTeachers,
-      maxClassTeachers: newSchoolMaxClassTeachers,
-      studentLimit: newSchoolStudentLimit,
-      packageName: newSchoolPackageName
-    });
-    toast({
-      title: "School Creation Initiated (Conceptual)",
-      description: `Simulating creation of school: ${newSchoolName}. Backend integration required.`,
-    });
-    setIsRegisterSchoolDialogOpen(false); // Close dialog
-    // Reset conceptual form fields
-    setNewSchoolName('');
-    setNewSchoolSubdomain('');
-    setNewSchoolAdminEmail('');
-    setNewSchoolSubscriptionModel('perStudentMonthly');
-    setNewSchoolPricePerStudent('');
-    setNewSchoolFlatFee('');
-    setNewSchoolMaxAdmins('1');
-    setNewSchoolMaxTeachers('5');
-    setNewSchoolMaxClassTeachers('2');
-    setNewSchoolStudentLimit('50');
-    setNewSchoolPackageName('');
-  };
-
 
   if (currentUser?.role !== 'SuperAdmin') {
     return (
@@ -381,6 +323,7 @@ export default function SuperAdminDashboardPage() {
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.style.display = 'none';
+                        console.error("Failed to load custom app icon:", formAppIconUrl);
                       }}
                     />
                   </div>
@@ -401,7 +344,7 @@ export default function SuperAdminDashboardPage() {
                   <div className="flex items-center space-x-2">
                     <Input
                       id="primaryColor"
-                      placeholder="e.g., 25 95% 55%"
+                      placeholder="e.g., 25 95% 55% or #FF8C00"
                       value={rawPrimaryColorInput}
                       onChange={(e) => setRawPrimaryColorInput(e.target.value)}
                       className="flex-grow"
@@ -419,7 +362,7 @@ export default function SuperAdminDashboardPage() {
                   <div className="flex items-center space-x-2">
                     <Input
                       id="secondaryColor"
-                      placeholder="e.g., 25 95% 75%"
+                      placeholder="e.g., 25 95% 75% or #FFA500"
                       value={rawSecondaryColorInput}
                       onChange={(e) =>
                         setRawSecondaryColorInput(e.target.value)
@@ -495,107 +438,26 @@ export default function SuperAdminDashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Dialog open={isRegisterSchoolDialogOpen} onOpenChange={setIsRegisterSchoolDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className="w-full">
-                    <PlusCircle className="mr-2 h-4 w-4" /> Register New School
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-lg">
-                  <DialogHeader>
-                    <DialogTitle>Register New School (Conceptual)</DialogTitle>
-                    <DialogDescription>
-                      Fill in the details to set up a new school instance. This is a conceptual form.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-2">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="newSchoolName" className="text-right col-span-1">School Name</Label>
-                      <Input id="newSchoolName" value={newSchoolName} onChange={(e) => setNewSchoolName(e.target.value)} className="col-span-3" placeholder="E.g., Little Stars Preschool" />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="newSchoolSubdomain" className="text-right col-span-1">Subdomain</Label>
-                      <Input id="newSchoolSubdomain" value={newSchoolSubdomain} onChange={(e) => setNewSchoolSubdomain(e.target.value)} className="col-span-3" placeholder="E.g., littlestars (app.com)" />
-                    </div>
-                     <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="newSchoolAdminEmail" className="text-right col-span-1">Admin Email</Label>
-                      <Input id="newSchoolAdminEmail" type="email" value={newSchoolAdminEmail} onChange={(e) => setNewSchoolAdminEmail(e.target.value)} className="col-span-3" placeholder="admin@littlestars.com" />
-                    </div>
-                    <Separator />
-                     <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="newSchoolSubscriptionModel" className="text-right col-span-1">Subscription Model</Label>
-                        <Select value={newSchoolSubscriptionModel} onValueChange={setNewSchoolSubscriptionModel}>
-                            <SelectTrigger className="col-span-3">
-                                <SelectValue placeholder="Select a model" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="perStudentMonthly">Per Student (Monthly)</SelectItem>
-                                <SelectItem value="flatFeeMonthly">Flat Fee (Monthly)</SelectItem>
-                                <SelectItem value="tieredFeature">Feature-Tiered Plan</SelectItem>
-                                <SelectItem value="customPackage">Custom Package</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    {newSchoolSubscriptionModel === 'perStudentMonthly' && (
-                         <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="newSchoolPricePerStudent" className="text-right col-span-1">Price/Student</Label>
-                            <Input id="newSchoolPricePerStudent" type="number" value={newSchoolPricePerStudent} onChange={(e) => setNewSchoolPricePerStudent(e.target.value)} className="col-span-3" placeholder="e.g., 10 (per month)" />
-                        </div>
-                    )}
-                     {newSchoolSubscriptionModel === 'flatFeeMonthly' && (
-                         <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="newSchoolFlatFee" className="text-right col-span-1">Flat Fee</Label>
-                            <Input id="newSchoolFlatFee" type="number" value={newSchoolFlatFee} onChange={(e) => setNewSchoolFlatFee(e.target.value)} className="col-span-3" placeholder="e.g., 500 (per month)" />
-                        </div>
-                    )}
-                     <Separator />
-                     <p className="col-span-4 text-sm font-medium text-muted-foreground">User & Resource Limits:</p>
-                     <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="newSchoolMaxAdmins" className="text-right col-span-1">Max Admins</Label>
-                        <Input id="newSchoolMaxAdmins" type="number" value={newSchoolMaxAdmins} onChange={(e) => setNewSchoolMaxAdmins(e.target.value)} className="col-span-3" />
-                    </div>
-                     <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="newSchoolMaxTeachers" className="text-right col-span-1">Max Teachers</Label>
-                        <Input id="newSchoolMaxTeachers" type="number" value={newSchoolMaxTeachers} onChange={(e) => setNewSchoolMaxTeachers(e.target.value)} className="col-span-3" />
-                    </div>
-                     <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="newSchoolMaxClassTeachers" className="text-right col-span-1">Max Class Teachers</Label>
-                        <Input id="newSchoolMaxClassTeachers" type="number" value={newSchoolMaxClassTeachers} onChange={(e) => setNewSchoolMaxClassTeachers(e.target.value)} className="col-span-3" />
-                    </div>
-                     <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="newSchoolStudentLimit" className="text-right col-span-1">Student Limit</Label>
-                        <Input id="newSchoolStudentLimit" type="number" value={newSchoolStudentLimit} onChange={(e) => setNewSchoolStudentLimit(e.target.value)} className="col-span-3" />
-                    </div>
-                     <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="newSchoolPackageName" className="text-right col-span-1">Package Name</Label>
-                        <Input id="newSchoolPackageName" value={newSchoolPackageName} onChange={(e) => setNewSchoolPackageName(e.target.value)} className="col-span-3" placeholder="E.g., Basic, Premium" />
-                    </div>
-
-                  </div>
-                  <DialogFooter>
-                    <DialogClose asChild>
-                        <Button type="button" variant="outline">Cancel</Button>
-                    </DialogClose>
-                    <Button type="button" onClick={handleCreateSchoolConceptual}>Create School (Conceptual)</Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-
+              <Link href="/superadmin/register-school" passHref>
+                <Button className="w-full">
+                  <PlusCircle className="mr-2 h-4 w-4" /> Register New School
+                </Button>
+              </Link>
               <div className="mt-3 p-3 border rounded-lg bg-muted/30 text-sm space-y-1">
                 <h4 className="font-semibold text-foreground mb-1">
                   Conceptual Features:
                 </h4>
                 <p className="text-muted-foreground">
                   <ExternalLink className="inline mr-1.5 h-3.5 w-3.5" />
-                  Manage Subdomains (e.g., `school.yourapp.com`)
+                  View/Manage Existing Schools & Subdomains
                 </p>
                 <p className="text-muted-foreground">
                   <Puzzle className="inline mr-1.5 h-3.5 w-3.5" />
-                  Assign/Update Subscription Packages
+                  Assign/Update Subscription Packages per School
                 </p>
                 <p className="text-muted-foreground">
                   <Users2 className="inline mr-1.5 h-3.5 w-3.5" />
-                  View School Admins & User Limits
+                  View School Admins & User Limits per School
                 </p>
                 <p className="text-muted-foreground">
                   <School className="inline mr-1.5 h-3.5 w-3.5" />
@@ -620,8 +482,7 @@ export default function SuperAdminDashboardPage() {
                 Core Module Management
               </CardTitle>
               <CardDescription>
-                Enable or disable features globally. (Tenant-specific toggles
-                would be managed per tenant).
+                Enable or disable features globally. (Per-tenant toggles would be managed per tenant).
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -691,23 +552,26 @@ export default function SuperAdminDashboardPage() {
             </CardContent>
           </Card>
 
-          <Card className="shadow-lg rounded-xl">
+           <Card className="shadow-lg rounded-xl">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <DollarSign className="mr-2 h-5 w-5 text-primary" />
                 Platform Finance (Conceptual)
               </CardTitle>
               <CardDescription>
-                Oversee revenue from school subscriptions.
+                Oversee revenue from school subscriptions. (Handled by AppManager_Finance)
               </CardDescription>
             </CardHeader>
             <CardContent>
                <p className="text-sm text-muted-foreground">
-                This section would show aggregated financial data like total MRR, active subscriptions, payment statuses from schools, etc. Requires backend finance & subscription management integration.
+                This section would show aggregated financial data like total MRR, active subscriptions, payment statuses from schools, etc. 
+                Requires backend finance & subscription management integration.
               </p>
-              <Button className="mt-3 w-full" variant="outline" disabled>
-                 View Platform Revenue Reports (Conceptual)
-              </Button>
+               <Link href="/app-manager/finance/dashboard" passHref>
+                <Button className="mt-3 w-full" variant="outline">
+                    <LinkIcon className="mr-2 h-4 w-4" /> Go to App Finance Dashboard
+                </Button>
+              </Link>
             </CardContent>
           </Card>
 
@@ -727,9 +591,10 @@ export default function SuperAdminDashboardPage() {
               </p>
             </CardContent>
           </Card>
-
         </div>
       </div>
     </div>
   );
 }
+
+    
