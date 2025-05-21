@@ -98,15 +98,16 @@ export default function ManageStudentsPage() {
               </CardContent>
               <div className="p-4 border-t mt-auto">
                 <div className="flex space-x-2">
-                    {/* Link to the general student detail page, accessible by multiple roles */}
                     <Link href={`/portfolio/${kid.id}`} passHref className="flex-1">
                         <Button variant="outline" className="w-full">
                         View Full Profile <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>
                     </Link>
-                    <Button variant="secondary" size="icon" aria-label="Edit Profile">
-                        <Edit3 className="h-4 w-4" />
-                    </Button>
+                    <Link href={`/admin/manage-students/${kid.id}/edit`} passHref>
+                      <Button variant="secondary" size="icon" aria-label="Edit Profile">
+                          <Edit3 className="h-4 w-4" />
+                      </Button>
+                    </Link>
                 </div>
               </div>
             </Card>
