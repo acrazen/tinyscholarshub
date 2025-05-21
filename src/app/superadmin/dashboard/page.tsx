@@ -2,13 +2,13 @@
 // src/app/superadmin/dashboard/page.tsx
 "use client";
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Cog, Save, Palette, Image as ImageIcon, Puzzle, Users2, School, PlusCircle, Briefcase, Building, DollarSign } from "lucide-react";
+import { Cog, Save, Palette, Image as ImageIcon, Puzzle, Users2, School, PlusCircle, Briefcase, Building, DollarSign, Edit3 } from "lucide-react";
 import NextImage from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { useAppCustomization, type AppModuleKey } from '@/context/app-customization-context';
@@ -27,16 +27,16 @@ import type { UserRole } from '@/lib/types';
 
 const manageableModules: { key: AppModuleKey; label: string; description: string }[] = [
   { key: 'messaging', label: 'Messaging', description: 'Enable/disable direct messaging features.' },
-  { key: 'myLearning', label: 'My Learning', description: 'Enable/disable the "My Learning" section for students/parents.' },
-  { key: 'portfolio', label: 'Portfolio', description: 'Enable/disable the student portfolio viewing feature.' },
-  { key: 'eventBooking', label: 'Event Booking', description: 'Enable/disable school event booking functionality.' },
-  { key: 'resources', label: 'Resources', description: 'Enable/disable access to shared school resources.' },
-  { key: 'statementOfAccount', label: 'Statement of Account', description: 'Enable/disable viewing financial statements.' },
+  { key: 'myLearning', label: 'My Learning', description: 'Enable/disable the "My Learning" section.' },
+  { key: 'portfolio', label: 'Portfolio', description: 'Enable/disable student portfolio viewing.' },
+  { key: 'eventBooking', label: 'Event Booking', description: 'Enable/disable school event booking.' },
+  { key: 'resources', label: 'Resources', description: 'Enable/disable shared school resources.' },
+  { key: 'statementOfAccount', label: 'Statement of Account', description: 'Enable/disable financial statements view.' },
   { key: 'eService', label: 'eService', description: 'Enable/disable general eServices portal.' },
-  { key: 'settings', label: 'Settings Page Access', description: 'Enable/disable user access to the main settings page.' },
-  { key: 'adminManageStudents', label: 'School Admin: Manage Students', description: 'Enable/disable student management for School Admins.' },
-  { key: 'teacherSmartUpdate', label: 'Teacher: Smart Update', description: 'Enable/disable AI update generator for Teachers.' },
-  { key: 'paymentGateway', label: 'Payment Gateway Integration', description: 'Enable/disable payment gateway features for schools.' },
+  { key: 'settings', label: 'Settings Page Access', description: 'Enable/disable user access to settings.' },
+  { key: 'adminManageStudents', label: 'School Admin: Manage Students', description: 'Student management for School Admins.' },
+  { key: 'teacherSmartUpdate', label: 'Teacher: Smart Update', description: 'AI update generator for Teachers.' },
+  { key: 'paymentGateway', label: 'Payment Gateway', description: 'Enable/disable payment gateway features.' },
 ];
 
 const allUserRolesForSimulation: UserRole[] = [
@@ -53,7 +53,7 @@ export default function SuperAdminDashboardPage() {
     secondaryColor: currentSecondaryColor,
     moduleSettings,
     currentUser, 
-    tempSetUserRole,
+    tempSetUserRole, // Changed from setCurrentUserRole to tempSetUserRole
     setAppName, 
     setAppIconUrl,
     setPrimaryColor,
@@ -153,235 +153,216 @@ export default function SuperAdminDashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center space-x-3">
+      <div className="flex items-center space-x-3 mb-6">
         <Cog className="h-8 w-8 text-primary" />
         <h1 className="text-3xl font-bold tracking-tight">Super Admin Dashboard</h1>
       </div>
       
-      <Card className="shadow-lg rounded-xl">
-        <CardHeader>
-          <CardTitle>Application Customization</CardTitle>
-          <CardDescription>
-            Global settings for white-labeling the application. Changes will reflect across the app (frontend simulation).
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="p-6 space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="appName" className="text-base">Custom App Name</Label>
-            <Input 
-              id="appName" 
-              placeholder="Enter custom app name" 
-              value={formAppName}
-              onChange={(e) => setFormAppName(e.target.value)}
-              className="text-base"
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="appIconUrl" className="text-base">Custom App Icon URL</Label>
-            <Input 
-              id="appIconUrl" 
-              type="url"
-              placeholder="Enter URL for custom app icon" 
-              value={formAppIconUrl}
-              onChange={(e) => setFormAppIconUrl(e.target.value)}
-              className="text-base"
-            />
-            {formAppIconUrl ? (
-              <div className="mt-3 p-3 border rounded-md inline-flex items-center justify-center bg-muted">
-                <NextImage 
-                  src={formAppIconUrl} 
-                  alt="App Icon Preview" 
-                  width={64} 
-                  height={64} 
-                  className="rounded-md object-contain"
-                  data-ai-hint="custom logo"
-                  unoptimized={true} 
-                  onError={(e) => { const target = e.target as HTMLImageElement; target.style.display = 'none'; }}
-                />
-              </div>
-            ) : (
-              <div className="mt-3 p-3 border rounded-md inline-flex items-center justify-center bg-muted h-[88px] w-[88px]">
-                <ImageIcon className="h-10 w-10 text-muted-foreground" />
-              </div>
-            )}
-          </div>
-
-          <Separator />
-
-          <div className="flex items-center space-x-2">
-            <Palette className="h-5 w-5 text-muted-foreground" />
-            <h3 className="text-lg font-medium">Theme Colors</h3>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="primaryColor" className="text-base">Primary Color (HSL or HEX)</Label>
-              <div className="flex items-center space-x-2">
-                <Input 
-                  id="primaryColor" 
-                  placeholder="e.g., 25 95% 55% or #FF8C00" 
-                  value={rawPrimaryColorInput}
-                  onChange={(e) => setRawPrimaryColorInput(e.target.value)}
-                  className="text-base flex-grow"
-                />
-                <div 
-                  className="w-8 h-8 rounded-md border shrink-0" 
-                  style={getColorPreviewStyle(rawPrimaryColorInput)}
-                  title="Primary Color Preview"
-                ></div>
-              </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <Card className="shadow-lg rounded-xl">
+          <CardHeader>
+            <CardTitle className="flex items-center"><Palette className="mr-2 h-5 w-5 text-primary" />App Branding & Theme</CardTitle>
+            <CardDescription>
+              Global settings for white-labeling the application.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-1">
+              <Label htmlFor="appName">Custom App Name</Label>
+              <Input 
+                id="appName" 
+                placeholder="Enter custom app name" 
+                value={formAppName}
+                onChange={(e) => setFormAppName(e.target.value)}
+              />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="secondaryColor" className="text-base">Secondary Color (HSL or HEX)</Label>
-               <div className="flex items-center space-x-2">
-                <Input 
-                  id="secondaryColor" 
-                  placeholder="e.g., 25 95% 75% or #FFA500" 
-                  value={rawSecondaryColorInput}
-                  onChange={(e) => setRawSecondaryColorInput(e.target.value)}
-                  className="text-base flex-grow"
-                />
-                 <div 
-                  className="w-8 h-8 rounded-md border shrink-0" 
-                  style={getColorPreviewStyle(rawSecondaryColorInput)}
-                  title="Secondary Color Preview"
-                ></div>
-              </div>
-              {secondaryColorSuggestions.length > 0 && (
-                <div className="mt-2 space-y-1">
-                  <Label htmlFor="secondaryColorSuggestions" className="text-xs text-muted-foreground">Or pick a lighter variant (based on Primary):</Label>
-                  <Select onValueChange={handleSecondarySuggestionSelect} value={rawSecondaryColorInput}>
-                    <SelectTrigger id="secondaryColorSuggestions" className="w-full text-sm">
-                      <SelectValue placeholder="Select a light variant..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {secondaryColorSuggestions.map((hsl, index) => {
-                        const hslStr = hslToString(hsl);
-                        return (
-                          <SelectItem key={index} value={hslStr}>
-                            <div className="flex items-center space-x-2">
-                              <div className="w-4 h-4 rounded border" style={{backgroundColor: `hsl(${hslStr})`}}></div>
-                              <span>{hslStr}</span>
-                            </div>
-                          </SelectItem>
-                        );
-                      })}
-                    </SelectContent>
-                  </Select>
+            
+            <div className="space-y-1">
+              <Label htmlFor="appIconUrl">Custom App Icon URL</Label>
+              <Input 
+                id="appIconUrl" 
+                type="url"
+                placeholder="Enter URL for custom app icon" 
+                value={formAppIconUrl}
+                onChange={(e) => setFormAppIconUrl(e.target.value)}
+              />
+              {formAppIconUrl ? (
+                <div className="mt-2 p-2 border rounded-md inline-flex items-center justify-center bg-muted/50">
+                  <NextImage 
+                    src={formAppIconUrl} 
+                    alt="App Icon Preview" 
+                    width={48} 
+                    height={48} 
+                    className="rounded-md object-contain"
+                    data-ai-hint="custom logo"
+                    unoptimized={true} 
+                    onError={(e) => { const target = e.target as HTMLImageElement; target.style.display = 'none'; }}
+                  />
+                </div>
+              ) : (
+                <div className="mt-2 p-2 border rounded-md inline-flex items-center justify-center bg-muted/50 h-[64px] w-[64px]">
+                  <ImageIcon className="h-8 w-8 text-muted-foreground" />
                 </div>
               )}
             </div>
-          </div>
-        </CardContent>
-        <CardFooter className="border-t pt-6">
-          <Button onClick={handleBrandingSaveChanges}>
-            <Save className="mr-2 h-4 w-4" /> Apply Branding Changes
-          </Button>
-        </CardFooter>
-      </Card>
 
-      <Card className="shadow-lg rounded-xl">
-        <CardHeader>
-          <div className="flex items-center space-x-2">
-            <Building className="h-5 w-5 text-muted-foreground" />
-            <CardTitle>Tenant / School Management (Conceptual)</CardTitle>
-          </div>
-          <CardDescription>
-            Simulate features for onboarding and managing different school instances (tenants). Backend required for actual functionality.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="p-6 space-y-6">
-          <Button 
-            onClick={() => toast({ title: "Feature Placeholder", description: "Registering a new school (tenant) involves creating a new subdomain, database schema, admin users for that school, and linking to a subscription package. This requires backend setup."})}
-            className="w-full md:w-auto"
-          >
-            <PlusCircle className="mr-2 h-4 w-4" /> Register New School / Tenant (Simulated)
-          </Button>
-          <div className="mt-4 p-4 border rounded-lg bg-muted/30">
-            <h4 className="font-semibold text-foreground mb-2">Manage Existing Schools</h4>
-            <p className="text-sm text-muted-foreground">
-              This section would list registered schools, allowing a Super Admin to:
-            </p>
-             <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1 pl-4 mt-2">
-                <li>View school details and primary admin contacts.</li>
-                <li>Assign/Update subscription packages.</li>
-                <li>Manage subdomain status (e.g., yourschool.tinyscholarshub.com).</li>
-                <li>Temporarily suspend or activate school accounts.</li>
-                <li>Access school-specific analytics (if available).</li>
-            </ul>
-             <p className="text-sm text-muted-foreground mt-2">
-              (Requires backend integration for multi-tenancy)
-            </p>
-          </div>
-        </CardContent>
-         <CardFooter className="border-t pt-6">
-          <p className="text-sm text-muted-foreground">School tenant management features are conceptual and require backend development.</p>
-        </CardFooter>
-      </Card>
-
-      <Card className="shadow-lg rounded-xl">
-        <CardHeader>
-          <div className="flex items-center space-x-2">
-            <Users2 className="h-5 w-5 text-muted-foreground" />
-            <CardTitle>User Role Simulation</CardTitle>
-          </div>
-          <CardDescription>
-            Switch the current user's role to test UI changes (frontend simulation only).
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="p-6 space-y-2">
-          <Label htmlFor="userRoleSelect" className="text-base">Current Simulated Role</Label>
-          <Select 
-            value={currentUser?.role || 'Parent'} 
-            onValueChange={(value) => tempSetUserRole(value as UserRole)}
-          >
-            <SelectTrigger id="userRoleSelect" className="w-full md:w-1/2 text-base">
-              <SelectValue placeholder="Select a role..." />
-            </SelectTrigger>
-            <SelectContent>
-              {allUserRolesForSimulation.map((role) => (
-                <SelectItem key={role} value={role} className="text-base">
-                  {role}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-           {currentUser && <p className="text-xs text-muted-foreground mt-1">Current User ID: {currentUser.id}, Email: {currentUser.email}</p>}
-        </CardContent>
-      </Card>
-
-      <Card className="shadow-lg rounded-xl">
-        <CardHeader>
-          <div className="flex items-center space-x-2">
-            <Puzzle className="h-5 w-5 text-muted-foreground" />
-            <CardTitle>Core Module Management</CardTitle>
-          </div>
-          <CardDescription>
-            Enable or disable specific features/modules globally or per-tenant (conceptual for per-tenant).
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="p-6 space-y-4">
-          {manageableModules.map(module => (
-            <div key={module.key} className="flex items-center justify-between p-3 border rounded-lg bg-muted/30 hover:bg-muted/50">
-              <div>
-                <Label htmlFor={`module-${module.key}`} className="text-base font-medium">
-                  {module.label}
-                </Label>
-                <p className="text-xs text-muted-foreground">{module.description}</p>
+            <Separator />
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <Label htmlFor="primaryColor">Primary Color (HSL or HEX)</Label>
+                <div className="flex items-center space-x-2">
+                  <Input 
+                    id="primaryColor" 
+                    placeholder="e.g., 25 95% 55%" 
+                    value={rawPrimaryColorInput}
+                    onChange={(e) => setRawPrimaryColorInput(e.target.value)}
+                    className="flex-grow"
+                  />
+                  <div 
+                    className="w-8 h-8 rounded-md border shrink-0" 
+                    style={getColorPreviewStyle(rawPrimaryColorInput)}
+                  ></div>
+                </div>
               </div>
-              <Switch
-                id={`module-${module.key}`}
-                checked={moduleSettings[module.key] ?? true} 
-                onCheckedChange={() => toggleModule(module.key)}
-                aria-label={`Toggle ${module.label} module`}
-              />
+              <div className="space-y-1">
+                <Label htmlFor="secondaryColor">Secondary Color (HSL or HEX)</Label>
+                 <div className="flex items-center space-x-2">
+                  <Input 
+                    id="secondaryColor" 
+                    placeholder="e.g., 25 95% 75%" 
+                    value={rawSecondaryColorInput}
+                    onChange={(e) => setRawSecondaryColorInput(e.target.value)}
+                    className="flex-grow"
+                  />
+                   <div 
+                    className="w-8 h-8 rounded-md border shrink-0" 
+                    style={getColorPreviewStyle(rawSecondaryColorInput)}
+                  ></div>
+                </div>
+                {secondaryColorSuggestions.length > 0 && (
+                  <div className="mt-1 space-y-1">
+                    <Label htmlFor="secondaryColorSuggestions" className="text-xs text-muted-foreground">Or pick a lighter variant:</Label>
+                    <Select onValueChange={handleSecondarySuggestionSelect} value={rawSecondaryColorInput}>
+                      <SelectTrigger id="secondaryColorSuggestions" className="w-full text-xs h-9">
+                        <SelectValue placeholder="Select light variant..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {secondaryColorSuggestions.map((hsl, index) => {
+                          const hslStr = hslToString(hsl);
+                          return (
+                            <SelectItem key={index} value={hslStr} className="text-xs">
+                              <div className="flex items-center space-x-2">
+                                <div className="w-3 h-3 rounded-sm border" style={{backgroundColor: `hsl(${hslStr})`}}></div>
+                                <span>{hslStr}</span>
+                              </div>
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </div>
             </div>
-          ))}
-        </CardContent>
-         <CardFooter className="border-t pt-6">
-          <p className="text-sm text-muted-foreground">Module changes are applied instantly (frontend simulation).</p>
-        </CardFooter>
-      </Card>
+          </CardContent>
+          <CardFooter className="border-t pt-4">
+            <Button onClick={handleBrandingSaveChanges}>
+              <Save className="mr-2 h-4 w-4" /> Apply Branding
+            </Button>
+          </CardFooter>
+        </Card>
+
+        <Card className="shadow-lg rounded-xl">
+          <CardHeader>
+            <CardTitle className="flex items-center"><Building className="mr-2 h-5 w-5 text-primary" />Tenant / School Management</CardTitle>
+            <CardDescription>
+              Oversee school instances, subdomains, and package assignments. (Conceptual)
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Button 
+              onClick={() => toast({ 
+                title: "Tenant Creation (Conceptual)", 
+                description: "This would open a form to input: School Name, Desired Subdomain (e.g., myschool.tinyscholars.com), Admin Email, Subscription Package. Requires backend integration."
+              })}
+              className="w-full"
+            >
+              <PlusCircle className="mr-2 h-4 w-4" /> Register New School / Tenant
+            </Button>
+            <div className="mt-3 p-3 border rounded-lg bg-muted/30 text-sm space-y-1">
+              <h4 className="font-semibold text-foreground mb-1">Conceptual Features:</h4>
+              <p className="text-muted-foreground"><Edit3 className="inline mr-1.5 h-3.5 w-3.5" />Manage Subdomains (e.g., `school.yourapp.com`)</p>
+              <p className="text-muted-foreground"><Puzzle className="inline mr-1.5 h-3.5 w-3.5" />Assign/Update Subscription Packages</p>
+              <p className="text-muted-foreground"><Users2 className="inline mr-1.5 h-3.5 w-3.5" />View School Admins & User Limits</p>
+              <p className="text-muted-foreground"><School className="inline mr-1.5 h-3.5 w-3.5" />Activate/Suspend School Accounts</p>
+            </div>
+          </CardContent>
+           <CardFooter className="border-t pt-4">
+            <p className="text-xs text-muted-foreground">Full tenant management requires backend infrastructure.</p>
+          </CardFooter>
+        </Card>
+
+        <Card className="shadow-lg rounded-xl lg:col-span-2"> {/* Module Management spans full width on large screens */}
+          <CardHeader>
+            <CardTitle className="flex items-center"><Puzzle className="mr-2 h-5 w-5 text-primary" />Core Module Management</CardTitle>
+            <CardDescription>
+              Enable or disable features globally. (Tenant-specific toggles would be managed per tenant).
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+              {manageableModules.map(module => (
+                <div key={module.key} className="flex items-center justify-between p-3 border rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                  <div>
+                    <Label htmlFor={`module-${module.key}`} className="font-medium">
+                      {module.label}
+                    </Label>
+                    <p className="text-xs text-muted-foreground">{module.description}</p>
+                  </div>
+                  <Switch
+                    id={`module-${module.key}`}
+                    checked={moduleSettings[module.key] ?? true} 
+                    onCheckedChange={() => toggleModule(module.key)}
+                    aria-label={`Toggle ${module.label} module`}
+                  />
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="shadow-lg rounded-xl lg:col-span-2"> {/* User Role Simulation also spans */}
+          <CardHeader>
+            <CardTitle className="flex items-center"><Users2 className="mr-2 h-5 w-5 text-primary" />User Role Simulation</CardTitle>
+            <CardDescription>
+              Switch current user's role to test UI changes (frontend simulation only).
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <Label htmlFor="userRoleSelect">Current Simulated Role</Label>
+            <Select 
+              value={currentUser?.role || 'Parent'} 
+              onValueChange={(value) => tempSetUserRole(value as UserRole)}
+            >
+              <SelectTrigger id="userRoleSelect" className="w-full md:w-1/2">
+                <SelectValue placeholder="Select a role..." />
+              </SelectTrigger>
+              <SelectContent>
+                {allUserRolesForSimulation.map((role) => (
+                  <SelectItem key={role} value={role}>
+                    {role}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {currentUser && <p className="text-xs text-muted-foreground mt-1">Current User ID: {currentUser.id}, Email: {currentUser.email}</p>}
+          </CardContent>
+        </Card>
+
+      </div>
     </div>
   );
 }
+
