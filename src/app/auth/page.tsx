@@ -32,14 +32,6 @@ export default function AuthPage() {
   const { toast } = useToast();
   const { tempSetUserRole } = useAppCustomization();
 
-  const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
-
   if (!supabase) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background p-4">
@@ -74,8 +66,8 @@ export default function AuthPage() {
         });
         if (error) throw error;
         if (signUpData.user) {
-          // For prototype: simulate setting a default role in context after signup
-          tempSetUserRole('Parent'); 
+          // The AppCustomizationContext will now handle role assignment based on email
+          // or default to 'Parent' via onAuthStateChange.
           toast({ title: "Sign Up Successful!", description: "Please check your email to confirm your account." });
           router.push('/');
         } else {
@@ -89,6 +81,7 @@ export default function AuthPage() {
           password: data.password,
         });
         if (error) throw error;
+        // Role will be determined by AppCustomizationContext onAuthStateChange
         toast({ title: "Sign In Successful!", description: "Welcome back!" });
         router.push('/');
       }
