@@ -1,8 +1,9 @@
 
 import type { LucideIcon } from 'lucide-react';
+import type { User as SupabaseUser } from '@supabase/supabase-js';
 
 // Updated and expanded UserRole type
-export type UserRole = 
+export type UserRole =
   | 'SuperAdmin'          // App provider, highest level
   | 'AppManager_Sales'    // App management team - Sales focus
   | 'AppManager_Finance'  // App management team - Finance focus
@@ -16,12 +17,12 @@ export type UserRole =
   | 'Student_User'        // If students themselves were to log in (less common for preschool)
   | 'Subscriber';         // User with limited access, e.g., newsletter
 
-export interface AuthenticatedUser {
-  id: string;
-  email?: string;
-  role: UserRole;
+export interface AuthenticatedUser extends Partial<SupabaseUser> {
+  id: string; // Overriding SupabaseUser's id to be non-optional
+  email?: string | null; // Align with SupabaseUser
+  role: UserRole; // Our custom role
   // You might add schoolId here if the user is tied to a specific school
-  schoolId?: string; 
+  schoolId?: string;
   // Other user-specific details from Supabase auth or your users table
 }
 
@@ -55,7 +56,7 @@ export interface ReportItem {
   year: number;
   type: 'folio' | 'pdf';
   url: string; // URL to the report file or view
-  iconName?: 'FileArchive' | 'FileText' | 'FileType2';
+  iconName?: 'FileArchive' | 'FileText' | 'FileType2' | string; // Made iconName more generic string
   dataAiHint?: string;
 }
 

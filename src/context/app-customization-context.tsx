@@ -4,66 +4,28 @@
 
 import type { ReactNode } from 'react';
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import type { UserRole, AuthenticatedUser } from '@/lib/types'; // Import UserRole & AuthenticatedUser
+import type { UserRole, AuthenticatedUser } from '@/lib/types';
+import { supabase } from '@/lib/supabaseClient'; // Import Supabase client
+import type { User as SupabaseAuthUser, Session } from '@supabase/supabase-js';
 
-// Define module keys - these should match keys used in nav items and page links
-export type AppModuleKey = 
+
+export type AppModuleKey =
   | 'messaging'
   | 'myLearning'
-  | 'portfolio' // Represents the main portfolio link for parents
+  | 'portfolio'
   | 'eventBooking'
   | 'resources'
   | 'statementOfAccount'
   | 'eService'
-  | 'settings' // Settings might always be enabled
-  | 'adminManageStudents' // Admin specific
-  | 'teacherSmartUpdate'; // Teacher specific
+  | 'settings'
+  | 'adminManageStudents'
+  | 'teacherSmartUpdate';
 
 export type ModuleSettings = Record<AppModuleKey, boolean>;
 
-// Simulating a basic authenticated user structure
-// In a real app, this would come from Supabase auth
-const MOCK_SUPER_ADMIN_USER: AuthenticatedUser = {
-  id: 'super-admin-001',
-  email: 'super@example.com',
-  role: 'SuperAdmin',
-};
-
-const MOCK_PARENT_USER: AuthenticatedUser = {
-  id: 'parent-user-123',
-  email: 'parent@example.com',
-  role: 'Parent',
-  schoolId: 'school-01' // Example school ID
-};
-
-
-interface AppCustomizationContextType {
-  appName: string;
-  appIconUrl: string | null;
-  primaryColor: string; 
-  secondaryColor: string; 
-  moduleSettings: ModuleSettings;
-  
-  // Simulated Auth State
-  currentUser: AuthenticatedUser | null; 
-  isLoadingAuth: boolean;
-  
-  setAppName: (name: string) => void;
-  setAppIconUrl: (url: string | null) => void;
-  setPrimaryColor: (color: string) => void;
-  setSecondaryColor: (color: string) => void;
-  setModuleSettings: (settings: ModuleSettings) => void;
-  toggleModule: (moduleKey: AppModuleKey) => void;
-
-  // Simulated Auth functions
-  loginAs: (role: UserRole) => void; // Simplified login for role switching
-  logout: () => void;
-  tempSetUserRole: (role: UserRole) => void; // For super admin role switcher
-}
-
 const defaultAppName = "Tiny Scholars Hub";
-const defaultIconUrl = null; 
-const defaultPrimaryColor = "25 95% 55%"; 
+const defaultIconUrl = null;
+const defaultPrimaryColor = "25 95% 55%";
 const defaultSecondaryColor = "25 95% 75%";
 
 const defaultModuleSettings: ModuleSettings = {
@@ -75,9 +37,29 @@ const defaultModuleSettings: ModuleSettings = {
   statementOfAccount: true,
   eService: true,
   settings: true,
-  adminManageStudents: true, 
-  teacherSmartUpdate: true, 
+  adminManageStudents: true,
+  teacherSmartUpdate: true,
 };
+
+interface AppCustomizationContextType {
+  appName: string;
+  appIconUrl: string | null;
+  primaryColor: string;
+  secondaryColor: string;
+  moduleSettings: ModuleSettings;
+
+  currentUser: AuthenticatedUser | null;
+  isLoadingAuth: boolean;
+
+  setAppName: (name: string) => void;
+  setAppIconUrl: (url: string | null) => void;
+  setPrimaryColor: (color: string) => void;
+  setSecondaryColor: (color: string) => void;
+  setModuleSettings: (settings: ModuleSettings) => void;
+  toggleModule: (moduleKey: AppModuleKey) => void;
+
+  tempSetUserRole: (role: UserRole) => void;
+}
 
 const AppCustomizationContext = createContext<AppCustomizationContextType | undefined>(undefined);
 
@@ -87,14 +69,61 @@ export function AppCustomizationProvider({ children }: { children: ReactNode }) 
   const [primaryColor, setPrimaryColorState] = useState<string>(defaultPrimaryColor);
   const [secondaryColor, setSecondaryColorState] = useState<string>(defaultSecondaryColor);
   const [moduleSettings, setModuleSettingsState] = useState<ModuleSettings>(defaultModuleSettings);
-  
-  // Simulated Auth State
-  const [currentUser, setCurrentUser] = useState<AuthenticatedUser | null>(MOCK_PARENT_USER); // Default to parent
-  const [isLoadingAuth, setIsLoadingAuth] = useState<boolean>(false);
+
+  const [currentUser, setCurrentUser] = useState<AuthenticatedUser | null>(null);
+  const [isLoadingAuth, setIsLoadingAuth] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (!supabase) {
+      // Supabase is not configured, so no auth state to check
+      console.warn("AppCustomizationContext: Supabase client not available. Auth features disabled.");
+      setIsLoadingAuth(false);
+      setCurrentUser(null); // Ensure user is null if Supabase is not configured
+      return;
+    }
+
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        // TODO: Fetch user's role from your 'profiles' table or custom claims
+        const userRole = (session.user as any).app_role || 'Parent';
+        setCurrentUser({
+          ...session.user,
+          id: session.user.id,
+          role: userRole as UserRole
+        });
+      }
+      setIsLoadingAuth(false);
+    };
+    getSession();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (_event, session: Session | null) => {
+        if (session?.user) {
+          let userRole: UserRole = 'Parent';
+          // Placeholder: you'd fetch the actual role from your DB or claims
+          // Example: const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).single();
+          // if (profile) userRole = profile.role;
+          setCurrentUser({
+            ...session.user,
+            id: session.user.id,
+            role: userRole,
+          });
+        } else {
+          setCurrentUser(null);
+        }
+        setIsLoadingAuth(false);
+      }
+    );
+
+    return () => {
+      authListener?.unsubscribe();
+    };
+  }, []);
 
 
   const setAppName = useCallback((name: string) => {
-    setAppNameState(name || defaultAppName); 
+    setAppNameState(name || defaultAppName);
   }, []);
 
   const setAppIconUrl = useCallback((url: string | null) => {
@@ -120,58 +149,43 @@ export function AppCustomizationProvider({ children }: { children: ReactNode }) 
     }));
   }, []);
 
-  // Simulated login function - in real app, this would call Supabase
-  const loginAs = useCallback((role: UserRole) => {
-    setIsLoadingAuth(true);
-    // Simulate API call
-    setTimeout(() => {
-      // Create a mock user based on role for simulation
-      let mockUser: AuthenticatedUser = { id: 'mock-user', role: role, email: `${role.toLowerCase()}@example.com`};
-      if (role === 'SuperAdmin') mockUser = MOCK_SUPER_ADMIN_USER;
-      else if (role === 'Parent') mockUser = MOCK_PARENT_USER;
-      else if (role === 'SchoolAdmin') mockUser = {id: 'school-admin-01', email: 'schooladmin@example.com', role: 'SchoolAdmin', schoolId: 'school-01'};
-      else if (role === 'ClassTeacher') mockUser = {id: 'class-teacher-01', email: 'classteacher@example.com', role: 'ClassTeacher', schoolId: 'school-01'};
-      
-      setCurrentUser(mockUser);
-      setIsLoadingAuth(false);
-    }, 500);
-  }, []);
-
-  const logout = useCallback(() => {
-    setIsLoadingAuth(true);
-    setTimeout(() => {
-      setCurrentUser(null);
-      setIsLoadingAuth(false);
-    }, 500);
-  }, []);
-
   const tempSetUserRole = useCallback((role: UserRole) => {
-    if (currentUser) {
-      setCurrentUser(prev => prev ? ({ ...prev, role }) : null);
-    } else {
-      // If no user, simulate logging in as that role
-      loginAs(role);
-    }
-  }, [currentUser, loginAs]);
+    setCurrentUser(prevUser => {
+      if (prevUser) {
+        return { ...prevUser, role: role };
+      }
+      // For testing with no real user logged in, we can create a mock user
+      if (!supabase) { // If Supabase isn't configured, we can still simulate this
+         return {
+            id: 'mock-user-id',
+            email: 'mockuser@example.com',
+            app_metadata: {},
+            user_metadata: {},
+            aud: 'authenticated',
+            created_at: new Date().toISOString(),
+            role: role,
+        };
+      }
+      return null; // Or handle as needed if no Supabase user
+    });
+  }, []);
 
 
   return (
-    <AppCustomizationContext.Provider value={{ 
-      appName, 
-      appIconUrl, 
+    <AppCustomizationContext.Provider value={{
+      appName,
+      appIconUrl,
       primaryColor,
       secondaryColor,
       moduleSettings,
       currentUser,
       isLoadingAuth,
-      setAppName, 
+      setAppName,
       setAppIconUrl,
       setPrimaryColor,
       setSecondaryColor,
       setModuleSettings,
       toggleModule,
-      loginAs,
-      logout,
       tempSetUserRole,
     }}>
       {children}
