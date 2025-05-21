@@ -10,13 +10,11 @@ import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { LogIn, UserPlus, Loader2, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
-import { useAppCustomization } from '@/context/app-customization-context';
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
@@ -30,7 +28,14 @@ export default function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
-  const { tempSetUserRole } = useAppCustomization();
+
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
 
   if (!supabase) {
     return (
@@ -66,8 +71,6 @@ export default function AuthPage() {
         });
         if (error) throw error;
         if (signUpData.user) {
-          // The AppCustomizationContext will now handle role assignment based on email
-          // or default to 'Parent' via onAuthStateChange.
           toast({ title: "Sign Up Successful!", description: "Please check your email to confirm your account." });
           router.push('/');
         } else {
@@ -81,7 +84,6 @@ export default function AuthPage() {
           password: data.password,
         });
         if (error) throw error;
-        // Role will be determined by AppCustomizationContext onAuthStateChange
         toast({ title: "Sign In Successful!", description: "Welcome back!" });
         router.push('/');
       }
@@ -107,7 +109,7 @@ export default function AuthPage() {
             {isSignUp ? "Enter your details to get started." : "Sign in to access your account."}
           </CardDescription>
         </CardHeader>
-        <Form {...form}>
+        <Form {...form}> {/* Ensure 'form' is correctly passed here */}
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <CardContent className="space-y-6">
               <FormField
