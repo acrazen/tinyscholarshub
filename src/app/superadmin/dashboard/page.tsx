@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Cog, Save, Palette, Image as ImageIcon, Puzzle, Users2, School, PlusCircle, Briefcase } from "lucide-react";
+import { Cog, Save, Palette, Image as ImageIcon, Puzzle, Users2, School, PlusCircle, Briefcase, Building, DollarSign } from "lucide-react";
 import NextImage from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { useAppCustomization, type AppModuleKey } from '@/context/app-customization-context';
@@ -23,7 +23,7 @@ import {
   isHexColorString,
   hexToHsl
 } from '@/lib/color-utils';
-import type { UserRole } from '@/lib/types'; // Import UserRole
+import type { UserRole } from '@/lib/types';
 
 const manageableModules: { key: AppModuleKey; label: string; description: string }[] = [
   { key: 'messaging', label: 'Messaging', description: 'Enable/disable direct messaging features.' },
@@ -36,10 +36,11 @@ const manageableModules: { key: AppModuleKey; label: string; description: string
   { key: 'settings', label: 'Settings Page Access', description: 'Enable/disable user access to the main settings page.' },
   { key: 'adminManageStudents', label: 'School Admin: Manage Students', description: 'Enable/disable student management for School Admins.' },
   { key: 'teacherSmartUpdate', label: 'Teacher: Smart Update', description: 'Enable/disable AI update generator for Teachers.' },
+  { key: 'paymentGateway', label: 'Payment Gateway Integration', description: 'Enable/disable payment gateway features for schools.' },
 ];
 
-const allUserRoles: UserRole[] = [
-  'SuperAdmin', 'AppManager_Sales', 'AppManager_Finance', 'AppManager_Support',
+const allUserRolesForSimulation: UserRole[] = [
+  'SuperAdmin', 'AppManager_Management', 'AppManager_Sales', 'AppManager_Finance', 'AppManager_Support',
   'SchoolAdmin', 'SchoolDataEditor', 'SchoolFinanceManager',
   'ClassTeacher', 'Teacher', 'Parent', 'Subscriber'
 ];
@@ -52,7 +53,7 @@ export default function SuperAdminDashboardPage() {
     secondaryColor: currentSecondaryColor,
     moduleSettings,
     currentUser, 
-    tempSetUserRole, // Use tempSetUserRole for the role switcher
+    tempSetUserRole,
     setAppName, 
     setAppIconUrl,
     setPrimaryColor,
@@ -282,40 +283,39 @@ export default function SuperAdminDashboardPage() {
       <Card className="shadow-lg rounded-xl">
         <CardHeader>
           <div className="flex items-center space-x-2">
-            <School className="h-5 w-5 text-muted-foreground" />
-            <CardTitle>School & Tenant Management (Conceptual)</CardTitle>
+            <Building className="h-5 w-5 text-muted-foreground" />
+            <CardTitle>Tenant / School Management (Conceptual)</CardTitle>
           </div>
           <CardDescription>
-            Simulate features for managing different school instances (tenants). Backend required for actual functionality.
+            Simulate features for onboarding and managing different school instances (tenants). Backend required for actual functionality.
           </CardDescription>
         </CardHeader>
         <CardContent className="p-6 space-y-6">
           <Button 
-            onClick={() => toast({ title: "Feature Placeholder", description: "Registering a new school requires backend setup for database, subdomains, etc."})}
+            onClick={() => toast({ title: "Feature Placeholder", description: "Registering a new school (tenant) involves creating a new subdomain, database schema, admin users for that school, and linking to a subscription package. This requires backend setup."})}
             className="w-full md:w-auto"
           >
-            <PlusCircle className="mr-2 h-4 w-4" /> Register New School (Simulated)
+            <PlusCircle className="mr-2 h-4 w-4" /> Register New School / Tenant (Simulated)
           </Button>
           <div className="mt-4 p-4 border rounded-lg bg-muted/30">
             <h4 className="font-semibold text-foreground mb-2">Manage Existing Schools</h4>
             <p className="text-sm text-muted-foreground">
-              This section would list registered schools, allowing you to configure their packages, admins, and subdomains.
-              (Requires backend integration)
+              This section would list registered schools, allowing a Super Admin to:
             </p>
-          </div>
-           <div className="mt-4 p-4 border rounded-lg bg-muted/30">
-            <h4 className="font-semibold text-foreground mb-2">Tenant Configuration Ideas</h4>
-            <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-                <li>Subdomain Allocation (e.g., schoolname.tinyscholarshub.com)</li>
-                <li>Package/Subscription Level Management</li>
-                <li>Assigning School-Specific Admins</li>
-                <li>Feature Flags per School/Tenant</li>
-                <li>Custom Billing & Invoicing Details</li>
+             <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1 pl-4 mt-2">
+                <li>View school details and primary admin contacts.</li>
+                <li>Assign/Update subscription packages.</li>
+                <li>Manage subdomain status (e.g., yourschool.tinyscholarshub.com).</li>
+                <li>Temporarily suspend or activate school accounts.</li>
+                <li>Access school-specific analytics (if available).</li>
             </ul>
+             <p className="text-sm text-muted-foreground mt-2">
+              (Requires backend integration for multi-tenancy)
+            </p>
           </div>
         </CardContent>
          <CardFooter className="border-t pt-6">
-          <p className="text-sm text-muted-foreground">School management features are conceptual and require backend development.</p>
+          <p className="text-sm text-muted-foreground">School tenant management features are conceptual and require backend development.</p>
         </CardFooter>
       </Card>
 
@@ -339,7 +339,7 @@ export default function SuperAdminDashboardPage() {
               <SelectValue placeholder="Select a role..." />
             </SelectTrigger>
             <SelectContent>
-              {allUserRoles.map((role) => (
+              {allUserRolesForSimulation.map((role) => (
                 <SelectItem key={role} value={role} className="text-base">
                   {role}
                 </SelectItem>
@@ -354,10 +354,10 @@ export default function SuperAdminDashboardPage() {
         <CardHeader>
           <div className="flex items-center space-x-2">
             <Puzzle className="h-5 w-5 text-muted-foreground" />
-            <CardTitle>Module Management</CardTitle>
+            <CardTitle>Core Module Management</CardTitle>
           </div>
           <CardDescription>
-            Enable or disable specific features/modules for this instance of the application.
+            Enable or disable specific features/modules globally or per-tenant (conceptual for per-tenant).
           </CardDescription>
         </CardHeader>
         <CardContent className="p-6 space-y-4">

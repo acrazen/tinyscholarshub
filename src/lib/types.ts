@@ -5,12 +5,13 @@ import type { User as SupabaseUser } from '@supabase/supabase-js';
 // Updated and expanded UserRole type
 export type UserRole =
   | 'SuperAdmin'          // App provider, highest level
+  | 'AppManager_Management'// App management team - Tenant/Module/App Creation
   | 'AppManager_Sales'    // App management team - Sales focus
-  | 'AppManager_Finance'  // App management team - Finance focus
+  | 'AppManager_Finance'  // App management team - Finance focus (Client Payments)
   | 'AppManager_Support'  // App management team - Support focus
   | 'SchoolAdmin'         // Admin for a specific school
-  | 'SchoolDataEditor'    // School staff for editing general school info
-  | 'SchoolFinanceManager'// School staff for school-specific finance
+  | 'SchoolDataEditor'    // School staff for editing general school info/content
+  | 'SchoolFinanceManager'// School staff for school-specific finance (Student Fees)
   | 'ClassTeacher'        // Teacher assigned to specific class(es), potentially more powers
   | 'Teacher'             // General teacher
   | 'Parent'              // Parent of a student
@@ -21,7 +22,7 @@ export interface AuthenticatedUser extends Partial<SupabaseUser> {
   id: string; // Overriding SupabaseUser's id to be non-optional
   email?: string | null; // Align with SupabaseUser
   role: UserRole; // Our custom role
-  // You might add schoolId here if the user is tied to a specific school
+  // You might add schoolId here if the user is tied to a specific school (for multi-tenancy)
   schoolId?: string;
   // Other user-specific details from Supabase auth or your users table
 }
@@ -56,7 +57,7 @@ export interface ReportItem {
   year: number;
   type: 'folio' | 'pdf';
   url: string; // URL to the report file or view
-  iconName?: 'FileArchive' | 'FileText' | 'FileType2' | string; // Made iconName more generic string
+  iconName?: 'FileArchive' | 'FileText' | 'FileType2' | string;
   dataAiHint?: string;
 }
 
@@ -126,7 +127,7 @@ export interface NavItem {
   label:string;
   icon: LucideIcon;
   active?: boolean;
-  roles?: UserRole[]; // Updated to use the new UserRole type
+  roles?: UserRole[];
 }
 
 export interface SchoolEvent {

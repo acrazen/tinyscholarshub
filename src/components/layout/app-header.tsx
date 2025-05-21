@@ -3,16 +3,16 @@
 "use client";
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation'; // Added useRouter
-import { Home, FolderKanban, GraduationCap, LayoutGrid, MessageSquare, ShieldCheck, UserCog, Briefcase, Settings, LogIn, LogOut } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { Home, FolderKanban, GraduationCap, LayoutGrid, MessageSquare, ShieldCheck, UserCog, Briefcase, Settings, LogIn, LogOut, Users, DollarSign, BuildingIcon, UserCheck, FileText, Edit } from 'lucide-react';
 import { Logo } from '@/components/icons/logo';
 import type { NavItem, UserRole } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAppCustomization, type AppModuleKey } from '@/context/app-customization-context';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/lib/supabaseClient'; // Import Supabase client
-import { useToast } from '@/hooks/use-toast'; // For logout toast
+import { supabase } from '@/lib/supabaseClient';
+import { useToast } from '@/hooks/use-toast';
 
 const mainNavModuleMap: Record<AppModuleKey, { href: string; label: string; icon: NavItem['icon'] } | null> = {
   messaging: { href: '/messages', label: 'Messages', icon: MessageSquare },
@@ -25,12 +25,13 @@ const mainNavModuleMap: Record<AppModuleKey, { href: string; label: string; icon
   settings: null,
   adminManageStudents: null,
   teacherSmartUpdate: null,
+  paymentGateway: null,
 };
 
 export function AppHeader() {
   const pathname = usePathname();
-  const router = useRouter(); // For navigation after logout
-  const { moduleSettings, currentUser, isLoadingAuth, tempSetUserRole } = useAppCustomization();
+  const router = useRouter();
+  const { moduleSettings, currentUser, isLoadingAuth } = useAppCustomization();
   const userRole = currentUser?.role;
   const { toast } = useToast();
 
@@ -47,19 +48,21 @@ export function AppHeader() {
   ];
 
   const handleLogout = async () => {
+    if (!supabase) {
+        toast({ title: "Supabase Not Configured", description: "Cannot log out.", variant: "destructive"});
+        return;
+    }
     const { error } = await supabase.auth.signOut();
     if (error) {
       toast({ title: "Logout Failed", description: error.message, variant: "destructive" });
     } else {
       toast({ title: "Logged Out", description: "You have been successfully logged out." });
-      // currentUser in context will be set to null by onAuthStateChange
-      router.push('/'); // Redirect to home after logout
+      router.push('/'); 
     }
   };
 
   const renderNavLinks = () => {
-    // Show parent navigation if user is a Parent OR if no user is logged in (guest view)
-    if (!currentUser || userRole === 'Parent') {
+    if (!currentUser || userRole === 'Parent' || userRole === 'Subscriber' || userRole === 'Student_User') {
       return baseNavItemsForParent.map((item) => (
         <Link
           key={item.href}
@@ -75,21 +78,30 @@ export function AppHeader() {
         </Link>
       ));
     }
-    // For other roles, specific dashboard links will be shown instead of full nav.
     return null;
   };
 
   const getDashboardLink = (role: UserRole | undefined) => {
     switch (role) {
+      case 'SuperAdmin':
+        return { href: '/superadmin/dashboard', label: 'Super Admin', icon: ShieldCheck };
+      case 'AppManager_Management':
+        return { href: '/app-manager/management/dashboard', label: 'App Mgmt', icon: BuildingIcon };
+      case 'AppManager_Finance':
+        return { href: '/app-manager/finance/dashboard', label: 'App Finance', icon: DollarSign };
+      case 'AppManager_Sales': // Placeholder link, actual dashboard can be created
+        return { href: '/app-manager/sales/dashboard', label: 'App Sales', icon: Users };
+      case 'AppManager_Support': // Placeholder link
+        return { href: '/app-manager/support/dashboard', label: 'App Support', icon: UserCheck };
       case 'SchoolAdmin':
+        return { href: '/admin/dashboard', label: 'School Admin', icon: UserCog };
       case 'SchoolDataEditor':
+        return { href: '/school-data-editor/dashboard', label: 'Content Editor', icon: Edit };
       case 'SchoolFinanceManager':
-        return { href: '/admin/dashboard', label: 'Admin Dashboard', icon: UserCog };
+        return { href: '/school-finance-manager/dashboard', label: 'School Finance', icon: FileText };
       case 'ClassTeacher':
       case 'Teacher':
         return { href: '/teacher/dashboard', label: 'Teacher Dashboard', icon: Briefcase };
-      case 'SuperAdmin':
-        return { href: '/superadmin/dashboard', label: 'Super Admin', icon: ShieldCheck };
       default:
         return null;
     }
@@ -106,7 +118,7 @@ export function AppHeader() {
 
         <nav className="hidden md:flex items-center space-x-1 lg:space-x-2 flex-wrap">
           {renderNavLinks()}
-          {dashboardLink && currentUser && ( // Only show if currentUser and dashboardLink exists
+          {dashboardLink && currentUser && (
             <Link
               href={dashboardLink.href}
               className={cn(
@@ -124,18 +136,17 @@ export function AppHeader() {
             <div className="h-9 w-20 animate-pulse rounded-md bg-muted"></div>
           ) : currentUser ? (
             <>
-              { (userRole !== 'Parent' && userRole !== 'SuperAdmin' && userRole !== 'Subscriber' && userRole !== 'Student_User') && (
+              { (userRole !== 'Parent' && userRole !== 'Subscriber' && userRole !== 'Student_User' && userRole !== 'SuperAdmin' && !userRole?.startsWith('AppManager')) && (
                  <Link href="/more/settings" className="hidden md:flex items-center p-2 text-muted-foreground hover:text-primary" aria-label="Settings">
                     <Settings className="h-5 w-5" />
                  </Link>
               )}
-              <div className={cn("md:hidden", (currentUser && userRole === 'Parent') && "md:block")}> {/* Show avatar on mobile, and on desktop for Parent */}
-                  <Link href={(userRole === 'Parent' || !userRole) ? "/more/my-profile" : "/more/settings"} aria-label="My Profile or Settings">
+              <div className={cn("md:hidden", (currentUser && (userRole === 'Parent' || userRole === 'Subscriber' || userRole === 'Student_User')) && "md:block")}>
+                  <Link href={(userRole === 'Parent' || userRole === 'Subscriber' || userRole === 'Student_User' || !userRole) ? "/more/my-profile" : "/more/settings"} aria-label="My Profile or Settings">
                     <Avatar className="h-9 w-9 cursor-pointer">
-                       {/* Using a generic avatar, update with user's actual avatar later */}
-                      <AvatarImage src={`https://picsum.photos/seed/${currentUser.id}/40/40`} alt="User Profile" data-ai-hint="user avatar" />
+                      <AvatarImage src={currentUser.user_metadata?.avatar_url || `https://picsum.photos/seed/${currentUser.id}/40/40`} alt={currentUser.user_metadata?.full_name || currentUser.email || "User"} data-ai-hint="user avatar" />
                       <AvatarFallback className="bg-muted text-muted-foreground">
-                        {currentUser.email ? currentUser.email.substring(0,1).toUpperCase() : 'U'}
+                        {(currentUser.email ? currentUser.email.substring(0,1) : (currentUser.user_metadata?.full_name ? currentUser.user_metadata?.full_name.substring(0,1) : 'U')).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                   </Link>
