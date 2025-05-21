@@ -103,18 +103,17 @@ export function AppCustomizationProvider({ children }: { children: ReactNode }) 
       }
 
       if (session?.user) {
-        // TODO: Fetch user's role from your 'profiles' table or custom claims
-        // For now, defaulting based on email or a fixed role after login
-        let userRole: UserRole = 'Parent'; // Default for new signups or unprofiled users
-        // Example: const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).single();
-        // if (profile && profile.role) userRole = profile.role;
-        
-        // Simulate roles for specific test users
+        let userRole: UserRole = 'Parent'; 
         if (session.user.email === 'superadmin@example.com') userRole = 'SuperAdmin';
         else if (session.user.email === 'appmanager@example.com') userRole = 'AppManager_Management';
+        else if (session.user.email === 'sales@example.com') userRole = 'AppManager_Sales';
+        else if (session.user.email === 'finance@example.com') userRole = 'AppManager_Finance';
+        else if (session.user.email === 'support@example.com') userRole = 'AppManager_Support';
         else if (session.user.email === 'schooladmin@example.com') userRole = 'SchoolAdmin';
-        else if (session.user.email === 'teacher@example.com') userRole = 'ClassTeacher';
-
+        else if (session.user.email === 'contenteditor@example.com') userRole = 'SchoolDataEditor';
+        else if (session.user.email === 'schoolfinance@example.com') userRole = 'SchoolFinanceManager';
+        else if (session.user.email === 'classteacher@example.com') userRole = 'ClassTeacher';
+        else if (session.user.email === 'teacher@example.com') userRole = 'Teacher';
 
         setCurrentUser({
           id: session.user.id,
@@ -134,14 +133,19 @@ export function AppCustomizationProvider({ children }: { children: ReactNode }) 
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
-        setIsLoadingAuth(true); // Indicate loading during auth state change
+        setIsLoadingAuth(true); 
         if (session?.user) {
            let userRole: UserRole = 'Parent';
-            // Simulate roles for specific test users - replace with DB lookup
             if (session.user.email === 'superadmin@example.com') userRole = 'SuperAdmin';
             else if (session.user.email === 'appmanager@example.com') userRole = 'AppManager_Management';
+            else if (session.user.email === 'sales@example.com') userRole = 'AppManager_Sales';
+            else if (session.user.email === 'finance@example.com') userRole = 'AppManager_Finance';
+            else if (session.user.email === 'support@example.com') userRole = 'AppManager_Support';
             else if (session.user.email === 'schooladmin@example.com') userRole = 'SchoolAdmin';
-            else if (session.user.email === 'teacher@example.com') userRole = 'ClassTeacher';
+            else if (session.user.email === 'contenteditor@example.com') userRole = 'SchoolDataEditor';
+            else if (session.user.email === 'schoolfinance@example.com') userRole = 'SchoolFinanceManager';
+            else if (session.user.email === 'classteacher@example.com') userRole = 'ClassTeacher';
+            else if (session.user.email === 'teacher@example.com') userRole = 'Teacher';
 
           setCurrentUser({
             id: session.user.id,
@@ -160,7 +164,7 @@ export function AppCustomizationProvider({ children }: { children: ReactNode }) 
     );
 
     return () => {
-      authListener?.unsubscribe();
+      authListener?.subscription?.unsubscribe();
     };
   }, []);
 
@@ -192,14 +196,11 @@ export function AppCustomizationProvider({ children }: { children: ReactNode }) 
     }));
   }, []);
 
-  // This function is used by the SuperAdmin dashboard to simulate different roles for UI testing.
-  // It does NOT affect the actual Supabase authenticated user.
   const tempSetUserRole = useCallback((role: UserRole) => {
     setCurrentUser(prevUser => {
       if (prevUser) {
         return { ...prevUser, role: role };
       }
-      // If no user is logged in (e.g. Supabase not configured), create a mock one for role testing
       return {
         id: `mock-${role.toLowerCase()}-id`,
         email: `${role.toLowerCase()}@example.com`,
