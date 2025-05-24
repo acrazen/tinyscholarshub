@@ -27,12 +27,13 @@ import {
   Briefcase,
   Building,
   DollarSign,
-  Settings,
+  Settings as SettingsIcon, // Renamed to avoid conflict
   ExternalLink,
   Link as LinkIcon,
   List,
   FileEdit,
   Eye,
+  Search,
 } from 'lucide-react';
 import NextImage from 'next/image';
 import { useToast } from '@/hooks/use-toast';
@@ -49,6 +50,15 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from '@/components/ui/dialog';
+import {
   type HSLColor,
   parseHslString,
   hslToString,
@@ -61,6 +71,7 @@ import type { UserRole } from '@/lib/types';
 import Link from 'next/link';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 const manageableModules: {
   key: AppModuleKey;
@@ -139,7 +150,6 @@ const allUserRolesForSimulation: UserRole[] = [
   'Subscriber',
 ];
 
-// Sample data for registered schools (conceptual)
 interface SampleSchool {
   id: string;
   name: string;
@@ -147,12 +157,17 @@ interface SampleSchool {
   status: 'Active' | 'Pending' | 'Suspended';
   adminEmail: string;
   package: string;
+  studentLimit: number;
+  teacherLimit: number;
+  adminLimit: number;
 }
 
 const sampleRegisteredSchools: SampleSchool[] = [
-  { id: 'school1', name: 'Bright Beginnings Academy', subdomain: 'brightbeginnings', status: 'Active', adminEmail: 'admin@brightbeginnings.com', package: 'Premium Plus' },
-  { id: 'school2', name: 'Little Explorers Playschool', subdomain: 'littleexplorers', status: 'Active', adminEmail: 'contact@littleexplorers.org', package: 'Standard' },
-  { id: 'school3', name: 'Happy Hearts Kindergarten', subdomain: 'happyhearts', status: 'Pending', adminEmail: 'info@happyhearts.edu', package: 'Basic' },
+  { id: 'school_bright_beginnings', name: 'Bright Beginnings Academy', subdomain: 'brightbeginnings', status: 'Active', adminEmail: 'admin@brightbeginnings.com', package: 'Premium Plus', studentLimit: 500, teacherLimit: 50, adminLimit: 5 },
+  { id: 'school_little_explorers', name: 'Little Explorers Playschool', subdomain: 'littleexplorers', status: 'Active', adminEmail: 'contact@littleexplorers.org', package: 'Standard', studentLimit: 200, teacherLimit: 20, adminLimit: 2 },
+  { id: 'school_happy_hearts', name: 'Happy Hearts Kindergarten', subdomain: 'happyhearts', status: 'Pending', adminEmail: 'info@happyhearts.edu', package: 'Basic', studentLimit: 100, teacherLimit: 10, adminLimit: 1 },
+  { id: 'school_creative_minds', name: 'Creative Minds Preschool', subdomain: 'creativeminds', status: 'Active', adminEmail: 'director@creativeminds.com', package: 'Premium', studentLimit: 300, teacherLimit: 30, adminLimit: 3 },
+  { id: 'school_sunshine_daycare', name: 'Sunshine Daycare & Learning', subdomain: 'sunshine', status: 'Suspended', adminEmail: 'manager@sunshine.net', package: 'Basic', studentLimit: 150, teacherLimit: 15, adminLimit: 2 },
 ];
 
 
@@ -186,6 +201,11 @@ export default function SuperAdminDashboardPage() {
   const [secondaryColorSuggestions, setSecondaryColorSuggestions] = useState<
     HSLColor[]
   >([]);
+
+  const [schoolSearchTerm, setSchoolSearchTerm] = useState('');
+  const [selectedSchoolForQuickView, setSelectedSchoolForQuickView] = useState<SampleSchool | null>(null);
+  const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
+
 
   useEffect(() => {
     setFormAppName(currentAppName);
@@ -278,6 +298,17 @@ export default function SuperAdminDashboardPage() {
     return { backgroundColor: 'transparent', border: '1px dashed #ccc' };
   };
 
+  const filteredSchools = sampleRegisteredSchools.filter(school => 
+    school.name.toLowerCase().includes(schoolSearchTerm.toLowerCase()) ||
+    school.subdomain.toLowerCase().includes(schoolSearchTerm.toLowerCase())
+  );
+
+  const handleQuickView = (school: SampleSchool) => {
+    setSelectedSchoolForQuickView(school);
+    setIsQuickViewOpen(true);
+  };
+
+
   if (isLoadingAuth) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -309,9 +340,9 @@ export default function SuperAdminDashboardPage() {
       </div>
 
       <Tabs defaultValue="platform_settings" className="w-full">
-        <TabsList className="grid w-full grid-cols-1 md:grid-cols-2 mb-6">
-          <TabsTrigger value="platform_settings">Platform Settings</TabsTrigger>
-          <TabsTrigger value="school_management">School Management</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 mb-6 rounded-lg shadow-sm bg-muted">
+          <TabsTrigger value="platform_settings" className="py-2.5 text-sm sm:text-base">Platform Settings</TabsTrigger>
+          <TabsTrigger value="school_management" className="py-2.5 text-sm sm:text-base">School Management</TabsTrigger>
         </TabsList>
 
         <TabsContent value="platform_settings">
@@ -464,7 +495,7 @@ export default function SuperAdminDashboardPage() {
                   </Button>
                 </CardFooter>
               </Card>
-
+              
               <Card className="shadow-lg rounded-xl">
                 <CardHeader>
                   <CardTitle className="flex items-center">
@@ -472,13 +503,12 @@ export default function SuperAdminDashboardPage() {
                     Platform Finance (Conceptual)
                   </CardTitle>
                   <CardDescription>
-                    Oversee revenue from school subscriptions. (Handled by AppManager_Finance)
+                    Oversee revenue from school subscriptions.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                    <p className="text-sm text-muted-foreground">
-                    This section would show aggregated financial data like total MRR, active subscriptions, payment statuses from schools, etc.
-                    Requires backend finance & subscription management integration.
+                    Aggregated financial data: total MRR, active subscriptions, payment statuses.
                   </p>
                    <Link href="/app-manager/finance/dashboard" passHref>
                     <Button className="mt-3 w-full" variant="outline">
@@ -498,7 +528,7 @@ export default function SuperAdminDashboardPage() {
                     Core Module Management
                   </CardTitle>
                   <CardDescription>
-                    Enable or disable features globally.
+                    Enable or disable features globally for all tenants.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -515,9 +545,6 @@ export default function SuperAdminDashboardPage() {
                           >
                             {module.label}
                           </Label>
-                          <p className="text-xs text-muted-foreground">
-                            {module.description}
-                          </p>
                         </div>
                         <Switch
                           id={`module-${module.key}`}
@@ -538,8 +565,7 @@ export default function SuperAdminDashboardPage() {
                     User Role Simulation
                   </CardTitle>
                   <CardDescription>
-                    Switch current user's role to test UI changes (frontend
-                    simulation only).
+                    Switch current user's role to test UI (frontend only).
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-2">
@@ -559,19 +585,13 @@ export default function SuperAdminDashboardPage() {
                       ))}
                     </SelectContent>
                   </Select>
-                  {currentUser && (
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Current User ID: {currentUser.id}, Email:{' '}
-                      {currentUser.email || 'N/A'}
-                    </p>
-                  )}
                 </CardContent>
               </Card>
 
               <Card className="shadow-lg rounded-xl">
                 <CardHeader>
                   <CardTitle className="flex items-center">
-                    <Settings className="mr-2 h-5 w-5 text-primary" />
+                    <SettingsIcon className="mr-2 h-5 w-5 text-primary" />
                     Global App Settings (Conceptual)
                   </CardTitle>
                   <CardDescription>
@@ -580,7 +600,7 @@ export default function SuperAdminDashboardPage() {
                 </CardHeader>
                 <CardContent>
                    <p className="text-sm text-muted-foreground">
-                    Placeholders for settings like: Default new user roles, global announcement templates, feature flags for experimental features, integration keys for third-party services (e.g., email, analytics).
+                    E.g., Default new user roles, feature flags, integration keys.
                   </p>
                 </CardContent>
               </Card>
@@ -589,88 +609,144 @@ export default function SuperAdminDashboardPage() {
         </TabsContent>
 
         <TabsContent value="school_management">
-          <div className="space-y-6">
-            <div className="flex justify-start mb-4">
-              <Link href="/superadmin/register-school" passHref>
-                <Button>
-                  <PlusCircle className="mr-2 h-4 w-4" /> Register New School
-                </Button>
-              </Link>
-            </div>
-            
-            <h3 className="text-xl font-semibold text-foreground mb-4">Registered Schools</h3>
-            {sampleRegisteredSchools.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {sampleRegisteredSchools.map((school) => (
-                        <Card key={school.id} className="shadow-md rounded-xl">
-                            <CardHeader>
-                                <CardTitle className="text-lg flex items-center justify-between">
-                                    {school.name}
-                                    <Badge 
-                                        variant={school.status === 'Active' ? 'default' : school.status === 'Pending' ? 'secondary' : 'destructive'}
-                                        className={school.status === 'Active' ? 'bg-green-500/20 text-green-700 border-green-400' : school.status === 'Pending' ? 'bg-yellow-500/20 text-yellow-700 border-yellow-400' : 'bg-red-500/20 text-red-700 border-red-400'}
-                                    >
-                                        {school.status}
-                                    </Badge>
-                                </CardTitle>
-                                <CardDescription>
-                                    Subdomain: <span className="font-medium text-primary">{school.subdomain}.{currentAppName.toLowerCase().replace(/\s+/g, '') || 'yourapp'}.com</span>
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-2 text-sm">
-                                <p>Admin: <span className="text-muted-foreground">{school.adminEmail}</span></p>
-                                <p>Package: <span className="text-muted-foreground">{school.package}</span></p>
-                            </CardContent>
-                            <CardFooter className="border-t pt-4 flex justify-end space-x-2">
-                                <Button variant="ghost" size="icon" onClick={() => toast({ title: 'Conceptual Action', description: `View/Edit details for ${school.name}.`})}>
-                                    <FileEdit className="h-4 w-4" />
-                                    <span className="sr-only">Edit Details</span>
-                                </Button>
-                                <Button variant="ghost" size="icon" onClick={() => toast({ title: 'Conceptual Action', description: `Open settings for ${school.name}.`})}>
-                                    <Settings className="h-4 w-4" />
-                                    <span className="sr-only">School Settings</span>
-                                </Button>
-                                <Button variant="ghost" size="icon" onClick={() => toast({ title: 'Conceptual Action', description: `Show quick info for ${school.name}.`})}>
-                                    <Eye className="h-4 w-4" />
-                                    <span className="sr-only">Quick View</span>
-                                </Button>
-                            </CardFooter>
-                        </Card>
-                    ))}
+          <Card className="shadow-lg rounded-xl">
+            <CardHeader>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                    <div className="mb-4 sm:mb-0">
+                        <CardTitle className="flex items-center">
+                        <Building className="mr-2 h-5 w-5 text-primary" />
+                        Tenant (School) Management
+                        </CardTitle>
+                        <CardDescription>
+                        Oversee registered schools, onboard new ones, and manage tenant configurations.
+                        </CardDescription>
+                    </div>
+                    <Link href="/superadmin/register-school" passHref>
+                        <Button>
+                        <PlusCircle className="mr-2 h-4 w-4" /> Register New School
+                        </Button>
+                    </Link>
                 </div>
-            ) : (
-                <p className="text-muted-foreground">No schools registered yet.</p>
-            )}
-            <Separator className="my-8" />
-            <Card className="shadow-lg rounded-xl">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Building className="mr-2 h-5 w-5 text-primary" />
-                  Tenant Configuration Ideas
-                </CardTitle>
-                <CardDescription>
-                  Conceptual features for managing individual school tenants.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p>- View detailed school information and current configuration.</p>
-                <p>- Edit school settings (e.g., update admin contact, change assigned package, logo).</p>
-                <p>- Manage custom domain and subdomain settings for the school.</p>
-                <p>- View user limits (admins, teachers, students) and current usage.</p>
-                <p>- Activate, suspend, or deactivate school accounts.</p>
-                <p>- Assign/update subscription packages and view billing history for the school.</p>
-                <p>- Enable/disable specific modules for this school (overriding global defaults).</p>
-              </CardContent>
-              <CardFooter className="border-t pt-4">
-                <p className="text-xs text-muted-foreground">
-                  Full tenant management requires backend infrastructure and database integration.
-                </p>
-              </CardFooter>
-            </Card>
-          </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="relative">
+                <Input 
+                  placeholder="Search schools by name or subdomain..."
+                  value={schoolSearchTerm}
+                  onChange={(e) => setSchoolSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              </div>
+
+              {filteredSchools.length > 0 ? (
+                <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
+                  {filteredSchools.map((school) => (
+                    <div key={school.id} className="flex items-center justify-between p-3 border rounded-md hover:bg-muted/50 transition-colors">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm truncate">{school.name}</p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {school.subdomain}.{currentAppName.toLowerCase().replace(/\s+/g, '') || 'yourapp'}.com
+                        </p>
+                         <p className="text-xs text-muted-foreground">Package: {school.package}</p>
+                      </div>
+                      <div className="flex items-center space-x-1 ml-2">
+                        <Badge 
+                            variant={school.status === 'Active' ? 'default' : school.status === 'Pending' ? 'secondary' : 'destructive'}
+                            className={cn("text-xs px-1.5 py-0.5 h-5", 
+                                school.status === 'Active' ? 'bg-green-100 text-green-700 border-green-300' : 
+                                school.status === 'Pending' ? 'bg-yellow-100 text-yellow-700 border-yellow-300' : 
+                                'bg-red-100 text-red-700 border-red-300'
+                            )}
+                        >
+                            {school.status}
+                        </Badge>
+                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleQuickView(school)}>
+                          <Eye className="h-4 w-4" />
+                          <span className="sr-only">Quick View</span>
+                        </Button>
+                        <Link href={`/superadmin/manage-schools/${school.id}/edit`} passHref>
+                          <Button variant="ghost" size="icon" className="h-7 w-7">
+                            <FileEdit className="h-4 w-4" />
+                            <span className="sr-only">Edit Details</span>
+                          </Button>
+                        </Link>
+                        <Link href={`/superadmin/manage-schools/${school.id}/settings`} passHref>
+                           <Button variant="ghost" size="icon" className="h-7 w-7">
+                            <SettingsIcon className="h-4 w-4" />
+                            <span className="sr-only">School Settings</span>
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-4">No schools match your search or none registered yet.</p>
+              )}
+            </CardContent>
+            <CardFooter className="border-t pt-4">
+              <p className="text-xs text-muted-foreground">
+                School management features (editing, specific settings) require backend integration.
+              </p>
+            </CardFooter>
+          </Card>
         </TabsContent>
       </Tabs>
+
+      {selectedSchoolForQuickView && (
+        <Dialog open={isQuickViewOpen} onOpenChange={setIsQuickViewOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>{selectedSchoolForQuickView.name} - Quick View</DialogTitle>
+              <DialogDescription>
+                Subdomain: {selectedSchoolForQuickView.subdomain}.{currentAppName.toLowerCase().replace(/\s+/g, '') || 'yourapp'}.com
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-3 py-4 text-sm">
+              <div className="grid grid-cols-[120px_1fr] items-center gap-2">
+                <span className="font-medium text-muted-foreground">Status:</span>
+                <Badge 
+                    variant={selectedSchoolForQuickView.status === 'Active' ? 'default' : selectedSchoolForQuickView.status === 'Pending' ? 'secondary' : 'destructive'}
+                    className={cn("w-fit", 
+                        selectedSchoolForQuickView.status === 'Active' ? 'bg-green-100 text-green-700 border-green-300' : 
+                        selectedSchoolForQuickView.status === 'Pending' ? 'bg-yellow-100 text-yellow-700 border-yellow-300' : 
+                        'bg-red-100 text-red-700 border-red-300'
+                    )}
+                >
+                    {selectedSchoolForQuickView.status}
+                </Badge>
+              </div>
+              <div className="grid grid-cols-[120px_1fr] items-center gap-2">
+                 <span className="font-medium text-muted-foreground">Admin Email:</span>
+                 <span>{selectedSchoolForQuickView.adminEmail}</span>
+              </div>
+              <div className="grid grid-cols-[120px_1fr] items-center gap-2">
+                <span className="font-medium text-muted-foreground">Package:</span>
+                <span>{selectedSchoolForQuickView.package}</span>
+              </div>
+              <Separator className="my-1" />
+              <div className="grid grid-cols-[120px_1fr] items-center gap-2">
+                <span className="font-medium text-muted-foreground">Student Limit:</span>
+                <span>{selectedSchoolForQuickView.studentLimit}</span>
+              </div>
+              <div className="grid grid-cols-[120px_1fr] items-center gap-2">
+                <span className="font-medium text-muted-foreground">Teacher Limit:</span>
+                <span>{selectedSchoolForQuickView.teacherLimit}</span>
+              </div>
+              <div className="grid grid-cols-[120px_1fr] items-center gap-2">
+                 <span className="font-medium text-muted-foreground">Admin Limit:</span>
+                 <span>{selectedSchoolForQuickView.adminLimit}</span>
+              </div>
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button type="button" variant="outline">Close</Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
-    
