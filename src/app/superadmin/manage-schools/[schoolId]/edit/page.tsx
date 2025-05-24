@@ -7,15 +7,23 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, FileEdit, Save } from 'lucide-react';
-import { sampleRegisteredSchools } from '@/app/superadmin/dashboard/page'; // Import the mock data
+import { sampleRegisteredSchools } from '../../dashboard/page'; // Import the mock data
 
 // Helper to get school data by ID from the mock array
-// In a real app, this would be a database call or API fetch.
 const getSchoolData = (id: string) => {
+  if (!sampleRegisteredSchools) return undefined; // Guard clause
   return sampleRegisteredSchools.find(school => school.id === id);
 };
 
 export async function generateStaticParams() {
+  if (!sampleRegisteredSchools) {
+    // Handle case where data might not be loaded (e.g., during initial build phase if dashboard is client-side only)
+    // Or if this page itself is being built before dashboard/page.tsx is fully resolved in some build setups.
+    // For now, return an empty array or a sensible default if data isn't ready.
+    // This might require ensuring dashboard/page.tsx is treated as a module that exports data consistently.
+    console.warn("generateStaticParams in edit page: sampleRegisteredSchools is not available at build time. Returning empty array.");
+    return [];
+  }
   return sampleRegisteredSchools.map((school) => ({
     schoolId: school.id,
   }));
@@ -45,10 +53,6 @@ export default function EditSchoolDetailsPage({ params }: EditSchoolDetailsPageP
     );
   }
 
-  // For a Server Component, we can't use react-hook-form directly for submission handling.
-  // This form is conceptual for UI display. Actual submission would require a Server Action or API.
-  // The "Save" button will just show a toast.
-
   return (
     <div className="max-w-3xl mx-auto">
       <Card className="shadow-xl rounded-xl">
@@ -59,11 +63,8 @@ export default function EditSchoolDetailsPage({ params }: EditSchoolDetailsPageP
           </div>
           <CardDescription>Modifying details for: <span className="font-semibold text-foreground">{school.name}</span></CardDescription>
         </CardHeader>
-        {/* Conceptual Form - Not interactive for saving in this Server Component version */}
         <form action={async () => {
           "use server";
-          // In a real app, this Server Action would handle form submission
-          // For now, this is a placeholder. The button will trigger a client-side toast.
           console.log("Conceptual save action triggered for school:", school.id);
         }}>
           <CardContent className="space-y-6">
@@ -126,13 +127,11 @@ export default function EditSchoolDetailsPage({ params }: EditSchoolDetailsPageP
                 <Input id="adminLimit" name="adminLimit" type="number" defaultValue={school.adminLimit} className="mt-1" />
               </div>
             </div>
-             {/* Add other conceptual fields as needed */}
           </CardContent>
           <CardFooter className="border-t pt-6 flex justify-between">
             <Link href="/superadmin/dashboard?tab=school_management" passHref>
               <Button type="button" variant="outline"><ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard</Button>
             </Link>
-            {/* This button is for visual representation; actual save needs client component + state or Server Action */}
              <Button type="button" onClick={() => alert('Conceptual Save: Changes for ' + school.name + ' would be processed here. (No actual data saved in prototype)')}>
               <Save className="mr-2 h-4 w-4" /> Save Changes (Conceptual)
             </Button>

@@ -28,14 +28,15 @@ import {
   Briefcase,
   Building,
   DollarSign,
-  Settings as SettingsIcon,
+  Settings as SettingsIcon, // Renamed to avoid conflict
   ExternalLink,
-  Link as LinkIcon,
+  Link as LinkIcon, // Renamed to avoid conflict
   List,
   FileEdit,
   Eye,
   Search,
   Filter,
+  Settings2, // For main tab icon
 } from 'lucide-react';
 import NextImage from 'next/image';
 import { useToast } from '@/hooks/use-toast';
@@ -110,7 +111,8 @@ interface SampleSchool {
   adminLimit: number;
 }
 
-const sampleRegisteredSchools: SampleSchool[] = [
+// Export this sample data
+export const sampleRegisteredSchools: SampleSchool[] = [
   { id: 'school_bright_beginnings', name: 'Bright Beginnings Academy', subdomain: 'brightbeginnings', status: 'Active', adminEmail: 'admin@brightbeginnings.com', package: 'Premium Plus', studentLimit: 500, teacherLimit: 50, adminLimit: 5 },
   { id: 'school_little_explorers', name: 'Little Explorers Playschool', subdomain: 'littleexplorers', status: 'Active', adminEmail: 'contact@littleexplorers.org', package: 'Standard', studentLimit: 200, teacherLimit: 20, adminLimit: 2 },
   { id: 'school_happy_hearts', name: 'Happy Hearts Kindergarten', subdomain: 'happyhearts', status: 'Pending', adminEmail: 'info@happyhearts.edu', package: 'Basic', studentLimit: 100, teacherLimit: 10, adminLimit: 1 },
@@ -133,15 +135,15 @@ export default function SuperAdminDashboardPage() {
   const [rawPrimaryColorInput, setRawPrimaryColorInput] = useState<string>(currentPrimaryColor);
   const [rawSecondaryColorInput, setRawSecondaryColorInput] = useState<string>(currentSecondaryColor);
   const [secondaryColorSuggestions, setSecondaryColorSuggestions] = useState<HSLColor[]>([]);
+  
+  const initialTab = searchParams.get('tab') || 'platform_settings';
+  const [activeTab, setActiveTab] = useState(initialTab);
 
   const [schoolSearchTerm, setSchoolSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'Active' | 'Pending' | 'Suspended'>('all');
   const [packageFilter, setPackageFilter] = useState<'all' | 'Basic' | 'Standard' | 'Premium' | 'Premium Plus'>('all');
   const [selectedSchoolForQuickView, setSelectedSchoolForQuickView] = useState<SampleSchool | null>(null);
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
-  
-  const initialTab = searchParams.get('tab') || 'platform_settings';
-  const [activeTab, setActiveTab] = useState(initialTab);
 
   useEffect(() => {
     const currentTab = searchParams.get('tab');
@@ -258,7 +260,7 @@ export default function SuperAdminDashboardPage() {
                 <CardContent className="space-y-2"><Label htmlFor="userRoleSelect">Current Simulated Role</Label><Select value={currentUser?.role || 'Parent'} onValueChange={(value) => tempSetUserRole(value as UserRole)}><SelectTrigger id="userRoleSelect" className="w-full md:w-1/2"><SelectValue placeholder="Select a role..." /></SelectTrigger><SelectContent>{allUserRolesForSimulation.map((role) => (<SelectItem key={role} value={role}>{role}</SelectItem>))}</SelectContent></Select></CardContent>
               </Card>
               <Card className="shadow-lg rounded-xl">
-                <CardHeader><CardTitle className="flex items-center"><SettingsIcon className="mr-2 h-5 w-5 text-primary" />Global App Settings (Conceptual)</CardTitle><CardDescription>Manage other platform-wide configurations.</CardDescription></CardHeader>
+                <CardHeader><CardTitle className="flex items-center"><Settings2 className="mr-2 h-5 w-5 text-primary" />Global App Settings (Conceptual)</CardTitle><CardDescription>Manage other platform-wide configurations.</CardDescription></CardHeader>
                 <CardContent><p className="text-sm text-muted-foreground">E.g., Default new user roles, feature flags, integration keys.</p></CardContent>
               </Card>
             </div>
@@ -344,3 +346,4 @@ export default function SuperAdminDashboardPage() {
     </div>
   );
 }
+

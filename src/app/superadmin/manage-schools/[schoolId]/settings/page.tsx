@@ -4,17 +4,23 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { ArrowLeft, Settings, ShieldCheck, Palette, Puzzle, CreditCard, Power } from 'lucide-react';
-import { sampleRegisteredSchools } from '@/app/superadmin/dashboard/page'; // Import the mock data
+import { sampleRegisteredSchools } from '../../dashboard/page'; // Import the mock data
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Separator } from '@/components/ui/separator';
 
 // Helper to get school data by ID from the mock array
 const getSchoolData = (id: string) => {
+  if (!sampleRegisteredSchools) return undefined; // Guard clause
   return sampleRegisteredSchools.find(school => school.id === id);
 };
 
 export async function generateStaticParams() {
+  if (!sampleRegisteredSchools) {
+    // Handle case where data might not be loaded (e.g., during initial build phase if dashboard is client-side only)
+    console.warn("generateStaticParams in settings page: sampleRegisteredSchools is not available at build time. Returning empty array.");
+    return [];
+  }
   return sampleRegisteredSchools.map((school) => ({
     schoolId: school.id,
   }));
@@ -120,7 +126,6 @@ export default function SchoolSpecificSettingsPage({ params }: SchoolSpecificSet
               )}
             </div>
           </section>
-
 
         </CardContent>
         <CardFooter className="border-t pt-6 flex justify-between">
