@@ -28,7 +28,7 @@ import {
   Briefcase,
   Building,
   DollarSign,
-  Settings as SettingsIcon, // Renamed to avoid conflict
+  Settings as SettingsIcon,
   ExternalLink,
   Link as LinkIcon,
   List,
@@ -269,12 +269,17 @@ export default function SuperAdminDashboardPage() {
           <Card className="shadow-lg rounded-xl">
             <CardHeader>
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                <div className="mb-4 sm:mb-0"><CardTitle className="flex items-center"><Building className="mr-2 h-5 w-5 text-primary" />Tenant (School) Management</CardTitle><CardDescription>Oversee registered schools, onboard new ones, and manage tenant configurations.</CardDescription></div>
-                <Link href="/superadmin/register-school" passHref><Button><PlusCircle className="mr-2 h-4 w-4" /> Register New School</Button></Link>
+                <div className="mb-4 sm:mb-0">
+                  <CardTitle className="flex items-center"><Building className="mr-2 h-5 w-5 text-primary" />Tenant (School) Management</CardTitle>
+                  <CardDescription>Oversee registered schools, onboard new ones, and manage tenant configurations.</CardDescription>
+                </div>
+                <Link href="/superadmin/register-school?tab=school_management" passHref>
+                  <Button><PlusCircle className="mr-2 h-4 w-4" /> Register New School</Button>
+                </Link>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex flex-col sm:flex-row gap-4 mb-4">
+              <div className="flex flex-col sm:flex-row gap-4 mb-4 p-4 border rounded-md bg-muted/20">
                 <div className="relative flex-grow">
                   <Input placeholder="Search schools by name or subdomain..." value={schoolSearchTerm} onChange={(e) => setSchoolSearchTerm(e.target.value)} className="pl-10" />
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
