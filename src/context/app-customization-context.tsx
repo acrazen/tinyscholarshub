@@ -24,10 +24,11 @@ export type AppModuleKey =
 
 export type ModuleSettings = Record<AppModuleKey, boolean>;
 
+// These are now considered the "pre-set" configurations for our simulated single school tenant
 const defaultAppName = "Tiny Scholars Hub";
-const defaultIconUrl = null;
-const defaultPrimaryColor = "25 95% 55%";
-const defaultSecondaryColor = "25 95% 75%";
+const defaultIconUrl = null; // Or a default icon URL if you have one
+const defaultPrimaryColor = "25 95% 55%"; // Playful Orange
+const defaultSecondaryColor = "25 95% 75%"; // Light Playful Orange
 
 const defaultModuleSettings: ModuleSettings = {
   messaging: true,
@@ -38,9 +39,9 @@ const defaultModuleSettings: ModuleSettings = {
   statementOfAccount: true,
   eService: true,
   settings: true,
-  adminManageStudents: true, 
+  adminManageStudents: true,
   teacherSmartUpdate: true,
-  paymentGateway: true, // Default to true, can be toggled by SuperAdmin/AppManager
+  paymentGateway: true,
 };
 
 interface AppCustomizationContextType {
@@ -60,7 +61,7 @@ interface AppCustomizationContextType {
   setModuleSettings: (settings: ModuleSettings) => void;
   toggleModule: (moduleKey: AppModuleKey) => void;
 
-  tempSetUserRole: (role: UserRole) => void; // For role simulation
+  tempSetUserRole: (role: UserRole) => void; // For role simulation via SuperAdmin dev tool
 }
 
 const AppCustomizationContext = createContext<AppCustomizationContextType | undefined>(undefined);
@@ -78,11 +79,18 @@ export function AppCustomizationProvider({ children }: { children: ReactNode }) 
  useEffect(() => {
     if (!supabase) {
       console.warn(
-        "AppCustomizationContext: Supabase client not available or not configured. " +
-        "Auth features will be disabled. Falling back to simulated user state."
+        "---------------------------------------------------------------------\n" +
+        "!!! Supabase client not available or not configured.      !!!\n" +
+        "!!! Auth features will be disabled.                       !!!\n" +
+        "!!! Ensure NEXT_PUBLIC_SUPABASE_URL and                   !!!\n" +
+        "!!! NEXT_PUBLIC_SUPABASE_ANON_KEY are set in your         !!!\n" +
+        "!!! hosting environment variables (e.g., Firebase Studio project settings).\n" +
+        "---------------------------------------------------------------------\n" +
+        "Falling back to simulated user state for UI testing."
       );
       setIsLoadingAuth(false);
-      setCurrentUser({ // Default mock user if Supabase is not configured
+      // Default mock user if Supabase is not configured, allowing UI to render.
+      setCurrentUser({
           id: 'mock-parent-id',
           email: 'parent@example.com',
           app_metadata: {},
@@ -94,27 +102,26 @@ export function AppCustomizationProvider({ children }: { children: ReactNode }) 
       return;
     }
 
-    const getSession = async () => {
-      setIsLoadingAuth(true); // Start loading
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError) {
-        console.error("Error getting Supabase session:", sessionError);
+    // Attempt to get initial session
+    const getInitialSession = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error("Error getting initial Supabase session:", error.message);
       }
-
       if (session?.user) {
-        let userRole: UserRole = 'Parent'; 
+        let userRole: UserRole = 'Parent'; // Default role
+        // Role assignment based on email for testing
         if (session.user.email === 'superadmin@example.com') userRole = 'SuperAdmin';
         else if (session.user.email === 'appmanager@example.com') userRole = 'AppManager_Management';
-        else if (session.user.email === 'sales@example.com') userRole = 'AppManager_Sales';
-        else if (session.user.email === 'finance@example.com') userRole = 'AppManager_Finance';
-        else if (session.user.email === 'support@example.com') userRole = 'AppManager_Support';
+        else if (session.user.email === 'appmanagerfinance@example.com') userRole = 'AppManager_Finance';
+        else if (session.user.email === 'appmanagersales@example.com') userRole = 'AppManager_Sales';
+        else if (session.user.email === 'appmanagersupport@example.com') userRole = 'AppManager_Support';
         else if (session.user.email === 'schooladmin@example.com') userRole = 'SchoolAdmin';
         else if (session.user.email === 'contenteditor@example.com') userRole = 'SchoolDataEditor';
         else if (session.user.email === 'schoolfinance@example.com') userRole = 'SchoolFinanceManager';
         else if (session.user.email === 'classteacher@example.com') userRole = 'ClassTeacher';
         else if (session.user.email === 'teacher@example.com') userRole = 'Teacher';
-
+        
         setCurrentUser({
           id: session.user.id,
           email: session.user.email,
@@ -122,25 +129,25 @@ export function AppCustomizationProvider({ children }: { children: ReactNode }) 
           user_metadata: session.user.user_metadata,
           aud: session.user.aud,
           created_at: session.user.created_at,
-          role: userRole
+          role: userRole,
         });
       } else {
         setCurrentUser(null);
       }
       setIsLoadingAuth(false);
     };
-    getSession();
+    getInitialSession();
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
-        setIsLoadingAuth(true); 
+        setIsLoadingAuth(true);
         if (session?.user) {
-           let userRole: UserRole = 'Parent';
+           let userRole: UserRole = 'Parent'; // Default role
             if (session.user.email === 'superadmin@example.com') userRole = 'SuperAdmin';
             else if (session.user.email === 'appmanager@example.com') userRole = 'AppManager_Management';
-            else if (session.user.email === 'sales@example.com') userRole = 'AppManager_Sales';
-            else if (session.user.email === 'finance@example.com') userRole = 'AppManager_Finance';
-            else if (session.user.email === 'support@example.com') userRole = 'AppManager_Support';
+            else if (session.user.email === 'appmanagerfinance@example.com') userRole = 'AppManager_Finance';
+            else if (session.user.email === 'appmanagersales@example.com') userRole = 'AppManager_Sales';
+            else if (session.user.email === 'appmanagersupport@example.com') userRole = 'AppManager_Support';
             else if (session.user.email === 'schooladmin@example.com') userRole = 'SchoolAdmin';
             else if (session.user.email === 'contenteditor@example.com') userRole = 'SchoolDataEditor';
             else if (session.user.email === 'schoolfinance@example.com') userRole = 'SchoolFinanceManager';
@@ -169,12 +176,13 @@ export function AppCustomizationProvider({ children }: { children: ReactNode }) 
   }, []);
 
 
+  // Setters remain for developer-level testing via SuperAdmin UI
   const setAppName = useCallback((name: string) => {
     setAppNameState(name || defaultAppName);
   }, []);
 
   const setAppIconUrl = useCallback((url: string | null) => {
-    setAppIconUrlState(url);
+    setAppIconUrlState(url); // Can be null
   }, []);
 
   const setPrimaryColor = useCallback((color: string) => {
@@ -197,21 +205,41 @@ export function AppCustomizationProvider({ children }: { children: ReactNode }) 
   }, []);
 
   const tempSetUserRole = useCallback((role: UserRole) => {
-    setCurrentUser(prevUser => {
-      if (prevUser) {
-        return { ...prevUser, role: role };
-      }
-      return {
-        id: `mock-${role.toLowerCase()}-id`,
-        email: `${role.toLowerCase()}@example.com`,
-        app_metadata: {},
-        user_metadata: {},
-        aud: 'authenticated',
-        created_at: new Date().toISOString(),
-        role: role,
-      };
-    });
-  }, []);
+    // This function is used by the SuperAdmin "developer tool" to simulate different user roles
+    // for testing the main application's UI.
+    if (!supabase && currentUser?.id.startsWith('mock-')) {
+        // If supabase is not configured, allow role switching for the mock user
+         setCurrentUser(prevUser => ({
+            ...(prevUser || { // Provide a base mock user if prevUser is somehow null
+                 id: `mock-${role.toLowerCase()}-id`,
+                 email: `${role.toLowerCase()}@example.com`,
+                 app_metadata: {},
+                 user_metadata: {},
+                 aud: 'authenticated',
+                 created_at: new Date().toISOString(),
+            }),
+            role: role,
+         }));
+        return;
+    }
+    
+    // If Supabase is configured, this simulates a role change for the currently logged-in Supabase user.
+    // In a real app, roles would come from JWT claims or a user profile table.
+    if (currentUser) {
+        setCurrentUser(prevUser => prevUser ? ({ ...prevUser, role: role }) : null);
+    } else {
+        // If no user is logged in but trying to simulate, create a mock user for UI testing
+         setCurrentUser({
+            id: `mock-${role.toLowerCase()}-id`,
+            email: `${role.toLowerCase()}@example.com`,
+            app_metadata: {},
+            user_metadata: {},
+            aud: 'authenticated',
+            created_at: new Date().toISOString(),
+            role: role,
+        });
+    }
+  }, [currentUser]);
 
 
   return (
@@ -243,3 +271,5 @@ export function useAppCustomization() {
   }
   return context;
 }
+
+    
