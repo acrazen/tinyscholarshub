@@ -4,21 +4,21 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { ArrowLeft, Settings, ShieldCheck, Palette, Puzzle, CreditCard, Power } from 'lucide-react';
-import { sampleRegisteredSchools } from '../../dashboard/page'; // Import the mock data
+import { sampleRegisteredSchools } from '@/lib/data'; // Import from central data file
+import type { SampleSchool } from '@/lib/types'; // Import SampleSchool type
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Separator } from '@/components/ui/separator';
 
 // Helper to get school data by ID from the mock array
-const getSchoolData = (id: string) => {
-  if (!sampleRegisteredSchools) return undefined; // Guard clause
+const getSchoolData = (id: string): SampleSchool | undefined => {
+  if (!sampleRegisteredSchools) return undefined; 
   return sampleRegisteredSchools.find(school => school.id === id);
 };
 
 export async function generateStaticParams() {
   if (!sampleRegisteredSchools) {
-    // Handle case where data might not be loaded (e.g., during initial build phase if dashboard is client-side only)
-    console.warn("generateStaticParams in settings page: sampleRegisteredSchools is not available at build time. Returning empty array.");
+    console.warn("generateStaticParams in settings page: sampleRegisteredSchools is not available. Returning empty array.");
     return [];
   }
   return sampleRegisteredSchools.map((school) => ({

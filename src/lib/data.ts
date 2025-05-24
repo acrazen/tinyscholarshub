@@ -1,5 +1,5 @@
 
-import type { Student, FeedPost, Guardian, Milestone, SchoolEvent, ResourceItem, UserProfile, Comment, CommentAuthor, ReportItem, ChildAward, SchoolAward } from './types';
+import type { Student, FeedPost, Guardian, Milestone, SchoolEvent, ResourceItem, UserProfile, Comment, CommentAuthor, ReportItem, ChildAward, SchoolAward, SampleSchool } from './types';
 import { FileText, Youtube, Link as LinkIcon, BookOpen, FileArchive, Trophy, Star } from 'lucide-react';
 
 const guardiansData: Guardian[] = [
@@ -295,7 +295,7 @@ export const sampleResources: ResourceItem[] = [
 export const sampleUserProfile: UserProfile = {
   id: 'userParent123', // Default parent user
   name: 'Sarah Davis',
-  email: 'sarah.davis@example.com',
+  email: 'parent@example.com', // Updated for easier role check
   phoneNumber: '555-123-4567',
   address: '123 Main Street, Anytown, USA 12345',
   profilePhotoUrl: 'https://picsum.photos/seed/currentUser/100/100',
@@ -307,17 +307,17 @@ export const sampleUserProfile: UserProfile = {
 export const sampleAdminProfile: UserProfile = {
   id: 'userAdmin456',
   name: 'Mr. Admin Principal',
-  email: 'admin@tinyscholarshub.com',
+  email: 'schooladmin@example.com', // Updated for role check
   phoneNumber: '555-987-6543',
   profilePhotoUrl: 'https://picsum.photos/seed/adminUser/100/100',
   dataAiHint: 'admin avatar',
-  role: 'Admin',
+  role: 'SchoolAdmin',
 };
 
 export const sampleTeacherProfile: UserProfile = {
   id: 'userTeacher789',
   name: 'Ms. Emily Teacher',
-  email: 'emily.teacher@tinyscholarshub.com',
+  email: 'teacher@example.com', // Updated for role check
   phoneNumber: '555-555-5555',
   profilePhotoUrl: 'https://picsum.photos/seed/teacherUser/100/100',
   dataAiHint: 'teacher avatar',
@@ -327,7 +327,7 @@ export const sampleTeacherProfile: UserProfile = {
 export const sampleSuperAdminProfile: UserProfile = {
   id: 'userSuperAdmin001',
   name: 'Super User',
-  email: 'super@tinyscholars.app',
+  email: 'superadmin@example.com', // Updated for role check
   phoneNumber: '555-000-0001',
   profilePhotoUrl: 'https://picsum.photos/seed/superadminUser/100/100',
   dataAiHint: 'superadmin avatar',
@@ -424,5 +424,10 @@ export const getSchoolAwardById = async (id: string): Promise<SchoolAward | unde
   return Promise.resolve(sampleSchoolAwards.find(award => award.id === id));
 };
 
-
-    
+export const sampleRegisteredSchools: SampleSchool[] = [
+  { id: 'school_bright_beginnings', name: 'Bright Beginnings Academy', subdomain: 'brightbeginnings', status: 'Active', adminEmail: 'admin@brightbeginnings.com', package: 'Premium Plus', studentLimit: 500, teacherLimit: 50, adminLimit: 5 },
+  { id: 'school_little_explorers', name: 'Little Explorers Playschool', subdomain: 'littleexplorers', status: 'Active', adminEmail: 'contact@littleexplorers.org', package: 'Standard', studentLimit: 200, teacherLimit: 20, adminLimit: 2 },
+  { id: 'school_happy_hearts', name: 'Happy Hearts Kindergarten', subdomain: 'happyhearts', status: 'Pending', adminEmail: 'info@happyhearts.edu', package: 'Basic', studentLimit: 100, teacherLimit: 10, adminLimit: 1 },
+  { id: 'school_creative_minds', name: 'Creative Minds Preschool', subdomain: 'creativeminds', status: 'Active', adminEmail: 'director@creativeminds.com', package: 'Premium', studentLimit: 300, teacherLimit: 30, adminLimit: 3 },
+  { id: 'school_sunshine_daycare', name: 'Sunshine Daycare & Learning', subdomain: 'sunshine', status: 'Suspended', adminEmail: 'manager@sunshine.net', package: 'Basic', studentLimit: 150, teacherLimit: 15, adminLimit: 2 },
+];

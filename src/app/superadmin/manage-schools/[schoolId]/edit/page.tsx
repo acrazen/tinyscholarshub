@@ -7,21 +7,18 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, FileEdit, Save } from 'lucide-react';
-import { sampleRegisteredSchools } from '../../dashboard/page'; // Import the mock data
+import { sampleRegisteredSchools } from '@/lib/data'; // Import from central data file
+import type { SampleSchool } from '@/lib/types'; // Import SampleSchool type
 
 // Helper to get school data by ID from the mock array
-const getSchoolData = (id: string) => {
-  if (!sampleRegisteredSchools) return undefined; // Guard clause
+const getSchoolData = (id: string): SampleSchool | undefined => {
+  if (!sampleRegisteredSchools) return undefined;
   return sampleRegisteredSchools.find(school => school.id === id);
 };
 
 export async function generateStaticParams() {
   if (!sampleRegisteredSchools) {
-    // Handle case where data might not be loaded (e.g., during initial build phase if dashboard is client-side only)
-    // Or if this page itself is being built before dashboard/page.tsx is fully resolved in some build setups.
-    // For now, return an empty array or a sensible default if data isn't ready.
-    // This might require ensuring dashboard/page.tsx is treated as a module that exports data consistently.
-    console.warn("generateStaticParams in edit page: sampleRegisteredSchools is not available at build time. Returning empty array.");
+    console.warn("generateStaticParams in edit page: sampleRegisteredSchools is not available. Returning empty array.");
     return [];
   }
   return sampleRegisteredSchools.map((school) => ({
@@ -65,7 +62,9 @@ export default function EditSchoolDetailsPage({ params }: EditSchoolDetailsPageP
         </CardHeader>
         <form action={async () => {
           "use server";
+          // In a real app, this would be a server action or API call
           console.log("Conceptual save action triggered for school:", school.id);
+          // Revalidate path or redirect as needed
         }}>
           <CardContent className="space-y-6">
             <div>

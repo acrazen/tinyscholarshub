@@ -191,3 +191,15 @@ export interface SchoolAward {
   imageUrl?: string;
   dataAiHint?: string;
 }
+
+export interface SampleSchool {
+  id: string;
+  name: string;
+  subdomain: string;
+  status: 'Active' | 'Pending' | 'Suspended';
+  adminEmail: string;
+  package: 'Basic' | 'Standard' | 'Premium' | 'Premium Plus';
+  studentLimit: number;
+  teacherLimit: number;
+  adminLimit: number;
+}

@@ -70,11 +70,12 @@ import {
   isHexColorString,
   hexToHsl,
 } from '@/lib/color-utils';
-import type { UserRole } from '@/lib/types';
+import type { UserRole, SampleSchool } from '@/lib/types'; // Import SampleSchool
 import Link from 'next/link';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { sampleRegisteredSchools } from '@/lib/data'; // Import from central data file
 
 const manageableModules: {
   key: AppModuleKey;
@@ -97,27 +98,6 @@ const manageableModules: {
 const allUserRolesForSimulation: UserRole[] = [
   'SuperAdmin', 'AppManager_Management', 'AppManager_Sales', 'AppManager_Finance', 'AppManager_Support',
   'SchoolAdmin', 'SchoolDataEditor', 'SchoolFinanceManager', 'ClassTeacher', 'Teacher', 'Parent', 'Subscriber',
-];
-
-interface SampleSchool {
-  id: string;
-  name: string;
-  subdomain: string;
-  status: 'Active' | 'Pending' | 'Suspended';
-  adminEmail: string;
-  package: 'Basic' | 'Standard' | 'Premium' | 'Premium Plus';
-  studentLimit: number;
-  teacherLimit: number;
-  adminLimit: number;
-}
-
-// Export this sample data
-export const sampleRegisteredSchools: SampleSchool[] = [
-  { id: 'school_bright_beginnings', name: 'Bright Beginnings Academy', subdomain: 'brightbeginnings', status: 'Active', adminEmail: 'admin@brightbeginnings.com', package: 'Premium Plus', studentLimit: 500, teacherLimit: 50, adminLimit: 5 },
-  { id: 'school_little_explorers', name: 'Little Explorers Playschool', subdomain: 'littleexplorers', status: 'Active', adminEmail: 'contact@littleexplorers.org', package: 'Standard', studentLimit: 200, teacherLimit: 20, adminLimit: 2 },
-  { id: 'school_happy_hearts', name: 'Happy Hearts Kindergarten', subdomain: 'happyhearts', status: 'Pending', adminEmail: 'info@happyhearts.edu', package: 'Basic', studentLimit: 100, teacherLimit: 10, adminLimit: 1 },
-  { id: 'school_creative_minds', name: 'Creative Minds Preschool', subdomain: 'creativeminds', status: 'Active', adminEmail: 'director@creativeminds.com', package: 'Premium', studentLimit: 300, teacherLimit: 30, adminLimit: 3 },
-  { id: 'school_sunshine_daycare', name: 'Sunshine Daycare & Learning', subdomain: 'sunshine', status: 'Suspended', adminEmail: 'manager@sunshine.net', package: 'Basic', studentLimit: 150, teacherLimit: 15, adminLimit: 2 },
 ];
 
 export default function SuperAdminDashboardPage() {
@@ -346,4 +326,3 @@ export default function SuperAdminDashboardPage() {
     </div>
   );
 }
-
