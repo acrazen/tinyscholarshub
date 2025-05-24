@@ -1,7 +1,6 @@
-
 // src/app/school-finance-manager/layout.tsx
 import { AppHeader } from "@/components/layout/app-header";
-import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
+import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav"; // Decide if needed
 
 export default function SchoolFinanceManagerLayout({
   children,
@@ -20,3 +19,5 @@ export default function SchoolFinanceManagerLayout({
     </div>
   );
 }
+
+    
