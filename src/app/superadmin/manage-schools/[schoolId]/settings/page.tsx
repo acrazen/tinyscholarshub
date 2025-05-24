@@ -3,9 +3,9 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { ArrowLeft, Settings, ShieldCheck, Palette, Puzzle, CreditCard, Power } from 'lucide-react';
-import { sampleRegisteredSchools } from '@/lib/data'; // Import from central data file
-import type { SampleSchool } from '@/lib/types'; // Import SampleSchool type
+import { ArrowLeft, Settings, ShieldCheck, Palette, Puzzle, CreditCard, Power, Save } from 'lucide-react';
+import { sampleRegisteredSchools } from '@/lib/data';
+import type { SampleSchool } from '@/lib/types';
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Separator } from '@/components/ui/separator';
@@ -18,7 +18,6 @@ const getSchoolData = (id: string): SampleSchool | undefined => {
 
 export async function generateStaticParams() {
   if (!sampleRegisteredSchools) {
-    console.warn("generateStaticParams in settings page: sampleRegisteredSchools is not available. Returning empty array.");
     return [];
   }
   return sampleRegisteredSchools.map((school) => ({
@@ -26,13 +25,16 @@ export async function generateStaticParams() {
   }));
 }
 
-interface SchoolSpecificSettingsPageProps {
-    params: { schoolId: string };
-}
-
-export default function SchoolSpecificSettingsPage({ params }: SchoolSpecificSettingsPageProps) {
+export default function SchoolSpecificSettingsPage({ params }: { params: { schoolId: string } }) {
   const schoolId = params.schoolId;
   const school = getSchoolData(schoolId);
+
+  async function handleConceptualSettingsSave() {
+    "use server";
+    // In a real app, you'd read form data or use client components to manage state
+    // For this conceptual save on a Server Component page, we'll just log.
+    console.log(`Conceptual settings save triggered for school ID: ${params.schoolId}. No data actually saved from UI toggles in this prototype.`);
+  }
 
   if (!school) {
     return (
@@ -57,6 +59,10 @@ export default function SchoolSpecificSettingsPage({ params }: SchoolSpecificSet
           <div className="flex items-center space-x-3 mb-2"><Settings className="h-8 w-8 text-primary" /><CardTitle className="text-2xl md:text-3xl">School Specific Settings</CardTitle></div>
           <CardDescription>Configuring settings for: <span className="font-semibold text-foreground">{school.name}</span></CardDescription>
         </CardHeader>
+        {/* For conceptual client-side switches, we can't easily submit their state via a single server action form
+            without making this page a client component or using more complex patterns.
+            For now, the "Save Settings" button will be a general conceptual action.
+         */}
         <CardContent className="space-y-6">
           
           <section>
@@ -64,11 +70,11 @@ export default function SchoolSpecificSettingsPage({ params }: SchoolSpecificSet
             <div className="space-y-4 p-4 border rounded-md bg-muted/30">
               <div className="flex items-center justify-between">
                 <Label htmlFor="customLogoOverride" className="cursor-pointer flex-grow">Allow Custom Logo Override</Label>
-                <Switch id="customLogoOverride" defaultChecked={true} />
+                <Switch id="customLogoOverride" defaultChecked={true} name="customLogoOverride" />
               </div>
               <div className="flex items-center justify-between">
                 <Label htmlFor="customThemeOverride" className="cursor-pointer flex-grow">Allow Custom Theme Color Override</Label>
-                <Switch id="customThemeOverride" defaultChecked={false} />
+                <Switch id="customThemeOverride" defaultChecked={false} name="customThemeOverride" />
               </div>
             </div>
           </section>
@@ -81,11 +87,11 @@ export default function SchoolSpecificSettingsPage({ params }: SchoolSpecificSet
               <p className="text-sm text-muted-foreground">Toggle modules specifically for {school.name}. Overrides global settings if allowed by package.</p>
               <div className="flex items-center justify-between">
                 <Label htmlFor="moduleAdvancedReporting" className="cursor-pointer flex-grow">Enable Advanced Reporting</Label>
-                <Switch id="moduleAdvancedReporting" defaultChecked={school.package === "Premium Plus"} />
+                <Switch id="moduleAdvancedReporting" defaultChecked={school.package === "Premium Plus"} name="moduleAdvancedReporting" />
               </div>
               <div className="flex items-center justify-between">
                 <Label htmlFor="moduleExtendedSupport" className="cursor-pointer flex-grow">Enable Extended Support Package</Label>
-                <Switch id="moduleExtendedSupport" defaultChecked={school.package.includes("Plus")} />
+                <Switch id="moduleExtendedSupport" defaultChecked={school.package.includes("Plus")} name="moduleExtendedSupport"/>
               </div>
             </div>
           </section>
@@ -132,11 +138,14 @@ export default function SchoolSpecificSettingsPage({ params }: SchoolSpecificSet
            <Link href="/superadmin/dashboard?tab=school_management" passHref>
             <Button type="button" variant="outline"><ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard</Button>
           </Link>
-          <Button type="button" onClick={() => alert('Conceptual Save: Settings for ' + school.name + ' would be processed here.')} >
-            <Save className="mr-2 h-4 w-4" /> Save Settings (Conceptual)
-          </Button>
+          <form action={handleConceptualSettingsSave}>
+            <Button type="submit">
+              <Save className="mr-2 h-4 w-4" /> Save Settings (Conceptual)
+            </Button>
+          </form>
         </CardFooter>
       </Card>
     </div>
   );
 }
+

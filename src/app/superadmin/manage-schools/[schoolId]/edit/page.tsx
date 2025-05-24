@@ -7,8 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, FileEdit, Save } from 'lucide-react';
-import { sampleRegisteredSchools } from '@/lib/data'; // Import from central data file
-import type { SampleSchool } from '@/lib/types'; // Import SampleSchool type
+import { sampleRegisteredSchools } from '@/lib/data';
+import type { SampleSchool } from '@/lib/types';
 
 // Helper to get school data by ID from the mock array
 const getSchoolData = (id: string): SampleSchool | undefined => {
@@ -18,7 +18,6 @@ const getSchoolData = (id: string): SampleSchool | undefined => {
 
 export async function generateStaticParams() {
   if (!sampleRegisteredSchools) {
-    console.warn("generateStaticParams in edit page: sampleRegisteredSchools is not available. Returning empty array.");
     return [];
   }
   return sampleRegisteredSchools.map((school) => ({
@@ -26,13 +25,26 @@ export async function generateStaticParams() {
   }));
 }
 
-interface EditSchoolDetailsPageProps {
-  params: { schoolId: string };
-}
-
-export default function EditSchoolDetailsPage({ params }: EditSchoolDetailsPageProps) {
+export default function EditSchoolDetailsPage({ params }: { params: { schoolId: string } }) {
   const schoolId = params.schoolId;
   const school = getSchoolData(schoolId);
+
+  async function handleConceptualSave(formData: FormData) {
+    "use server";
+    const schoolName = formData.get('schoolName') as string;
+    const adminEmail = formData.get('adminEmail') as string;
+    // Add other form fields as needed
+    console.log(`Conceptual Save for school ID: ${schoolId}.`);
+    console.log({
+      schoolName,
+      adminEmail,
+      // Log other captured fields
+    });
+    // In a real app, update the database here
+    // For prototype, we can't directly show a client-side toast from a server action this simply.
+    // You might redirect or revalidate a path.
+    // For now, it just logs to the server console.
+  }
 
   if (!school) {
     return (
@@ -60,12 +72,7 @@ export default function EditSchoolDetailsPage({ params }: EditSchoolDetailsPageP
           </div>
           <CardDescription>Modifying details for: <span className="font-semibold text-foreground">{school.name}</span></CardDescription>
         </CardHeader>
-        <form action={async () => {
-          "use server";
-          // In a real app, this would be a server action or API call
-          console.log("Conceptual save action triggered for school:", school.id);
-          // Revalidate path or redirect as needed
-        }}>
+        <form action={handleConceptualSave}>
           <CardContent className="space-y-6">
             <div>
               <Label htmlFor="schoolName">School Name</Label>
@@ -131,7 +138,7 @@ export default function EditSchoolDetailsPage({ params }: EditSchoolDetailsPageP
             <Link href="/superadmin/dashboard?tab=school_management" passHref>
               <Button type="button" variant="outline"><ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard</Button>
             </Link>
-             <Button type="button" onClick={() => alert('Conceptual Save: Changes for ' + school.name + ' would be processed here. (No actual data saved in prototype)')}>
+             <Button type="submit">
               <Save className="mr-2 h-4 w-4" /> Save Changes (Conceptual)
             </Button>
           </CardFooter>
