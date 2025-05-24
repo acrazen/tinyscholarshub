@@ -5,8 +5,8 @@ import { redirect } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { ArrowLeft, Settings, ShieldCheck, Palette, Puzzle, CreditCard, Power, Save, Router } from 'lucide-react';
-import { sampleRegisteredSchools } from '@/lib/data'; // Import the mock data
 import type { SampleSchool } from '@/lib/types';
+import { sampleRegisteredSchools } from '@/lib/data'; // Import from the central data file
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Separator } from '@/components/ui/separator';
@@ -156,7 +156,7 @@ export default function SchoolSpecificSettingsPage({ params }: { params: { schoo
         <Separator />
 
         {/* Separate form for Account Status to have its own Server Action */}
-        <section className="p-6 pt-0">
+        <section className="p-6 pt-0"> {/* Adjusted padding to remove top padding here */}
             <h3 className="text-lg font-semibold mb-3 flex items-center"><Power className="mr-2 h-5 w-5 text-destructive" /> Account Status</h3>
             <div className="p-4 border rounded-md bg-muted/30">
               <p className="text-sm text-muted-foreground mb-3">Current status: <span className="font-bold">{school.status}</span>. Manage the operational status of {school.name}'s account.</p>

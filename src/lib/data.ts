@@ -1,5 +1,5 @@
 
-import type { Student, FeedPost, Guardian, Milestone, SchoolEvent, ResourceItem, UserProfile, Comment, CommentAuthor, ReportItem, ChildAward, SchoolAward, SampleSchool } from './types';
+import type { Student, FeedPost, Guardian, Milestone, SchoolEvent, ResourceItem, UserProfile, Comment, CommentAuthor, ReportItem, ChildAward, SchoolAward, Conversation, ChatMessage } from './types';
 import { FileText, Youtube, Link as LinkIcon, BookOpen, FileArchive, Trophy, Star } from 'lucide-react';
 
 const guardiansData: Guardian[] = [
@@ -169,7 +169,7 @@ export const feedPostsData: FeedPost[] = [
     author: { name: 'Caterpillars Class', avatarUrl: 'https://picsum.photos/seed/caterpillarsclass/50/50' },
     timestamp: '2024-07-19T12:00:00.000Z',
     type: 'video',
-    mediaUrl: 'https://picsum.photos/seed/singalong/600/400',
+    mediaUrl: 'https://picsum.photos/seed/singalong/600/400', // Placeholder video thumbnail
     dataAiHint: 'kids singing',
     description: 'Sing-along time! 🎶 Our Caterpillars are learning new songs and having so much fun with music and movement. #MusicTime #EarlyLearning Special thanks to @SarahDavis for the song suggestion!',
     likes: 30,
@@ -293,9 +293,9 @@ export const sampleResources: ResourceItem[] = [
 ];
 
 export const sampleUserProfile: UserProfile = {
-  id: 'userParent123', // Default parent user
+  id: 'userParent123', 
   name: 'Sarah Davis',
-  email: 'parent@example.com', // Updated for easier role check
+  email: 'parent@example.com', 
   phoneNumber: '555-123-4567',
   address: '123 Main Street, Anytown, USA 12345',
   profilePhotoUrl: 'https://picsum.photos/seed/currentUser/100/100',
@@ -303,11 +303,10 @@ export const sampleUserProfile: UserProfile = {
   role: 'Parent',
 };
 
-// Additional sample user profiles for role simulation
 export const sampleAdminProfile: UserProfile = {
   id: 'userAdmin456',
   name: 'Mr. Admin Principal',
-  email: 'schooladmin@example.com', // Updated for role check
+  email: 'schooladmin@example.com', 
   phoneNumber: '555-987-6543',
   profilePhotoUrl: 'https://picsum.photos/seed/adminUser/100/100',
   dataAiHint: 'admin avatar',
@@ -317,7 +316,7 @@ export const sampleAdminProfile: UserProfile = {
 export const sampleTeacherProfile: UserProfile = {
   id: 'userTeacher789',
   name: 'Ms. Emily Teacher',
-  email: 'teacher@example.com', // Updated for role check
+  email: 'teacher@example.com',
   phoneNumber: '555-555-5555',
   profilePhotoUrl: 'https://picsum.photos/seed/teacherUser/100/100',
   dataAiHint: 'teacher avatar',
@@ -327,7 +326,7 @@ export const sampleTeacherProfile: UserProfile = {
 export const sampleSuperAdminProfile: UserProfile = {
   id: 'userSuperAdmin001',
   name: 'Super User',
-  email: 'superadmin@example.com', // Updated for role check
+  email: 'superadmin@example.com', 
   phoneNumber: '555-000-0001',
   profilePhotoUrl: 'https://picsum.photos/seed/superadminUser/100/100',
   dataAiHint: 'superadmin avatar',
@@ -424,6 +423,15 @@ export const getSchoolAwardById = async (id: string): Promise<SchoolAward | unde
   return Promise.resolve(sampleSchoolAwards.find(award => award.id === id));
 };
 
+// sampleRegisteredSchools is now in /src/app/superadmin/dashboard/page.tsx
+// To keep data centralized, it's better here.
+// We'll re-export it from there if necessary for other superadmin pages.
+// For now, the dynamic school pages (edit/settings) directly import from dashboard/page.tsx
+// This can be revisited if that causes issues.
+// Actually, it's better practice to keep it here for potential reuse
+// and import it into dashboard page and other superadmin pages.
+
+// Centralized mock data for registered schools
 export const sampleRegisteredSchools: SampleSchool[] = [
   { id: 'school_bright_beginnings', name: 'Bright Beginnings Academy', subdomain: 'brightbeginnings', status: 'Active', adminEmail: 'admin@brightbeginnings.com', package: 'Premium Plus', studentLimit: 500, teacherLimit: 50, adminLimit: 5 },
   { id: 'school_little_explorers', name: 'Little Explorers Playschool', subdomain: 'littleexplorers', status: 'Active', adminEmail: 'contact@littleexplorers.org', package: 'Standard', studentLimit: 200, teacherLimit: 20, adminLimit: 2 },

@@ -7,8 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, FileEdit, Save } from 'lucide-react';
-import { sampleRegisteredSchools } from '@/lib/data';
 import type { SampleSchool } from '@/lib/types';
+import { sampleRegisteredSchools } from '@/lib/data'; // Import from the central data file
 
 // Helper to get school data by ID from the mock array
 const getSchoolData = (id: string): SampleSchool | undefined => {
