@@ -8,7 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea'; // For address
+import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -23,11 +23,8 @@ import Link from 'next/link';
 const initialSchoolModuleKeys: AppModuleKey[] = [
   'messaging', 'myLearning', 'portfolio', 'eventBooking', 'resources',
   'statementOfAccount', 'eService', 'settings', 'paymentGateway',
-  // Admin/Teacher specific modules might be configured differently or globally
-  // 'adminManageStudents', 'teacherSmartUpdate'
 ];
 
-// Dynamically create the Zod schema for defaultModules
 const defaultModulesSchemaObject = initialSchoolModuleKeys.reduce((acc, key) => {
   acc[key] = z.boolean();
   return acc;
@@ -35,37 +32,64 @@ const defaultModulesSchemaObject = initialSchoolModuleKeys.reduce((acc, key) => 
 
 const defaultModulesSchema = z.object(defaultModulesSchemaObject);
 
+const sampleTimezones = [
+  "Etc/GMT+12", // (GMT-12:00) International Date Line West
+  "Pacific/Midway", // (GMT-11:00) Midway Island, Samoa
+  "Pacific/Honolulu", // (GMT-10:00) Hawaii
+  "America/Anchorage", // (GMT-09:00) Alaska
+  "America/Los_Angeles", // (GMT-08:00) Pacific Time (US & Canada)
+  "America/Denver", // (GMT-07:00) Mountain Time (US & Canada)
+  "America/Chicago", // (GMT-06:00) Central Time (US & Canada)
+  "America/New_York", // (GMT-05:00) Eastern Time (US & Canada)
+  "America/Caracas", // (GMT-04:00) Caracas, La Paz
+  "America/Sao_Paulo", // (GMT-03:00) Brasilia
+  "Atlantic/South_Georgia", // (GMT-02:00) Mid-Atlantic
+  "Atlantic/Azores", // (GMT-01:00) Azores
+  "Etc/GMT", // (GMT+00:00) Greenwich Mean Time : Dublin, Edinburgh, Lisbon, London
+  "Europe/Berlin", // (GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna
+  "Europe/Athens", // (GMT+02:00) Athens, Bucharest, Istanbul
+  "Europe/Moscow", // (GMT+03:00) Moscow, St. Petersburg, Volgograd
+  "Asia/Dubai", // (GMT+04:00) Abu Dhabi, Muscat
+  "Asia/Karachi", // (GMT+05:00) Islamabad, Karachi, Tashkent
+  "Asia/Dhaka", // (GMT+05:30) Colombo
+  "Asia/Kolkata", // (GMT+05:30) Chennai, Kolkata, Mumbai, New Delhi
+  "Asia/Kathmandu", // (GMT+05:45) Kathmandu
+  "Asia/Almaty", // (GMT+06:00) Almaty, Novosibirsk
+  "Asia/Yangon", // (GMT+06:30) Yangon (Rangoon)
+  "Asia/Bangkok", // (GMT+07:00) Bangkok, Hanoi, Jakarta
+  "Asia/Shanghai", // (GMT+08:00) Beijing, Chongqing, Hong Kong, Urumqi
+  "Asia/Tokyo", // (GMT+09:00) Osaka, Sapporo, Tokyo
+  "Australia/Sydney", // (GMT+10:00) Canberra, Melbourne, Sydney
+  "Pacific/Auckland", // (GMT+12:00) Auckland, Wellington
+  "Pacific/Fiji", // (GMT+12:00) Fiji, Kamchatka, Marshall Is.
+];
+
+
 const registerSchoolSchema = z.object({
   schoolName: z.string().min(3, "School name must be at least 3 characters."),
   subdomain: z.string().min(3, "Subdomain must be at least 3 characters.").regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Subdomain can only contain lowercase letters, numbers, and hyphens."),
   adminEmail: z.string().email("Invalid email address for admin."),
   
-  // School Contact & Info
   schoolAddress: z.string().optional(),
   schoolPhoneNumber: z.string().optional(),
   schoolLogoUrl: z.string().url({ message: "Please enter a valid URL for the logo." }).optional().or(z.literal('')),
 
-  // Regional Settings
-  schoolTimeZone: z.string().optional(), // Example: "America/New_York", "Asia/Kolkata"
+  schoolTimeZone: z.string().min(1, "Timezone is required."),
   schoolCurrency: z.string().min(3, "Currency code should be 3 letters, e.g., USD, INR.").optional(),
 
-  // Academic Year (Conceptual)
-  academicYearStart: z.string().optional(), // Could be date string later
-  academicYearEnd: z.string().optional(),   // Could be date string later
+  academicYearStart: z.string().optional(),
+  academicYearEnd: z.string().optional(),
 
-  // Subscription & Package
   subscriptionModel: z.enum(["perStudentMonthly", "flatFeeMonthly", "tieredFeature", "customPackage"]),
   pricePerStudent: z.string().optional(), 
   flatFee: z.string().optional(),
   packageName: z.string().min(2, "Package name is required.").optional(),
 
-  // User & Resource Limits
   maxAdmins: z.coerce.number().min(1, "At least 1 admin required.").max(10),
   maxTeachers: z.coerce.number().min(1, "At least 1 teacher required.").max(100),
   maxClassTeachers: z.coerce.number().min(0).max(50),
   studentLimit: z.coerce.number().min(10, "Minimum 10 students.").max(10000),
 
-  // Default Modules for the new school
   defaultModules: defaultModulesSchema.optional(),
 });
 
@@ -73,15 +97,13 @@ type RegisterSchoolFormData = z.infer<typeof registerSchoolSchema>;
 
 export default function RegisterSchoolPage() {
   const { toast } = useToast();
-  const { currentUser, moduleSettings: globalModuleSettings } = useAppCustomization();
+  const { currentUser, moduleSettings: globalModuleSettings, appName: currentGlobalAppName, isLoadingAuth } = useAppCustomization();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Prepare default values for module switches
   const initialDefaultModules = initialSchoolModuleKeys.reduce((acc, key) => {
-    acc[key] = true; // Default all to true for a new school, can be adjusted
+    acc[key] = true; 
     return acc;
   }, {} as Record<AppModuleKey, boolean>);
-
 
   const form = useForm<RegisterSchoolFormData>({
     resolver: zodResolver(registerSchoolSchema),
@@ -92,8 +114,8 @@ export default function RegisterSchoolPage() {
       schoolAddress: '',
       schoolPhoneNumber: '',
       schoolLogoUrl: '',
-      schoolTimeZone: 'Asia/Kolkata', // Example default
-      schoolCurrency: 'INR',         // Example default
+      schoolTimeZone: 'Asia/Kolkata', 
+      schoolCurrency: 'INR',
       academicYearStart: '',
       academicYearEnd: '',
       subscriptionModel: 'perStudentMonthly',
@@ -121,8 +143,16 @@ export default function RegisterSchoolPage() {
       description: `Simulating registration for ${data.schoolName}. Backend integration required.`,
     });
     setIsSubmitting(false);
-    // form.reset(); // Optionally reset form
   };
+
+  if (isLoadingAuth) {
+    return (
+      <div className="flex justify-center items-center h-[60vh]">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        <p className="ml-3 text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
 
   if (currentUser?.role !== 'SuperAdmin' && currentUser?.role !== 'AppManager_Management') {
     return (
@@ -132,6 +162,11 @@ export default function RegisterSchoolPage() {
         <p className="text-muted-foreground">
           You do not have permission to view this page.
         </p>
+         <Link href="/superadmin/dashboard" passHref>
+            <Button variant="outline" className="mt-6">
+                <ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard
+            </Button>
+          </Link>
       </div>
     );
   }
@@ -179,7 +214,7 @@ export default function RegisterSchoolPage() {
                             <div className="flex items-center">
                                 <Input placeholder="e.g., littlestars" {...field} className="rounded-r-none" />
                                 <span className="px-3 py-2 text-sm bg-muted border border-l-0 border-input rounded-r-md text-muted-foreground">
-                                .{appName.toLowerCase().replace(/\s+/g, '')}.com 
+                                .{currentGlobalAppName.toLowerCase().replace(/\s+/g, '') || 'yourapp'}.com 
                                 </span>
                             </div>
                             </FormControl>
@@ -262,11 +297,20 @@ export default function RegisterSchoolPage() {
                         name="schoolTimeZone"
                         render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Timezone</FormLabel>
-                            <FormControl>
-                            <Input placeholder="E.g., Asia/Kolkata" {...field} />
-                            </FormControl>
-                            <FormDescription>IANA timezone identifier.</FormDescription>
+                            <FormLabel>Timezone *</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a timezone" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {sampleTimezones.map(tz => (
+                                    <SelectItem key={tz} value={tz}>{tz.replace(/_/g, ' ')}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                            </Select>
+                            <FormDescription>Select the school's primary timezone.</FormDescription>
                             <FormMessage />
                         </FormItem>
                         )}
@@ -455,12 +499,12 @@ export default function RegisterSchoolPage() {
                     <FormField
                       key={moduleKey}
                       control={form.control}
-                      name={`defaultModules.${moduleKey}` as any} // Type assertion for dynamic key
+                      name={`defaultModules.${moduleKey}` as any} 
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm bg-muted/30">
                           <div className="space-y-0.5">
                             <FormLabel className="text-sm capitalize">
-                              {moduleKey.replace(/([A-Z])/g, ' $1').trim()} {/* Prettify name */}
+                              {moduleKey.replace(/([A-Z])/g, ' $1').trim()}
                             </FormLabel>
                           </div>
                           <FormControl>
@@ -501,11 +545,3 @@ export default function RegisterSchoolPage() {
     </div>
   );
 }
-
-// Helper to get appName, in real app this might come from context or config
-// For now, just a placeholder value if appName from context is not available/needed for subdomain preview
-const appName = "yourapp"; 
-// This is just for the placeholder in the subdomain input, the actual appName for branding is from AppCustomizationContext
-// It might be better to dynamically get appName from useAppCustomization if this component needs to be fully self-contained
-// But for now, keeping it simple as this is a conceptual form.
-
