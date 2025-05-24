@@ -31,6 +31,8 @@ import {
   ExternalLink,
   Link as LinkIcon,
   List,
+  FileEdit,
+  Eye,
 } from 'lucide-react';
 import NextImage from 'next/image';
 import { useToast } from '@/hooks/use-toast';
@@ -58,6 +60,7 @@ import {
 import type { UserRole } from '@/lib/types';
 import Link from 'next/link';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from '@/components/ui/badge';
 
 const manageableModules: {
   key: AppModuleKey;
@@ -136,6 +139,23 @@ const allUserRolesForSimulation: UserRole[] = [
   'Subscriber',
 ];
 
+// Sample data for registered schools (conceptual)
+interface SampleSchool {
+  id: string;
+  name: string;
+  subdomain: string;
+  status: 'Active' | 'Pending' | 'Suspended';
+  adminEmail: string;
+  package: string;
+}
+
+const sampleRegisteredSchools: SampleSchool[] = [
+  { id: 'school1', name: 'Bright Beginnings Academy', subdomain: 'brightbeginnings', status: 'Active', adminEmail: 'admin@brightbeginnings.com', package: 'Premium Plus' },
+  { id: 'school2', name: 'Little Explorers Playschool', subdomain: 'littleexplorers', status: 'Active', adminEmail: 'contact@littleexplorers.org', package: 'Standard' },
+  { id: 'school3', name: 'Happy Hearts Kindergarten', subdomain: 'happyhearts', status: 'Pending', adminEmail: 'info@happyhearts.edu', package: 'Basic' },
+];
+
+
 export default function SuperAdminDashboardPage() {
   const {
     appName: currentAppName,
@@ -144,7 +164,7 @@ export default function SuperAdminDashboardPage() {
     secondaryColor: currentSecondaryColor,
     moduleSettings,
     currentUser,
-    isLoadingAuth, // Added isLoadingAuth
+    isLoadingAuth,
     tempSetUserRole,
     setAppName,
     setAppIconUrl,
@@ -457,7 +477,7 @@ export default function SuperAdminDashboardPage() {
                 </CardHeader>
                 <CardContent>
                    <p className="text-sm text-muted-foreground">
-                    This section would show aggregated financial data like total MRR, active subscriptions, payment statuses from schools, etc. 
+                    This section would show aggregated financial data like total MRR, active subscriptions, payment statuses from schools, etc.
                     Requires backend finance & subscription management integration.
                   </p>
                    <Link href="/app-manager/finance/dashboard" passHref>
@@ -570,41 +590,76 @@ export default function SuperAdminDashboardPage() {
 
         <TabsContent value="school_management">
           <div className="space-y-6">
+            <div className="flex justify-start mb-4">
+              <Link href="/superadmin/register-school" passHref>
+                <Button>
+                  <PlusCircle className="mr-2 h-4 w-4" /> Register New School
+                </Button>
+              </Link>
+            </div>
+            
+            <h3 className="text-xl font-semibold text-foreground mb-4">Registered Schools</h3>
+            {sampleRegisteredSchools.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {sampleRegisteredSchools.map((school) => (
+                        <Card key={school.id} className="shadow-md rounded-xl">
+                            <CardHeader>
+                                <CardTitle className="text-lg flex items-center justify-between">
+                                    {school.name}
+                                    <Badge 
+                                        variant={school.status === 'Active' ? 'default' : school.status === 'Pending' ? 'secondary' : 'destructive'}
+                                        className={school.status === 'Active' ? 'bg-green-500/20 text-green-700 border-green-400' : school.status === 'Pending' ? 'bg-yellow-500/20 text-yellow-700 border-yellow-400' : 'bg-red-500/20 text-red-700 border-red-400'}
+                                    >
+                                        {school.status}
+                                    </Badge>
+                                </CardTitle>
+                                <CardDescription>
+                                    Subdomain: <span className="font-medium text-primary">{school.subdomain}.{currentAppName.toLowerCase().replace(/\s+/g, '') || 'yourapp'}.com</span>
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-2 text-sm">
+                                <p>Admin: <span className="text-muted-foreground">{school.adminEmail}</span></p>
+                                <p>Package: <span className="text-muted-foreground">{school.package}</span></p>
+                            </CardContent>
+                            <CardFooter className="border-t pt-4 flex justify-end space-x-2">
+                                <Button variant="ghost" size="icon" onClick={() => toast({ title: 'Conceptual Action', description: `View/Edit details for ${school.name}.`})}>
+                                    <FileEdit className="h-4 w-4" />
+                                    <span className="sr-only">Edit Details</span>
+                                </Button>
+                                <Button variant="ghost" size="icon" onClick={() => toast({ title: 'Conceptual Action', description: `Open settings for ${school.name}.`})}>
+                                    <Settings className="h-4 w-4" />
+                                    <span className="sr-only">School Settings</span>
+                                </Button>
+                                <Button variant="ghost" size="icon" onClick={() => toast({ title: 'Conceptual Action', description: `Show quick info for ${school.name}.`})}>
+                                    <Eye className="h-4 w-4" />
+                                    <span className="sr-only">Quick View</span>
+                                </Button>
+                            </CardFooter>
+                        </Card>
+                    ))}
+                </div>
+            ) : (
+                <p className="text-muted-foreground">No schools registered yet.</p>
+            )}
+            <Separator className="my-8" />
             <Card className="shadow-lg rounded-xl">
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Building className="mr-2 h-5 w-5 text-primary" />
-                  Tenant / School Management
+                  Tenant Configuration Ideas
                 </CardTitle>
                 <CardDescription>
-                  Oversee school instances, subdomains, and package assignments.
+                  Conceptual features for managing individual school tenants.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <Link href="/superadmin/register-school" passHref>
-                  <Button className="w-full md:w-auto">
-                    <PlusCircle className="mr-2 h-4 w-4" /> Register New School
-                  </Button>
-                </Link>
-                <div className="mt-4 p-4 border rounded-lg bg-muted/30">
-                  <h4 className="font-semibold text-foreground mb-2 flex items-center">
-                     <List className="mr-2 h-5 w-5" /> Manage Existing Schools (Conceptual)
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    This section would list all registered schools. Each school entry would allow you to:
-                  </p>
-                  <ul className="list-disc list-inside text-sm text-muted-foreground pl-4 mt-2 space-y-1">
-                    <li>View detailed school information and configuration.</li>
-                    <li>Edit school settings (e.g., update admin contact, change assigned package).</li>
-                    <li>Manage subdomain and custom domain settings.</li>
-                    <li>View user limits and current usage (admins, teachers, students).</li>
-                    <li>Activate, suspend, or deactivate school accounts.</li>
-                    <li>Assign/update subscription packages and view billing history.</li>
-                  </ul>
-                   <Button variant="outline" className="mt-4" disabled>
-                        View All Schools (Conceptual)
-                    </Button>
-                </div>
+              <CardContent className="space-y-2 text-sm text-muted-foreground">
+                <p>- View detailed school information and current configuration.</p>
+                <p>- Edit school settings (e.g., update admin contact, change assigned package, logo).</p>
+                <p>- Manage custom domain and subdomain settings for the school.</p>
+                <p>- View user limits (admins, teachers, students) and current usage.</p>
+                <p>- Activate, suspend, or deactivate school accounts.</p>
+                <p>- Assign/update subscription packages and view billing history for the school.</p>
+                <p>- Enable/disable specific modules for this school (overriding global defaults).</p>
               </CardContent>
               <CardFooter className="border-t pt-4">
                 <p className="text-xs text-muted-foreground">
@@ -618,5 +673,4 @@ export default function SuperAdminDashboardPage() {
     </div>
   );
 }
-
     
