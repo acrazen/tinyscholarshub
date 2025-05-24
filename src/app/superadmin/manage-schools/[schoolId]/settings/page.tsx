@@ -1,40 +1,38 @@
 
 // src/app/superadmin/manage-schools/[schoolId]/settings/page.tsx
-"use client";
 
-import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { ArrowLeft, Settings } from 'lucide-react';
-import { sampleRegisteredSchools } from '@/app/superadmin/dashboard/page'; // Assuming it's exported or moved to data.ts
 
-// Required for static export with dynamic routes
+// Assuming sampleRegisteredSchools might be moved to a shared data file or fetched for generateStaticParams
+// For now, let's use a placeholder if direct import isn't feasible or causes issues.
+// In a real app, this would fetch IDs from your actual data source.
+const getSampleSchoolsForParams = () => [
+    { id: 'school_bright_beginnings', name: 'Bright Beginnings Academy' },
+    { id: 'school_little_explorers', name: 'Little Explorers Playschool' },
+    { id: 'school_happy_hearts', name: 'Happy Hearts Kindergarten' },
+    { id: 'school_creative_minds', name: 'Creative Minds Preschool' },
+    { id: 'school_sunshine_daycare', name: 'Sunshine Daycare & Learning' },
+];
+
 export async function generateStaticParams() {
- // This is a simplified version for the prototype.
-  // In a real app, you'd fetch IDs from your actual data source.
-  // If sampleRegisteredSchools is defined within the dashboard page, 
-  // you'd ideally move it to a shared data file to import here.
-  // For now, let's use a placeholder if we can't directly import.
-  const schools = sampleRegisteredSchools || [
-    { id: 'school_bright_beginnings' },
-    { id: 'school_little_explorers' },
-    { id: 'school_happy_hearts' },
-    { id: 'school_creative_minds' },
-    { id: 'school_sunshine_daycare' },
-  ];
+  const schools = getSampleSchoolsForParams();
   return schools.map((school) => ({
     schoolId: school.id,
   }));
 }
 
-export default function SchoolSpecificSettingsPage() {
-  const params = useParams();
-  const schoolId = params.schoolId as string;
-  const router = useRouter();
+interface SchoolSpecificSettingsPageProps {
+    params: { schoolId: string };
+}
 
+export default function SchoolSpecificSettingsPage({ params }: SchoolSpecificSettingsPageProps) {
+  const schoolId = params.schoolId;
   // In a real app, you would fetch school details based on schoolId here
-  const schoolName = schoolId.replace('school_', '').split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  const school = getSampleSchoolsForParams().find(s => s.id === schoolId);
+  const schoolName = school ? school.name : schoolId.replace('school_', '').split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -45,7 +43,7 @@ export default function SchoolSpecificSettingsPage() {
             <CardTitle className="text-2xl md:text-3xl">School Specific Settings</CardTitle>
           </div>
           <CardDescription>
-            Configuring settings for: <span className="font-semibold text-foreground">{schoolName || schoolId}</span>
+            Configuring settings for: <span className="font-semibold text-foreground">{schoolName}</span>
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -79,3 +77,4 @@ export default function SchoolSpecificSettingsPage() {
     </div>
   );
 }
+

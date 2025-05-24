@@ -27,7 +27,7 @@ import {
   Briefcase,
   Building,
   DollarSign,
-  Settings as SettingsIcon, // Renamed to avoid conflict
+  Settings as SettingsIcon,
   ExternalLink,
   Link as LinkIcon,
   List,
@@ -340,9 +340,9 @@ export default function SuperAdminDashboardPage() {
       </div>
 
       <Tabs defaultValue="platform_settings" className="w-full">
-        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 mb-6 rounded-lg shadow-sm bg-muted">
-          <TabsTrigger value="platform_settings" className="py-2.5 text-sm sm:text-base">Platform Settings</TabsTrigger>
-          <TabsTrigger value="school_management" className="py-2.5 text-sm sm:text-base">School Management</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 mb-6 rounded-lg shadow-sm bg-muted h-auto">
+          <TabsTrigger value="platform_settings" className="py-2.5 text-sm sm:text-base data-[state=active]:shadow-md data-[state=active]:bg-background data-[state=active]:rounded-md">Platform Settings</TabsTrigger>
+          <TabsTrigger value="school_management" className="py-2.5 text-sm sm:text-base data-[state=active]:shadow-md data-[state=active]:bg-background data-[state=active]:rounded-md">School Management</TabsTrigger>
         </TabsList>
 
         <TabsContent value="platform_settings">
@@ -750,3 +750,4 @@ export default function SuperAdminDashboardPage() {
     </div>
   );
 }
+
