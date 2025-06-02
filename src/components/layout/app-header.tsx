@@ -1,3 +1,4 @@
+
 // src/components/layout/app-header.tsx
 "use client";
 
@@ -42,6 +43,19 @@ const mainAppNavModuleMap: Record<AppModuleKey, { href: string; label: string; i
   adminManageStudents: null,
   teacherSmartUpdate: null,
   paymentGateway: null,
+  leadManagement: null,
+  admissionManagement: null,
+  recurringInvoices: null,
+  schoolAccounting: null,
+  inventoryManagement: null,
+  bulkCommunication: null,
+  employeeTimesheets: null,
+  timetableManagement: null,
+  attendanceManagement: null,
+  assignmentManagement: null,
+  customReporting: null,
+  certificateGeneration: null,
+  studentDocumentManagement: null,
 };
 
 
@@ -61,8 +75,10 @@ export function AppHeader() {
       case 'AppManager_Finance':
         return { href: '/app-manager/finance/dashboard', label: 'App Finance', icon: DollarSign };
       case 'AppManager_Sales':
-        return { href: '/app-manager/finance/dashboard', label: 'App Sales & Finance', icon: Users };
+        // Assuming Sales might share a dashboard or have their own, for now pointing to finance as an example
+        return { href: '/app-manager/finance/dashboard', label: 'App Sales', icon: Users };
       case 'AppManager_Support':
+        // Assuming Support might share management or have their own
         return { href: '/app-manager/management/dashboard', label: 'App Support', icon: AppSupportIcon };
       case 'SchoolAdmin':
         return { href: '/admin/dashboard', label: 'School Admin', icon: UserCog };
@@ -93,7 +109,7 @@ export function AppHeader() {
   };
 
   const isPlatformManagementUser = userRole && platformManagementRoles.includes(userRole);
-  const isTenantAppUser = userRole && !isPlatformManagementUser; // Any role that is not a platform management role
+  const isTenantAppUser = userRole && !isPlatformManagementUser;
 
   const dashboardLink = getDashboardLink(userRole);
 
@@ -145,7 +161,6 @@ export function AppHeader() {
                   {item.label}
                 </Link>
               ))}
-              {/* Specific dashboard link for tenant app admins/teachers if not covered by main nav */}
               {dashboardLink && (schoolSpecificAdminRoles.includes(userRole!) || teacherRoles.includes(userRole!)) && (
                 <Link
                   href={dashboardLink.href}
@@ -171,16 +186,22 @@ export function AppHeader() {
                     <Settings className="h-5 w-5" />
                  </Link>
               )}
-              <div className={cn("md:hidden", isTenantAppUser && "md:block")}>
-                  <Link href={(parentRoles.includes(userRole!) || !userRole) ? "/more/my-profile" : "/more/settings"} aria-label="My Profile or App Settings">
-                    <Avatar className="h-9 w-9 cursor-pointer border-2 border-transparent hover:border-primary transition-colors">
-                      <AvatarImage src={currentUser.user_metadata?.avatar_url || `https://picsum.photos/seed/${currentUser.id}/40/40`} alt={currentUser.user_metadata?.full_name || currentUser.email || "User"} data-ai-hint="user avatar" />
-                      <AvatarFallback className="bg-muted text-muted-foreground text-xs">
-                        {(currentUser.email ? currentUser.email.substring(0,1) : (currentUser.user_metadata?.full_name ? currentUser.user_metadata?.full_name.substring(0,1) : 'U')).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Link>
-              </div>
+              
+              {/* Avatar Link for Tenant App Users */}
+              {currentUser && isTenantAppUser && (
+                <Link 
+                  href={(userRole && parentRoles.includes(userRole)) || !userRole ? "/more/my-profile" : "/more/settings"} 
+                  aria-label="My Profile or App Settings"
+                >
+                  <Avatar className="h-9 w-9 cursor-pointer border-2 border-transparent hover:border-primary transition-colors">
+                    <AvatarImage src={currentUser.user_metadata?.avatar_url || `https://picsum.photos/seed/${currentUser.id}/40/40`} alt={currentUser.user_metadata?.full_name || currentUser.email || "User"} data-ai-hint="user avatar" />
+                    <AvatarFallback className="bg-muted text-muted-foreground text-xs">
+                      {(currentUser.email ? currentUser.email.substring(0,1) : (currentUser.user_metadata?.full_name ? currentUser.user_metadata?.full_name.substring(0,1) : 'U')).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                </Link>
+              )}
+
               <Button variant="outline" size="sm" onClick={handleLogout} className="flex">
                 <LogOut className="mr-1.5 h-4 w-4" /> Logout
               </Button>
