@@ -15,6 +15,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useToast } from '@/hooks/use-toast';
 import { LogIn, UserPlus, Loader2, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
+import type { UserRole } from '@/lib/types'; // Import UserRole if needed for typing
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
@@ -22,6 +23,37 @@ const formSchema = z.object({
 });
 
 type FormData = z.infer<typeof formSchema>;
+
+// Helper function to determine redirect path based on email
+const getRedirectPath = (email?: string | null): string => {
+  if (!email) return '/'; // Default for safety or if email is somehow null
+
+  switch (email) {
+    case 'superadmin@example.com':
+      return '/superadmin/dashboard';
+    case 'appmanager@example.com':
+      return '/app-manager/management/dashboard';
+    case 'appmanagerfinance@example.com':
+      return '/app-manager/finance/dashboard';
+    case 'appmanagersales@example.com':
+      return '/app-manager/finance/dashboard'; // Or specific sales dashboard if created
+    case 'appmanagersupport@example.com':
+      return '/app-manager/management/dashboard'; // Or specific support dashboard
+    case 'schooladmin@example.com':
+      return '/admin/dashboard';
+    case 'contenteditor@example.com':
+      return '/school-data-editor/dashboard';
+    case 'schoolfinance@example.com':
+      return '/school-finance-manager/dashboard';
+    case 'classteacher@example.com':
+    case 'teacher@example.com':
+      return '/teacher/dashboard';
+    case 'parent@example.com': // Explicitly Parent role
+    default: // Default for parents, subscribers, or any other role not specifically routed
+      return '/';
+  }
+};
+
 
 export default function AuthPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -61,32 +93,40 @@ export default function AuthPage() {
     );
   }
 
-  const onSubmit: SubmitHandler<FormData> = async (data) => {
+  const onSubmit: SubmitHandler<FormData> = async (formData) => {
     setIsLoading(true);
     try {
+      let userEmail: string | undefined | null = formData.email;
+
       if (isSignUp) {
         const { data: signUpData, error } = await supabase.auth.signUp({
-          email: data.email,
-          password: data.password,
+          email: formData.email,
+          password: formData.password,
         });
         if (error) throw error;
-        if (signUpData.user) {
-          toast({ title: "Sign Up Successful!", description: "Please check your email to confirm your account." });
-          router.push('/');
-        } else {
-           toast({ title: "Sign Up Almost Complete", description: "Please check your email to confirm your account." });
-           router.push('/');
-        }
+        
+        userEmail = signUpData.user?.email; // Get email from signup data
+        
+        toast({ title: "Sign Up Successful!", description: "Please check your email to confirm your account." });
+        // For sign-up, Supabase usually requires email confirmation.
+        // Redirecting to a generic page or success message might be better than direct dashboard access.
+        // However, for prototype purposes and immediate role testing, we'll redirect based on role.
+        // router.push('/'); // Or a page like /auth/confirm-email
 
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email: data.email,
-          password: data.password,
+      } else { // Sign In
+        const { data: signInData, error } = await supabase.auth.signInWithPassword({
+          email: formData.email,
+          password: formData.password,
         });
         if (error) throw error;
+        userEmail = signInData.user?.email; // Get email from signin data
         toast({ title: "Sign In Successful!", description: "Welcome back!" });
-        router.push('/');
       }
+      
+      // Determine redirect path based on user's email (which dictates their role in this prototype)
+      const redirectPath = getRedirectPath(userEmail);
+      router.push(redirectPath);
+
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -109,7 +149,7 @@ export default function AuthPage() {
             {isSignUp ? "Enter your details to get started." : "Sign in to access your account."}
           </CardDescription>
         </CardHeader>
-        <Form {...form}> {/* Ensure 'form' is correctly passed here */}
+        <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <CardContent className="space-y-6">
               <FormField
