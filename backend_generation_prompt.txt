@@ -1,0 +1,341 @@
+
+You are an expert backend AI developer tasked with creating a robust and scalable backend for a multi-tenant school management application (SaaS platform). The frontend is a Next.js PWA, and this backend will serve its data and logic needs.
+
+**Project Goal:** Build an Express.js backend using TypeScript, with Supabase as the primary database (PostgreSQL), authentication provider, and storage solution. The backend must implement role-based access control (RBAC) and support multi-tenancy where each "School" is a tenant.
+
+**Core Technologies:**
+1.  **Runtime/Framework:** Node.js with Express.js
+2.  **Language:** TypeScript (preferred, with strict typing)
+3.  **Database:** Supabase (PostgreSQL)
+4.  **Authentication:** Supabase Auth (for user sign-up, sign-in, JWT management)
+5.  **Storage:** Supabase Storage (for profile pictures, feed media, student documents, etc.)
+6.  **API Style:** RESTful
+
+**Key Architectural Requirements:**
+1.  **Multi-Tenancy:**
+    *   The application serves multiple schools (tenants).
+    *   Data must be strictly isolated between tenants (e.g., a user from School A cannot access data from School B unless explicitly permitted by a SuperAdmin role).
+    *   Most tables should have a `school_id` column to associate records with a specific tenant.
+2.  **Role-Based Access Control (RBAC):**
+    *   Implement a flexible RBAC system. User roles will be defined (see `User Roles` section below).
+    *   API endpoints must be protected, allowing access only to users with appropriate roles and, for tenant-specific data, only if they belong to the correct tenant.
+    *   SuperAdmin/AppManager roles will have platform-wide access capabilities.
+3.  **Modularity:** Structure the backend code logically (e.g., by feature: `routes/students.ts`, `controllers/studentController.ts`, `services/studentService.ts`).
+4.  **Error Handling:** Implement consistent and informative error responses (e.g., standard JSON error objects with appropriate HTTP status codes).
+5.  **Validation:** Implement input validation for all API requests (e.g., using a library like Zod or Joi).
+
+**User Roles (to be managed in conjunction with Supabase Auth):**
+*   `SuperAdmin`: Platform owner, full access to all tenants and platform settings.
+*   `AppManager_Management`: Manages tenant (school) creation, global module configurations.
+*   `AppManager_Sales`: Focus on sales aspects, potentially viewing aggregated tenant data.
+*   `AppManager_Finance`: Manages platform-level finances, client school subscriptions.
+*   `AppManager_Support`: Provides support, may need access to tenant data under specific conditions.
+*   `SchoolAdmin`: Administrator for a specific school, manages users, content, and settings within their school.
+*   `SchoolDataEditor`: Staff member who can edit general school information, announcements, resources.
+*   `SchoolFinanceManager`: Staff member managing school-specific finances (student fees, local invoicing).
+*   `ClassTeacher`: Teacher with specific classroom responsibilities.
+*   `Teacher`: General teacher role.
+*   `Parent`: Parent of a student.
+*   `Subscriber`: User with limited access (e.g., potential future students/parents).
+*   `Student_User` (Conceptual, less common for preschool but consider if students themselves might log in for certain features later).
+
+**Database Schema Design (Illustrative - expand as needed):**
+*   **`schools` (Tenants Table):**
+    *   `id` (UUID, primary key)
+    *   `name` (text, not null)
+    *   `subdomain` (text, unique, not null - for potential multi-tenant routing)
+    *   `admin_email` (text, not null - initial admin for the school)
+    *   `package` (text - e.g., 'Basic', 'Premium', 'Premium Plus')
+    *   `status` (text - e.g., 'Active', 'Pending', 'Suspended')
+    *   `student_limit` (integer)
+    *   `teacher_limit` (integer)
+    *   `admin_limit` (integer)
+    *   `branding_settings` (JSONB - e.g., { appName, appIconUrl, primaryColor, secondaryColor })
+    *   `module_settings` (JSONB - e.g., { messaging: true, portfolio: false, ... })
+    *   `timezone` (text)
+    *   `currency_code` (text, 3 chars)
+    *   `academic_year_start` (date)
+    *   `academic_year_end` (date)
+    *   `created_at`, `updated_at`
+*   **`users` (Leverage Supabase `auth.users` table):**
+    *   Supabase handles `id`, `email`, `password_hash`, `last_sign_in_at`, etc.
+*   **`user_profiles` (Extends Supabase users with app-specific data):**
+    *   `user_id` (UUID, foreign key to `auth.users.id`, primary key)
+    *   `school_id` (UUID, foreign key to `schools.id`, nullable for SuperAdmin/AppManager roles)
+    *   `role` (text, not null - one of the defined UserRoles)
+    *   `full_name` (text)
+    *   `phone_number` (text)
+    *   `address` (text)
+    *   `profile_photo_url` (text - URL from Supabase Storage)
+    *   `created_at`, `updated_at`
+*   **`students`:**
+    *   `id` (UUID, primary key)
+    *   `school_id` (UUID, foreign key to `schools.id`, not null)
+    *   `first_name` (text, not null)
+    *   `last_name` (text, not null)
+    *   `date_of_birth` (date)
+    *   `class_name` (text)
+    *   `profile_photo_url` (text - URL from Supabase Storage)
+    *   `allergies` (JSONB or text[])
+    *   `notes` (text)
+    *   `created_at`, `updated_at`
+*   **`guardians`:**
+    *   `id` (UUID, primary key)
+    *   `student_id` (UUID, foreign key to `students.id`, not null)
+    *   `name` (text, not null)
+    *   `relation` (text)
+    *   `phone_number` (text)
+    *   `email` (text)
+    *   `profile_photo_url` (text)
+    *   `created_at`, `updated_at`
+*   **`milestones`:**
+    *   `id` (UUID, primary key)
+    *   `student_id` (UUID, foreign key to `students.id`, not null)
+    *   `date` (date)
+    *   `title` (text)
+    *   `description` (text)
+    *   `achieved` (boolean)
+    *   `category` (text - 'Academic', 'Social', etc.)
+    *   `created_at`, `updated_at`
+*   **`attendance_records`:**
+    *   `id` (UUID, primary key)
+    *   `student_id` (UUID, foreign key to `students.id`, not null)
+    *   `date` (date, not null)
+    *   `status` (text - 'Present', 'Absent', 'Late', not null)
+    *   `notes` (text)
+    *   `recorded_by_user_id` (UUID, foreign key to `auth.users.id`)
+    *   `created_at`, `updated_at`
+*   **`reports` (Student Reports):**
+    *   `id` (UUID, primary key)
+    *   `student_id` (UUID, foreign key to `students.id`, not null)
+    *   `title` (text)
+    *   `term_name` (text)
+    *   `year` (integer)
+    *   `type` (text - 'folio', 'pdf')
+    *   `file_url` (text - URL from Supabase Storage)
+    *   `uploaded_by_user_id` (UUID, foreign key to `auth.users.id`)
+    *   `created_at`, `updated_at`
+*   **`child_awards`:**
+    *   `id` (UUID, primary key)
+    *   `student_id` (UUID, foreign key to `students.id`, not null)
+    *   `title` (text)
+    *   `description` (text)
+    *   `date_awarded` (date)
+    *   `category` (text)
+    *   `awarded_by_user_id` (UUID, foreign key to `auth.users.id`)
+    *   `created_at`, `updated_at`
+*   **`feed_posts`:**
+    *   `id` (UUID, primary key)
+    *   `school_id` (UUID, foreign key to `schools.id`, not null)
+    *   `author_user_id` (UUID, foreign key to `auth.users.id`, not null)
+    *   `type` (text - 'photo', 'video', 'text')
+    *   `media_url` (text - URL from Supabase Storage, nullable)
+    *   `description` (text)
+    *   `created_at`, `updated_at`
+*   **`comments`:**
+    *   `id` (UUID, primary key)
+    *   `post_id` (UUID, foreign key to `feed_posts.id`, not null)
+    *   `author_user_id` (UUID, foreign key to `auth.users.id`, not null)
+    *   `text` (text)
+    *   `created_at`, `updated_at`
+*   **`likes` (Polymorphic or separate tables for post_likes, comment_likes):**
+    *   `id` (UUID, primary key)
+    *   `user_id` (UUID, foreign key to `auth.users.id`, not null)
+    *   `target_type` (text - 'post', 'comment')
+    *   `target_id` (UUID, not null)
+    *   `created_at`
+    *   (Unique constraint on `user_id`, `target_type`, `target_id`)
+*   **`school_events`:**
+    *   `id` (UUID, primary key)
+    *   `school_id` (UUID, foreign key to `schools.id`, not null)
+    *   `title` (text)
+    *   `date` (timestamp with timezone)
+    *   `time_details` (text - e.g., "09:00 AM - 01:00 PM")
+    *   `location` (text)
+    *   `description` (text)
+    *   `status` (text - 'upcoming', 'past', 'cancelled')
+    *   `created_by_user_id` (UUID, foreign key to `auth.users.id`)
+    *   `created_at`, `updated_at`
+*   **`event_bookings`:**
+    *   `id` (UUID, primary key)
+    *   `event_id` (UUID, foreign key to `school_events.id`, not null)
+    *   `user_id` (UUID, foreign key to `auth.users.id`, not null)
+    *   `status` (text - 'confirmed', 'cancelled')
+    *   `created_at`, `updated_at`
+*   **`resources`:**
+    *   `id` (UUID, primary key)
+    *   `school_id` (UUID, foreign key to `schools.id`, not null)
+    *   `title` (text)
+    *   `description` (text)
+    *   `type` (text - 'pdf', 'article', 'video', 'link')
+    *   `url_or_file_path` (text - URL or path in Supabase Storage)
+    *   `category` (text)
+    *   `uploaded_by_user_id` (UUID, foreign key to `auth.users.id`)
+    *   `created_at`, `updated_at`
+*   **`school_awards` (Awards received by the school itself):**
+    *   `id` (UUID, primary key)
+    *   `school_id` (UUID, foreign key to `schools.id`, not null)
+    *   `title` (text)
+    *   `awarding_body` (text)
+    *   `year` (text or integer)
+    *   `description` (text)
+    *   `icon_name` (text, optional)
+    *   `image_url` (text, optional - URL from Supabase Storage)
+    *   `created_at`, `updated_at`
+*   **`conversations` (for 1-to-1 or group chat):**
+    *   `id` (UUID, primary key)
+    *   `school_id` (UUID, foreign key to `schools.id`, not null)
+    *   `created_at`, `updated_at`
+*   **`conversation_participants`:**
+    *   `conversation_id` (UUID, foreign key to `conversations.id`)
+    *   `user_id` (UUID, foreign key to `auth.users.id`)
+    *   `joined_at`
+    *   (Primary key on `conversation_id`, `user_id`)
+*   **`chat_messages`:**
+    *   `id` (UUID, primary key)
+    *   `conversation_id` (UUID, foreign key to `conversations.id`, not null)
+    *   `sender_user_id` (UUID, foreign key to `auth.users.id`, not null)
+    *   `text_content` (text)
+    *   `media_url` (text, nullable - for images/files in chat)
+    *   `sent_at` (timestamp with timezone, default now())
+    *   `read_at` (timestamp with timezone, nullable)
+*   **Tables for New Modules (High-Level):**
+    *   `leads` (`school_id`, contact_info, status, follow_up_notes, assigned_to_user_id)
+    *   `admissions` (`school_id`, student_info, application_data, status, documents_jsonb)
+    *   `fee_structures` (`school_id`, name, details_jsonb)
+    *   `student_fees` (`school_id`, `student_id`, fee_structure_id, amount_due, amount_paid, due_date, status)
+    *   `invoices` (`school_id`, `student_id` or `parent_user_id`, items_jsonb, total_amount, due_date, status, is_recurring, recurrence_pattern)
+    *   `transactions` (`school_id`, related_to (invoice/fee), amount, type (payment/refund), method, status, transaction_id_gateway)
+    *   `accounting_entries` (`school_id`, date, description, debit_account_id, credit_account_id, amount) // Simplified chart of accounts needed
+    *   `inventory_items` (`school_id`, name, category, quantity, reorder_level)
+    *   `bulk_communications_log` (`school_id`, type (sms/email), recipients_count, content, sent_at, status)
+    *   `employee_timesheets` (`school_id`, `user_id` (staff), date, hours_worked, status)
+    *   `timetables` (`school_id`, class_name, day_of_week, period, subject, teacher_user_id)
+    *   `assignments` (`school_id`, `class_name` or `teacher_user_id`, title, description, due_date, file_url)
+    *   `student_assignments` (`assignment_id`, `student_id`, submission_url, grade, feedback)
+    *   `custom_reports_definitions` (`school_id`, name, query_logic_or_config_jsonb)
+    *   `certificates` (`school_id`, `student_id`, title, issue_date, file_url)
+    *   `student_documents` (`school_id`, `student_id`, document_name, file_url, category, uploaded_by_user_id)
+
+**API Endpoints (Illustrative - prefix with `/api/v1`):**
+*   **Auth (handled by Supabase client, but backend might need user profile endpoint):**
+    *   `POST /auth/signup` (Supabase)
+    *   `POST /auth/login` (Supabase)
+    *   `GET /users/me` (Get current logged-in user's profile from `user_profiles`)
+    *   `PUT /users/me` (Update current user's profile)
+*   **SuperAdmin/AppManager Endpoints:**
+    *   `POST /platform/schools` (Create new school tenant)
+    *   `GET /platform/schools` (List all schools)
+    *   `GET /platform/schools/:schoolId` (Get specific school details)
+    *   `PUT /platform/schools/:schoolId` (Update school details, package, limits, branding, modules)
+    *   `GET /platform/users` (List all users across platform - SuperAdmin only)
+*   **School-Specific Admin Endpoints (e.g., `/schools/:schoolId/...` - `schoolId` often derived from authed user's profile):**
+    *   `GET /schools/my/students` (List students for the admin's school)
+    *   `POST /schools/my/students` (Add new student)
+    *   `GET /schools/my/students/:studentId`
+    *   `PUT /schools/my/students/:studentId`
+    *   `DELETE /schools/my/students/:studentId`
+    *   (Similar CRUD for staff, classes, etc.)
+*   **Teacher Endpoints:**
+    *   `GET /schools/my/classes/:classId/students`
+    *   `POST /schools/my/classes/:classId/attendance`
+    *   `POST /ai/generate-daily-update` (This specific one might call Genkit/Vertex AI)
+*   **Parent Endpoints:**
+    *   `GET /schools/my/children/:studentId/portfolio`
+    *   `GET /schools/my/feed`
+*   **General Endpoints (accessible by multiple roles with appropriate permissions):**
+    *   Feed: `GET /feed`, `POST /feed`, `POST /feed/:postId/comments`, `POST /feed/:postId/like`
+    *   Events: `GET /events`, `POST /events/:eventId/book`
+    *   Resources: `GET /resources`
+    *   Messaging: `GET /conversations`, `GET /conversations/:convoId/messages`, `POST /conversations/:convoId/messages`
+*   **Endpoints for New Modules:**
+    *   `/leads`, `/admissions`, `/fees`, `/invoices`, `/accounting`, `/inventory`, `/communications/bulk`, `/timesheets`, `/timetables`, `/attendance`, `/assignments`, `/reports/custom`, `/certificates`, `/documents/student` (each with relevant GET, POST, PUT, DELETE methods and sub-routes).
+
+**Supabase Specifics:**
+1.  **Authentication:**
+    *   Express middleware to verify JWTs from `Authorization: Bearer <token>` header. Use `supabase.auth.getUser(token)` to validate and get user details.
+    *   User roles should be stored in your `user_profiles` table and fetched after validating the JWT.
+2.  **Database Interactions:** Use the Supabase JavaScript client (`@supabase/supabase-js`) for all database queries.
+3.  **Storage:**
+    *   For file uploads (profile photos, feed media, documents), the frontend will typically request a signed URL from the backend.
+    *   The backend generates a signed URL using `supabase.storage.from('bucket-name').createSignedUploadUrl(filePath)` with appropriate permissions.
+    *   Frontend uploads directly to Supabase Storage using this URL.
+    *   The file path/URL is then saved in the relevant database record.
+4.  **Row Level Security (RLS):** Implement RLS policies in Supabase for an additional layer of data security, especially for multi-tenancy. Express RBAC is the primary gate, RLS is a defense-in-depth.
+
+**File Upload Flow Example (e.g., Student Profile Photo):**
+1.  Frontend: User selects a photo.
+2.  Frontend: `POST /api/v1/students/:studentId/upload-photo-url` (sends file metadata like name, type).
+3.  Backend:
+    *   Authorizes the request (e.g., is this user allowed to update this student's photo?).
+    *   Generates a unique file path (e.g., `school_uploads/<school_id>/students/<student_id>/profile_photos/<uuid>.<extension>`).
+    *   Uses `supabase.storage.from('student-assets').createSignedUploadUrl(filePath)` to get a signed URL.
+    *   Responds with the signed URL and the file path.
+4.  Frontend: Uploads the file directly to Supabase Storage using the signed URL.
+5.  Frontend: On successful upload, `PUT /api/v1/students/:studentId` with the `profile_photo_url` set to the public URL of the uploaded file (obtained via `supabase.storage.from('student-assets').getPublicUrl(filePath).data.publicUrl`).
+
+**Backend Authorization Logic Example (Middleware):**
+```typescript
+// Example middleware (simplified)
+import { Request, Response, NextFunction } from 'express';
+import { supabase } from './supabaseClient'; // Your initialized Supabase client
+
+export async function authenticateToken(req: Request, res: Response, next: NextFunction) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if (token == null) return res.sendStatus(401);
+
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+    if (error || !user) return res.sendStatus(403); // Forbidden
+
+    // Fetch user profile with role and school_id
+    const { data: profile, error: profileError } = await supabase
+        .from('user_profiles')
+        .select('role, school_id')
+        .eq('user_id', user.id)
+        .single();
+
+    if (profileError || !profile) return res.sendStatus(403);
+
+    (req as any).user = { ...user, role: profile.role, school_id: profile.school_id }; // Attach user object to request
+    next();
+}
+
+export function authorizeRoles(...allowedRoles: UserRole[]) {
+    return (req: Request, res: Response, next: NextFunction) => {
+        const userRole = (req as any).user?.role;
+        if (!userRole || !allowedRoles.includes(userRole)) {
+            return res.sendStatus(403); // Forbidden
+        }
+        next();
+    };
+}
+
+// Tenant check middleware example (simplified)
+export function checkTenantAccess(paramNameForSchoolId = 'schoolId') {
+    return (req: Request, res: Response, next: NextFunction) => {
+        const userSchoolId = (req as any).user?.school_id;
+        const requestedSchoolId = req.params[paramNameForSchoolId];
+
+        // Allow SuperAdmin/AppManager to bypass tenant check if needed for specific routes
+        const userRole = (req as any).user?.role;
+        if (userRole === 'SuperAdmin' || userRole?.startsWith('AppManager_')) {
+             return next();
+        }
+
+        if (requestedSchoolId && userSchoolId !== requestedSchoolId) {
+            return res.status(403).json({ message: "Forbidden: Access to this school's data is not allowed." });
+        }
+        next();
+    };
+}
+```
+
+**Setup Instructions:**
+*   Initialize a Node.js project with Express and TypeScript.
+*   Install necessary dependencies: `express`, `cors`, `dotenv`, `@supabase/supabase-js`, `typescript`, `@types/express`, `@types/node`, `ts-node-dev` (for development).
+*   Set up Supabase project and get URL and Anon Key. Store these in `.env` file.
+*   Create database tables in Supabase based on the schema.
+
+This prompt should provide a solid foundation for an AI to generate the described backend. Good luck!
+    
