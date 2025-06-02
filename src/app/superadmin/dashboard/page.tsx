@@ -70,12 +70,12 @@ import {
   isHexColorString,
   hexToHsl,
 } from '@/lib/color-utils';
-import type { UserRole, SampleSchool } from '@/lib/types'; // Import SampleSchool
+import type { UserRole, SampleSchool } from '@/lib/types';
 import Link from 'next/link';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { sampleRegisteredSchools } from '@/lib/data'; // Import from central data file
+import { sampleRegisteredSchools } from '@/lib/data';
 
 const manageableModules: {
   key: AppModuleKey;
@@ -92,7 +92,20 @@ const manageableModules: {
   { key: 'settings', label: 'Settings Page Access', description: 'Enable/disable user access to settings.' },
   { key: 'adminManageStudents', label: 'School Admin: Manage Students', description: 'Student management for School Admins.' },
   { key: 'teacherSmartUpdate', label: 'Teacher: Smart Update', description: 'AI update generator for Teachers.' },
-  { key: 'paymentGateway', label: 'Payment Gateway', description: 'Enable/disable payment gateway features for schools.' },
+  { key: 'paymentGateway', label: 'Payment Gateway', description: 'Enable/disable payment gateway features.' },
+  { key: 'leadManagement', label: 'Lead Management', description: 'CRM for school leads.' },
+  { key: 'admissionManagement', label: 'Admission Management', description: 'Manage student admissions.' },
+  { key: 'recurringInvoices', label: 'Recurring Invoices', description: 'Automated invoicing for fees.' },
+  { key: 'schoolAccounting', label: 'School Accounting', description: 'Basic accounting features for schools.' },
+  { key: 'inventoryManagement', label: 'Inventory Management', description: 'Track school supplies and assets.' },
+  { key: 'bulkCommunication', label: 'Bulk Communication', description: 'Bulk SMS/Email facility.' },
+  { key: 'employeeTimesheets', label: 'Employee Timesheets', description: 'Manage staff work hours.' },
+  { key: 'timetableManagement', label: 'Timetable Management', description: 'Create and view class schedules.' },
+  { key: 'attendanceManagement', label: 'Attendance Management', description: 'Track student/staff attendance.' },
+  { key: 'assignmentManagement', label: 'Assignment Management', description: 'Manage homework and assignments.' },
+  { key: 'customReporting', label: 'Custom Reporting', description: 'Generate custom school reports.' },
+  { key: 'certificateGeneration', label: 'Certificate Generation', description: 'Create student certificates.' },
+  { key: 'studentDocumentManagement', label: 'Student Document Management', description: 'Manage student documents.' },
 ];
 
 const allUserRolesForSimulation: UserRole[] = [

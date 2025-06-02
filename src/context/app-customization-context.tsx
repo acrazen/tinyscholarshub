@@ -20,7 +20,21 @@ export type AppModuleKey =
   | 'settings'
   | 'adminManageStudents' // SchoolAdmin feature
   | 'teacherSmartUpdate'  // Teacher feature
-  | 'paymentGateway';     // New module for payments
+  | 'paymentGateway'
+  // New modules based on feature list:
+  | 'leadManagement'
+  | 'admissionManagement'
+  | 'recurringInvoices'
+  | 'schoolAccounting'
+  | 'inventoryManagement'
+  | 'bulkCommunication'
+  | 'employeeTimesheets'
+  | 'timetableManagement'
+  | 'attendanceManagement'
+  | 'assignmentManagement'
+  | 'customReporting'
+  | 'certificateGeneration'
+  | 'studentDocumentManagement';
 
 export type ModuleSettings = Record<AppModuleKey, boolean>;
 
@@ -42,6 +56,20 @@ const defaultModuleSettings: ModuleSettings = {
   adminManageStudents: true,
   teacherSmartUpdate: true,
   paymentGateway: true,
+  // New modules defaulted to true for current development focus
+  leadManagement: true,
+  admissionManagement: true,
+  recurringInvoices: true,
+  schoolAccounting: true,
+  inventoryManagement: true,
+  bulkCommunication: true,
+  employeeTimesheets: true,
+  timetableManagement: true,
+  attendanceManagement: true,
+  assignmentManagement: true,
+  customReporting: true,
+  certificateGeneration: true,
+  studentDocumentManagement: true,
 };
 
 interface AppCustomizationContextType {
@@ -271,5 +299,3 @@ export function useAppCustomization() {
   }
   return context;
 }
-
-    
