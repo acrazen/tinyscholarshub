@@ -76,18 +76,20 @@ export default function TeacherDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg rounded-xl opacity-50 cursor-not-allowed">
+        <Card className="shadow-lg rounded-xl hover:shadow-xl transition-shadow">
           <CardHeader>
             <CardTitle className="flex items-center text-xl">
-              <ClipboardList className="mr-2 h-5 w-5 text-muted-foreground"/>
+              <ClipboardList className="mr-2 h-5 w-5 text-primary"/>
               Assignments
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              Create and manage homework or assignments. (Coming Soon)
+              Create and manage homework or assignments.
             </p>
-            <Button className="w-full" disabled>Manage Assignments</Button>
+            <Link href="/teacher/assignments" passHref>
+              <Button className="w-full">Manage Assignments</Button>
+            </Link>
           </CardContent>
         </Card>
         

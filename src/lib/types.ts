@@ -203,3 +203,27 @@ export interface SampleSchool {
   teacherLimit: number;
   adminLimit: number;
 }
+
+// Assignment Management
+export interface Assignment {
+  id: string;
+  title: string;
+  description: string;
+  dueDate: string; // ISO date string (YYYY-MM-DD)
+  className: string; // e.g., "Butterflies", "Caterpillars"
+  teacherId: string; // ID of the teacher who created it (conceptual)
+  fileUrl?: string; // Optional URL for an attached file
+  createdAt: string; // ISO date string
+}
+
+export interface StudentAssignmentSubmission {
+  id: string;
+  assignmentId: string;
+  studentId: string;
+  submissionDate: string; // ISO date string
+  textSubmission?: string;
+  fileUrl?: string;
+  grade?: string; // e.g., "A+", "Satisfactory", "85/100"
+  teacherFeedback?: string;
+  status: 'Pending' | 'Submitted' | 'Graded' | 'Late';
+}

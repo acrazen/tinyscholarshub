@@ -1,5 +1,5 @@
 
-import type { Student, FeedPost, Guardian, Milestone, SchoolEvent, ResourceItem, UserProfile, Comment, CommentAuthor, ReportItem, ChildAward, SchoolAward, Conversation, ChatMessage } from './types';
+import type { Student, FeedPost, Guardian, Milestone, SchoolEvent, ResourceItem, UserProfile, Comment, CommentAuthor, ReportItem, ChildAward, SchoolAward, Conversation, ChatMessage, Assignment, SampleSchool } from './types';
 import { FileText, Youtube, Link as LinkIcon, BookOpen, FileArchive, Trophy, Star } from 'lucide-react';
 
 const guardiansData: Guardian[] = [
@@ -423,15 +423,6 @@ export const getSchoolAwardById = async (id: string): Promise<SchoolAward | unde
   return Promise.resolve(sampleSchoolAwards.find(award => award.id === id));
 };
 
-// sampleRegisteredSchools is now in /src/app/superadmin/dashboard/page.tsx
-// To keep data centralized, it's better here.
-// We'll re-export it from there if necessary for other superadmin pages.
-// For now, the dynamic school pages (edit/settings) directly import from dashboard/page.tsx
-// This can be revisited if that causes issues.
-// Actually, it's better practice to keep it here for potential reuse
-// and import it into dashboard page and other superadmin pages.
-
-// Centralized mock data for registered schools
 export const sampleRegisteredSchools: SampleSchool[] = [
   { id: 'school_bright_beginnings', name: 'Bright Beginnings Academy', subdomain: 'brightbeginnings', status: 'Active', adminEmail: 'admin@brightbeginnings.com', package: 'Premium Plus', studentLimit: 500, teacherLimit: 50, adminLimit: 5 },
   { id: 'school_little_explorers', name: 'Little Explorers Playschool', subdomain: 'littleexplorers', status: 'Active', adminEmail: 'contact@littleexplorers.org', package: 'Standard', studentLimit: 200, teacherLimit: 20, adminLimit: 2 },
@@ -439,3 +430,5 @@ export const sampleRegisteredSchools: SampleSchool[] = [
   { id: 'school_creative_minds', name: 'Creative Minds Preschool', subdomain: 'creativeminds', status: 'Active', adminEmail: 'director@creativeminds.com', package: 'Premium', studentLimit: 300, teacherLimit: 30, adminLimit: 3 },
   { id: 'school_sunshine_daycare', name: 'Sunshine Daycare & Learning', subdomain: 'sunshine', status: 'Suspended', adminEmail: 'manager@sunshine.net', package: 'Basic', studentLimit: 150, teacherLimit: 15, adminLimit: 2 },
 ];
+
+export const sampleAssignments: Assignment[] = [];
