@@ -11,6 +11,7 @@ import type { Assignment } from '@/lib/types';
  */
 export const getAssignments = async (): Promise<Assignment[]> => {
   // In a real app, you'd fetch from a database.
+  // Sort by creation date, newest first for display
   return Promise.resolve([...sampleAssignments].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
 };
 

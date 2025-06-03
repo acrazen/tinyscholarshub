@@ -5,7 +5,7 @@ import type { Assignment } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, CalendarDays, Edit, Trash2, ClipboardList, Users, UploadCloud } from 'lucide-react';
+import { ArrowLeft, CalendarDays, Edit, Trash2, ClipboardList, Users, UploadCloud, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { Separator } from '@/components/ui/separator';
@@ -14,17 +14,8 @@ interface AssignmentDetailPageProps {
   params: { assignmentId: string };
 }
 
-// Required for static export with dynamic routes
-// For now, since assignments are created dynamically, we won't pre-render specific assignment IDs.
-// If you had a fixed set of assignments or wanted to pre-render some, you would populate this.
-// export async function generateStaticParams() {
-//   const assignments = await getAssignments(); // Assuming getAssignments can be called at build time
-//   return assignments.map((assignment) => ({
-//     assignmentId: assignment.id,
-//   }));
-// }
 // For dynamic segment without pre-rendering:
-export const dynamic = 'force-dynamic'; // Or 'auto' if some could be pre-rendered
+export const dynamic = 'force-dynamic'; 
 
 export default async function AssignmentDetailPage({ params }: AssignmentDetailPageProps) {
   const assignment = await getAssignmentById(params.assignmentId);
@@ -84,10 +75,13 @@ export default async function AssignmentDetailPage({ params }: AssignmentDetailP
               <Separator className="my-4" />
               <h3 className="text-lg font-semibold mb-2">Attached File</h3>
               <Button variant="outline" asChild size="sm">
-                <a href={assignment.fileUrl} target="_blank" rel="noopener noreferrer">
-                  <UploadCloud className="mr-2 h-4 w-4" /> Download Attachment
+                <a href={assignment.fileUrl} target="_blank" rel="noopener noreferrer" download={assignment.fileName || 'assignment-file'}>
+                  <FileText className="mr-2 h-4 w-4" /> {assignment.fileName || 'Download Attachment'}
                 </a>
               </Button>
+               <p className="text-xs text-muted-foreground mt-1">
+                Note: This is a conceptual download. The file URL is temporary if created via local file selection.
+              </p>
             </>
           )}
         </CardContent>

@@ -15,16 +15,28 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, FilePlus, ArrowLeft } from 'lucide-react';
+import { Loader2, FilePlus, ArrowLeft, Paperclip } from 'lucide-react';
 import Link from 'next/link';
 
-// Teacher ID is conceptual for now, not part of the form for simplicity.
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const ACCEPTED_FILE_TYPES = ["application/pdf", "image/jpeg", "image/png", "image/gif"];
+
 const assignmentFormSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters.").max(100, "Title is too long."),
   description: z.string().min(10, "Description must be at least 10 characters.").max(1000, "Description is too long."),
   dueDate: z.string().refine((date) => !isNaN(Date.parse(date)), { message: "Invalid date format." }),
   className: z.enum(["Butterflies", "Caterpillars"], { required_error: "Please select a class." }),
-  // fileUrl: z.string().url().optional(), // For future file uploads
+  attachment: z
+    .custom<FileList>()
+    .optional()
+    .refine(
+      (files) => !files || files.length === 0 || files[0].size <= MAX_FILE_SIZE,
+      `Max file size is 5MB.`
+    )
+    .refine(
+      (files) => !files || files.length === 0 || ACCEPTED_FILE_TYPES.includes(files[0].type),
+      "Only .pdf, .jpg, .png, .gif files are accepted."
+    ),
 });
 
 type AssignmentFormData = z.infer<typeof assignmentFormSchema>;
@@ -33,6 +45,7 @@ export default function CreateAssignmentPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [fileName, setFileName] = useState<string | null>(null);
 
   const form = useForm<AssignmentFormData>({
     resolver: zodResolver(assignmentFormSchema),
@@ -40,15 +53,48 @@ export default function CreateAssignmentPage() {
       title: '',
       description: '',
       dueDate: '',
-      className: undefined, // Default to undefined so placeholder shows
+      className: undefined,
+      attachment: undefined,
     },
   });
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      setFileName(files[0].name);
+      form.setValue('attachment', files); // Update RHF state
+    } else {
+      setFileName(null);
+      form.setValue('attachment', undefined);
+    }
+  };
 
   const onSubmit: SubmitHandler<AssignmentFormData> = async (data) => {
     setIsSubmitting(true);
     try {
-      // In a real app, teacherId would come from the authenticated user session
-      const assignmentData = { ...data, teacherId: 'teacher-placeholder-id' };
+      let fileUrl: string | undefined = undefined;
+      let attachmentName: string | undefined = undefined;
+
+      if (data.attachment && data.attachment.length > 0) {
+        const file = data.attachment[0];
+        // Simulate file upload: In a real app, upload to cloud storage and get URL
+        // For conceptual frontend, we can use a blob URL for local preview if needed,
+        // or just use the filename as a placeholder.
+        fileUrl = URL.createObjectURL(file); // This URL is temporary and local to the browser session
+        attachmentName = file.name;
+        console.log("Simulating file upload for:", file.name, "Conceptual URL:", fileUrl);
+      }
+
+      const assignmentData = {
+        title: data.title,
+        description: data.description,
+        dueDate: data.dueDate,
+        className: data.className,
+        teacherId: 'teacher-placeholder-id', // In a real app, from authenticated user
+        fileUrl: fileUrl,
+        fileName: attachmentName,
+      };
+
       await createAssignment(assignmentData);
       toast({
         title: "Assignment Created!",
@@ -124,7 +170,6 @@ export default function CreateAssignmentPage() {
                         <SelectContent>
                           <SelectItem value="Butterflies">Butterflies</SelectItem>
                           <SelectItem value="Caterpillars">Caterpillars</SelectItem>
-                          {/* Add more classes if needed */}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -132,7 +177,36 @@ export default function CreateAssignmentPage() {
                   )}
                 />
               </div>
-              {/* Future file upload field can go here */}
+              <FormField
+                control={form.control}
+                name="attachment"
+                render={() => ( // field is not directly used in render for file input with RHF
+                  <FormItem>
+                    <FormLabel>Attachment (Optional)</FormLabel>
+                    <FormControl>
+                      <div className="flex items-center space-x-2">
+                        <label
+                          htmlFor="file-upload"
+                          className="flex items-center px-4 py-2 bg-secondary text-secondary-foreground rounded-md cursor-pointer hover:bg-secondary/80 transition-colors text-sm"
+                        >
+                          <Paperclip className="mr-2 h-4 w-4" />
+                          Choose File
+                        </label>
+                        <Input
+                          id="file-upload"
+                          type="file"
+                          className="hidden"
+                          onChange={handleFileChange}
+                          accept=".pdf,.jpg,.jpeg,.png,.gif"
+                        />
+                        {fileName && <span className="text-sm text-muted-foreground truncate max-w-[200px]">{fileName}</span>}
+                      </div>
+                    </FormControl>
+                    <FormDescription>Max 5MB. PDF, JPG, PNG, GIF accepted.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </CardContent>
             <CardFooter className="flex justify-between border-t pt-6">
               <Link href="/teacher/assignments" passHref>

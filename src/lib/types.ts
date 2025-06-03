@@ -213,6 +213,7 @@ export interface Assignment {
   className: string; // e.g., "Butterflies", "Caterpillars"
   teacherId: string; // ID of the teacher who created it (conceptual)
   fileUrl?: string; // Optional URL for an attached file
+  fileName?: string; // Optional name for the attached file
   createdAt: string; // ISO date string
 }
 
