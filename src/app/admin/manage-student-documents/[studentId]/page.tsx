@@ -78,6 +78,7 @@ export default function ManageSpecificStudentDocumentsPage() {
         } catch (error) {
           console.error("Failed to fetch student:", error);
           toast({ title: "Error", description: "Could not load student data.", variant: "destructive" });
+          setStudent(null); // Set to null on error
         }
         setIsLoadingStudent(false);
       };
@@ -103,21 +104,22 @@ export default function ManageSpecificStudentDocumentsPage() {
   }, [studentId, toast]);
 
   const onUploadSubmit: SubmitHandler<DocumentUploadFormData> = async (data) => {
+    if (!studentId) return;
     setIsUploading(true);
     try {
       const file = data.attachment[0];
-      const fileUrl = URL.createObjectURL(file); // Conceptual URL
+      const fileUrl = URL.createObjectURL(file); 
 
       const newDocData = {
         documentName: data.documentName,
         category: data.category,
-        fileUrl: fileUrl, // Conceptual
+        fileUrl: fileUrl, 
         fileName: file.name,
         dataAiHint: file.type.startsWith('image/') ? 'student document image' : 'student document file'
       };
 
       const newDocument = await addStudentDocument(studentId, newDocData);
-      setDocuments(prevDocs => [newDocument, ...prevDocs]); // Add to start for immediate visibility
+      setDocuments(prevDocs => [newDocument, ...prevDocs]); 
 
       toast({
         title: "Document Uploaded (Simulated)",
@@ -125,7 +127,7 @@ export default function ManageSpecificStudentDocumentsPage() {
       });
       form.reset();
       if (fileInputRef.current) {
-        fileInputRef.current.value = ""; // Clear file input
+        fileInputRef.current.value = ""; 
       }
     } catch (error) {
       console.error("Upload failed:", error);
@@ -135,7 +137,6 @@ export default function ManageSpecificStudentDocumentsPage() {
   };
   
   const handleConceptualDelete = (docId: string, docName: string) => {
-    // In a real app, call a service: await deleteStudentDocument(docId);
     setDocuments(prevDocs => prevDocs.filter(doc => doc.id !== docId));
     toast({
       title: "Document Deleted (Simulated)",
@@ -227,15 +228,16 @@ export default function ManageSpecificStudentDocumentsPage() {
               <FormField
                 control={form.control}
                 name="attachment"
-                render={({ field }) => ( // Unpack field to avoid passing ref directly to native input if not needed
+                render={({ field: { onChange, ...rest } }) => ( 
                   <FormItem>
                     <FormLabel>File *</FormLabel>
                     <FormControl>
                       <Input
                         type="file"
                         ref={fileInputRef}
-                        onChange={(e) => field.onChange(e.target.files)}
+                        onChange={(e) => onChange(e.target.files)}
                         accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                        {...rest}
                       />
                     </FormControl>
                     <FormDescription>PDF, JPG, PNG, DOC, DOCX. Max 10MB.</FormDescription>
@@ -296,12 +298,4 @@ export default function ManageSpecificStudentDocumentsPage() {
       </Card>
     </div>
   );
-}
-
-export async function generateStaticParams() {
-  // In a real app, fetch student IDs. For now, using mock data.
-  const { studentsData } = await import('@/lib/data'); 
-  return studentsData.map((student) => ({
-    studentId: student.id,
-  }));
 }

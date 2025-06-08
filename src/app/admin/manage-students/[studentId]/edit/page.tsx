@@ -1,3 +1,4 @@
+
 // src/app/admin/manage-students/[studentId]/edit/page.tsx
 "use client";
 
@@ -6,7 +7,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { getStudentById } from '@/lib/services/studentService';
+import { getStudentById, getAllStudents } from '@/lib/services/studentService';
 import type { Student } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,34 +18,25 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Save, UserCog, ArrowLeft, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
-import { getAllStudents } from '@/lib/services/studentService'; // For generateStaticParams
 
 // Form schema
 const studentFormSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters."),
   lastName: z.string().min(2, "Last name must be at least 2 characters."),
   className: z.string().min(1, "Class name is required."),
-  allergies: z.string().optional().transform(val => val ? val.split(',').map(s => s.trim()).filter(Boolean) : []), // Transform comma-separated string to array
+  allergies: z.string().optional().transform(val => val ? val.split(',').map(s => s.trim()).filter(Boolean) : []), 
   notes: z.string().optional(),
+  // profilePhotoUrl: z.string().url({ message: "Please enter a valid URL." }).optional().or(z.literal('')),
 });
 
 type StudentFormData = z.infer<typeof studentFormSchema>;
-
-// Required for static export with dynamic routes
-export async function generateStaticParams() {
-  const students = await getAllStudents();
-  return students.map((student) => ({
-    studentId: student.id,
-  }));
-}
-
 
 export default function EditStudentPage() {
   const router = useRouter();
   const params = useParams();
   const studentId = params.studentId as string;
   const { toast } = useToast();
-  const [student, setStudent] = useState<Student | null | undefined>(undefined); // undefined for loading, null for not found
+  const [student, setStudent] = useState<Student | null | undefined>(undefined); 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -56,6 +48,7 @@ export default function EditStudentPage() {
       className: '',
       allergies: [],
       notes: '',
+      // profilePhotoUrl: '',
     },
   });
 
@@ -73,11 +66,13 @@ export default function EditStudentPage() {
               className: fetchedStudent.className,
               allergies: fetchedStudent.allergies || [],
               notes: fetchedStudent.notes || '',
+              // profilePhotoUrl: fetchedStudent.profilePhotoUrl || '',
             });
           }
         } catch (error) {
           console.error("Failed to fetch student:", error);
           toast({ title: "Error", description: "Could not load student data.", variant: "destructive" });
+          setStudent(null); // Set to null if not found or error
         }
         setIsLoading(false);
       };
@@ -89,15 +84,25 @@ export default function EditStudentPage() {
     setIsSaving(true);
     console.log("Simulating save for student:", studentId, data);
     // In a real app, you'd call an updateStudent service here
-    // e.g., await updateStudent(studentId, data);
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
+    // e.g., await updateStudent(studentId, { ...student, ...data }); 
+    // Ensure you merge correctly if only partial data is sent to the update service.
+    // For this prototype, we assume the service updates the mock data source.
+    
+    // Mock update to studentsData (if you want changes to reflect in list immediately)
+    // This is a client-side simulation of backend update.
+    // const studentIndex = studentsData.findIndex(s => s.id === studentId);
+    // if (studentIndex !== -1 && student) {
+    //   studentsData[studentIndex] = { ...student, ...data, allergies: data.allergies || [] };
+    // }
+
+    await new Promise(resolve => setTimeout(resolve, 1000)); 
     
     toast({
       title: "Student Updated (Simulated)",
       description: `${data.firstName} ${data.lastName}'s profile has been updated.`,
     });
     setIsSaving(false);
-    router.push('/admin/manage-students'); // Navigate back to the list
+    router.push('/admin/manage-students'); 
   };
 
   if (isLoading) {
@@ -109,7 +114,7 @@ export default function EditStudentPage() {
     );
   }
 
-  if (student === null) { // Explicitly null means not found
+  if (student === null) { 
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] text-center p-4">
         <AlertTriangle className="w-16 h-16 text-destructive mb-4" />
@@ -125,7 +130,7 @@ export default function EditStudentPage() {
     );
   }
   
-  if (!student) return null; // Handles the case where student is undefined (initial state or error)
+  if (!student) return null;
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -188,7 +193,12 @@ export default function EditStudentPage() {
                   <FormItem>
                     <FormLabel>Allergies (comma-separated)</FormLabel>
                     <FormControl>
-                       <Input placeholder="e.g., Peanuts, Dairy" {...field} value={Array.isArray(field.value) ? field.value.join(', ') : ''} />
+                       <Input 
+                         placeholder="e.g., Peanuts, Dairy" 
+                         {...field} 
+                         value={Array.isArray(field.value) ? field.value.join(', ') : field.value || ''}
+                         onChange={e => field.onChange(e.target.value)} // Ensure RHF updates with the string value
+                       />
                     </FormControl>
                     <FormDescription>
                       List allergies separated by commas.
@@ -210,6 +220,19 @@ export default function EditStudentPage() {
                   </FormItem>
                 )}
               />
+                {/* <FormField
+                  control={form.control}
+                  name="profilePhotoUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Profile Photo URL</FormLabel>
+                      <FormControl>
+                        <Input type="url" placeholder="https://example.com/photo.jpg" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                /> */}
             </CardContent>
             <CardFooter className="flex justify-between border-t pt-6">
               <Link href="/admin/manage-students" passHref>
