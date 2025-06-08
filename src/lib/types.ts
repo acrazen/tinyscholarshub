@@ -69,6 +69,18 @@ export interface ChildAward {
   category: 'Academic' | 'Sports' | 'Arts' | 'Citizenship' | 'Effort';
 }
 
+export interface StudentDocument {
+  id: string;
+  studentId: string;
+  documentName: string;
+  fileUrl: string; // Conceptual URL or path to the document
+  fileName?: string; // Display name for the file
+  category: 'Consent Form' | 'Medical Record' | 'Previous Report' | 'Identification' | 'Other';
+  uploadDate: string; // ISO date string
+  uploadedByUserId?: string; // ID of the user who uploaded it (conceptual)
+  dataAiHint?: string;
+}
+
 export interface Student {
   id: string;
   firstName: string;
@@ -89,6 +101,7 @@ export interface Student {
   milestones: Milestone[];
   reports?: ReportItem[];
   childAwards?: ChildAward[];
+  studentDocuments?: StudentDocument[];
 }
 
 export interface CommentAuthor {

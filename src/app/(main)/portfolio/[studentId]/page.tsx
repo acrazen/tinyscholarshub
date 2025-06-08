@@ -1,12 +1,14 @@
+
 // src/app/(main)/portfolio/[studentId]/page.tsx
 import { getStudentById } from '@/lib/services/studentService';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Activity, FileText as ReportIcon, AlertTriangle, ArrowLeft } from 'lucide-react';
+import { Activity, FileText as ReportIcon, FolderClosed as DocumentsIcon, AlertTriangle, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { MilestonesCard } from '@/components/performance/milestones-card';
 import { ReportsTabContent } from '@/components/portfolio/reports-tab-content';
+import { DocumentsTabContent } from '@/components/portfolio/documents-tab-content'; // New import
 
 interface PortfolioDetailPageProps {
   params: { studentId: string };
@@ -48,12 +50,27 @@ export default async function PortfolioDetailPage({ params }: PortfolioDetailPag
       </div>
       
       <Tabs defaultValue="reports" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-6 rounded-lg shadow-sm bg-muted">
-          <TabsTrigger value="activities" className="py-3 text-base data-[state=active]:shadow-md data-[state=active]:bg-background">
-            <Activity className="mr-2 h-5 w-5" /> Activities
+        <TabsList className="grid w-full grid-cols-3 mb-6 rounded-lg shadow-sm bg-muted h-auto">
+          <TabsTrigger 
+            value="activities" 
+            className="py-2.5 sm:py-3 text-sm sm:text-base data-[state=active]:shadow-md data-[state=active]:bg-background data-[state=active]:rounded-md"
+          >
+            <Activity className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+            <span>Activities</span>
           </TabsTrigger>
-          <TabsTrigger value="reports" className="py-3 text-base data-[state=active]:shadow-md data-[state=active]:bg-background">
-            <ReportIcon className="mr-2 h-5 w-5" /> Reports
+          <TabsTrigger 
+            value="reports" 
+            className="py-2.5 sm:py-3 text-sm sm:text-base data-[state=active]:shadow-md data-[state=active]:bg-background data-[state=active]:rounded-md"
+          >
+            <ReportIcon className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+            <span>Reports</span>
+          </TabsTrigger>
+           <TabsTrigger 
+            value="documents" 
+            className="py-2.5 sm:py-3 text-sm sm:text-base data-[state=active]:shadow-md data-[state=active]:bg-background data-[state=active]:rounded-md"
+          >
+            <DocumentsIcon className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+            <span>Documents</span>
           </TabsTrigger>
         </TabsList>
 
@@ -65,13 +82,16 @@ export default async function PortfolioDetailPage({ params }: PortfolioDetailPag
         <TabsContent value="reports">
           <ReportsTabContent student={student} />
         </TabsContent>
+         <TabsContent value="documents">
+          <DocumentsTabContent student={student} />
+        </TabsContent>
       </Tabs>
 
        <div className="mt-8 text-center">
-        <Link href="/portfolio"> 
+        <Link href="/admin/manage-students"> 
           <Button variant="outline">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Portfolio Overview
+            Back to Student List (Admin)
           </Button>
         </Link>
       </div>

@@ -180,18 +180,20 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg rounded-xl opacity-50 cursor-not-allowed">
+        <Card className="shadow-lg rounded-xl hover:shadow-xl transition-shadow">
           <CardHeader>
             <CardTitle className="flex items-center text-xl">
-              <FileUp className="mr-2 h-5 w-5 text-muted-foreground" />
-              Student Docs (Coming Soon)
+              <FileUp className="mr-2 h-5 w-5 text-primary" />
+              Student Documents
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
               Upload and manage important student documents.
             </p>
-            <Button className="w-full" disabled>Manage Documents</Button>
+             <Link href="/admin/manage-student-documents" passHref>
+                <Button className="w-full">Manage Documents</Button>
+            </Link>
           </CardContent>
         </Card>
         

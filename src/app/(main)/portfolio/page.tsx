@@ -1,14 +1,16 @@
+
 // src/app/(main)/portfolio/page.tsx
 // This page will now directly show the detailed portfolio for a default student
 
 import { getStudentById, getAllStudents } from '@/lib/services/studentService';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Activity, FileText as ReportIcon, AlertTriangle, ArrowLeft } from 'lucide-react';
+import { Activity, FileText as ReportIcon, FolderClosed as DocumentsIcon, AlertTriangle, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { MilestonesCard } from '@/components/performance/milestones-card';
 import { ReportsTabContent } from '@/components/portfolio/reports-tab-content';
+import { DocumentsTabContent } from '@/components/portfolio/documents-tab-content'; // New import
 
 export default async function PortfolioPage() {
   // For this page, we'll display the portfolio of the first student as a default.
@@ -50,7 +52,7 @@ export default async function PortfolioPage() {
       </div>
       
       <Tabs defaultValue="reports" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-4 rounded-lg shadow-sm bg-muted h-auto">
+        <TabsList className="grid w-full grid-cols-3 mb-4 rounded-lg shadow-sm bg-muted h-auto">
           <TabsTrigger 
             value="activities" 
             className="py-2.5 sm:py-3 text-sm sm:text-base data-[state=active]:shadow-md data-[state=active]:bg-background data-[state=active]:rounded-md"
@@ -65,6 +67,13 @@ export default async function PortfolioPage() {
             <ReportIcon className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
             <span>Reports</span>
           </TabsTrigger>
+          <TabsTrigger 
+            value="documents" 
+            className="py-2.5 sm:py-3 text-sm sm:text-base data-[state=active]:shadow-md data-[state=active]:bg-background data-[state=active]:rounded-md"
+          >
+            <DocumentsIcon className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+            <span>Documents</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="activities">
@@ -72,6 +81,9 @@ export default async function PortfolioPage() {
         </TabsContent>
         <TabsContent value="reports">
           <ReportsTabContent student={student} />
+        </TabsContent>
+        <TabsContent value="documents">
+          <DocumentsTabContent student={student} />
         </TabsContent>
       </Tabs>
     </div>

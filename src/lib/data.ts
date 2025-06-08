@@ -1,5 +1,5 @@
 
-import type { Student, FeedPost, Guardian, Milestone, SchoolEvent, ResourceItem, UserProfile, Comment, CommentAuthor, ReportItem, ChildAward, SchoolAward, Conversation, ChatMessage, Assignment, SampleSchool } from './types';
+import type { Student, FeedPost, Guardian, Milestone, SchoolEvent, ResourceItem, UserProfile, Comment, CommentAuthor, ReportItem, ChildAward, SchoolAward, Conversation, ChatMessage, Assignment, SampleSchool, StudentDocument } from './types';
 import { FileText, Youtube, Link as LinkIcon, BookOpen, FileArchive, Trophy, Star } from 'lucide-react';
 
 const guardiansData: Guardian[] = [
@@ -39,6 +39,13 @@ const sampleChildAwardsMia: ChildAward[] = [
     { id: 'ca4', title: 'Math Whiz', description: 'Excellent performance in number recognition and counting.', dateAwarded: '2024-05-01', category: 'Academic' },
 ];
 
+export const sampleStudentDocuments: StudentDocument[] = [
+  { id: 'doc1-s1', studentId: 's1', documentName: 'Leo - Consent Form Field Trip.pdf', fileUrl: '#consent-leo', fileName: 'Leo - Consent Form Field Trip.pdf', category: 'Consent Form', uploadDate: '2024-03-01', uploadedByUserId: 'adminUser456', dataAiHint: 'form document' },
+  { id: 'doc2-s1', studentId: 's1', documentName: 'Leo - Immunization Record.pdf', fileUrl: '#immunization-leo', fileName: 'Leo - Immunization Record.pdf', category: 'Medical Record', uploadDate: '2024-02-15', dataAiHint: 'medical record' },
+  { id: 'doc1-s2', studentId: 's2', documentName: 'Mia - Birth Certificate.jpg', fileUrl: '#birthcert-mia', fileName: 'Mia - Birth Certificate.jpg', category: 'Identification', uploadDate: '2024-01-20', dataAiHint: 'certificate id' },
+  { id: 'doc2-s2', studentId: 's2', documentName: 'Mia - Previous School Report.pdf', fileUrl: '#prevreport-mia', fileName: 'Mia - Previous School Report.pdf', category: 'Previous Report', uploadDate: '2024-01-20', dataAiHint: 'report document' },
+];
+
 
 export const studentsData: Student[] = [
   {
@@ -63,6 +70,7 @@ export const studentsData: Student[] = [
     milestones: [milestonesData[0], milestonesData[1], milestonesData[2]],
     reports: sampleReportsLeo,
     childAwards: sampleChildAwardsLeo,
+    studentDocuments: sampleStudentDocuments.filter(doc => doc.studentId === 's1'),
   },
   {
     id: 's2',
@@ -85,6 +93,7 @@ export const studentsData: Student[] = [
     milestones: [milestonesData[3], milestonesData[4]],
     reports: sampleReportsMia,
     childAwards: sampleChildAwardsMia,
+    studentDocuments: sampleStudentDocuments.filter(doc => doc.studentId === 's2'),
   },
   {
     id: 's3',
@@ -107,6 +116,7 @@ export const studentsData: Student[] = [
     milestones: [],
     reports: [],
     childAwards: [],
+    studentDocuments: [],
   },
    {
     id: 's4',
@@ -122,6 +132,7 @@ export const studentsData: Student[] = [
     milestones: [milestonesData[0]],
     reports: [],
     childAwards: [],
+    studentDocuments: [],
   },
 ];
 
