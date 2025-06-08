@@ -7,7 +7,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { getStudentById } from '@/lib/services/studentService';
+import { getStudentById, getAllStudents } from '@/lib/services/studentService'; // Ensure getAllStudents is imported
 import { getStudentDocuments, addStudentDocument } from '@/lib/services/documentService';
 import type { Student, StudentDocument } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -45,6 +45,14 @@ const documentUploadSchema = z.object({
 });
 
 type DocumentUploadFormData = z.infer<typeof documentUploadSchema>;
+
+// Required for static export with dynamic routes
+export async function generateStaticParams() {
+  const students = await getAllStudents();
+  return students.map((student) => ({
+    studentId: student.id,
+  }));
+}
 
 export default function ManageSpecificStudentDocumentsPage() {
   const router = useRouter();

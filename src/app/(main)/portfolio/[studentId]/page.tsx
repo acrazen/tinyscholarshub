@@ -1,6 +1,6 @@
 
 // src/app/(main)/portfolio/[studentId]/page.tsx
-import { getStudentById } from '@/lib/services/studentService';
+import { getStudentById, getAllStudents } from '@/lib/services/studentService'; // Updated import
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Activity, FileText as ReportIcon, FolderClosed as DocumentsIcon, AlertTriangle, ArrowLeft } from 'lucide-react';
@@ -12,6 +12,14 @@ import { DocumentsTabContent } from '@/components/portfolio/documents-tab-conten
 
 interface PortfolioDetailPageProps {
   params: { studentId: string };
+}
+
+// Required for static export with dynamic routes
+export async function generateStaticParams() {
+  const students = await getAllStudents(); // Use service to fetch students
+  return students.map((student) => ({
+    studentId: student.id,
+  }));
 }
 
 export default async function PortfolioDetailPage({ params }: PortfolioDetailPageProps) {

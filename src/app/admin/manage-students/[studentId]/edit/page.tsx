@@ -7,7 +7,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { getStudentById, getAllStudents } from '@/lib/services/studentService';
+import { getStudentById, getAllStudents } from '@/lib/services/studentService'; // Ensure getAllStudents is imported
 import type { Student } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,6 +30,14 @@ const studentFormSchema = z.object({
 });
 
 type StudentFormData = z.infer<typeof studentFormSchema>;
+
+// Required for static export with dynamic routes
+export async function generateStaticParams() {
+  const students = await getAllStudents();
+  return students.map((student) => ({
+    studentId: student.id,
+  }));
+}
 
 export default function EditStudentPage() {
   const router = useRouter();
